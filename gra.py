@@ -15,14 +15,14 @@ points_counter = -1
 font = pygame.font.Font(None, 36)
 
 # tlo z obrazka
-background = pygame.image.load('tlo.jpg')
+background = pygame.image.load('textures/tlo.jpg')
 background = pygame.transform.scale(background, window.get_size())
 
 # tworzenie player1
 x = 100
 y = 100
 player1_texture = pygame.transform.scale(
-    pygame.image.load('player.png'), (50, 50))
+    pygame.image.load('textures/player.png'), (50, 50))
 player1_rect = player1_texture.get_rect()
 player1_rect.x = x
 player1_rect.y = y
@@ -31,20 +31,20 @@ player1_rect.y = y
 treeWidth = 70
 treeHeight = 100
 tree_texture = pygame.transform.scale(
-    pygame.image.load('drzewo.png'), (treeWidth, treeHeight))
+    pygame.image.load('textures/drzewo.png'), (treeWidth, treeHeight))
 tree_rect = tree_texture.get_rect
 
 stoneWidth = 50
 stoneHeight = 50
 stone_texture = pygame.transform.scale(
-    pygame.image.load('kamien.png'), (stoneWidth, stoneHeight))
+    pygame.image.load('textures/kamien.png'), (stoneWidth, stoneHeight))
 stone_rect = stone_texture.get_rect
 
 
 goldWidth = 20
 goldHeight = 20
 gold_texture = pygame.transform.scale(
-    pygame.image.load('gold.png'), (goldWidth, goldHeight))
+    pygame.image.load('textures/gold.png'), (goldWidth, goldHeight))
 gold_rect = gold_texture.get_rect
 # szablon przeszkody
 
@@ -194,7 +194,7 @@ while run:
     player1_rect = pygame.rect.Rect(x, y, 50, 50)
     # wczytanie klatki
     points_text = font.render(
-        f'Punkty : {points_counter}', True, (255, 255, 255))
+        f'Punkty: {points_counter}', True, (255, 255, 255))
     window.blit(points_text, (10, 10))
 
     pygame.display.update()
