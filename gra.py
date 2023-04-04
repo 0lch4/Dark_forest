@@ -175,8 +175,15 @@ while run:
     y += yy
 
     for i in borders_list:
-        if player1_rect.colliderect(i.rect):
-            pass
+        if player1_rect.colliderect(i):
+            if i == borders_list[0]:
+                y = i.rect.top + 5
+            elif i == borders_list[1]:
+                y = i.rect.bottom - 55
+            elif i == borders_list[2]:
+                x = i.rect.left + 5
+            elif i == borders_list[3]:
+                x = i.rect.right - 55
 
     for i in gold_list:
         if player1_rect.colliderect(i.rect):
