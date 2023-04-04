@@ -43,6 +43,39 @@ gold_texture = pygame.transform.scale(
 gold_rect = gold_texture.get_rect
 
 
+class Board:
+    def __init__(self, x, y, width, height):
+        self.rect = pygame.Rect(x, y, width, height)
+
+    def draw(self, surface):
+        surface.blit(self.rect)
+
+
+def boards():
+    boards_list = []
+
+    def down():
+        down = Board(1, 1, 1920, 1)
+        boards_list.append(down)
+
+    def up():
+        up = Board(1, 1080, 1920, 1)
+        boards_list.append(up)
+
+    def left():
+        left = Board(1, 1, 1, 1080)
+        boards_list.append(left)
+
+    def right():
+        right = Board(1920, 1, 1, 1080)
+        boards_list.append(right)
+
+    return boards_list
+
+
+board_list = boards()
+
+
 class Obstacle:
     def __init__(self, x, y, width, height, texture):
         self.rect = pygame.Rect(x, y, width, height)
@@ -170,6 +203,9 @@ while run:
         gol.draw(window)
 
     for obj in obstacles_list:
+        obj.draw(window)
+
+    for obj in board_list:
         obj.draw(window)
 
     window.blit(player1_texture, player1_rect)
