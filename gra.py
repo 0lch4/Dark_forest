@@ -6,8 +6,6 @@ import time
 pygame.init()
 widthWindow = 1920
 heightWindow = 1080
-widthBoard = 0
-heightBoard = 0
 window = pygame.display.set_mode((widthWindow, heightWindow))
 points_counter = -1
 font = pygame.font.Font(None, 36)
