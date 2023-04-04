@@ -43,37 +43,33 @@ gold_texture = pygame.transform.scale(
 gold_rect = gold_texture.get_rect
 
 
-class Board:
+class Border:
     def __init__(self, x, y, width, height):
         self.rect = pygame.Rect(x, y, width, height)
 
     def draw(self, surface):
-        surface.blit(self.rect)
+        pygame.draw.rect(surface, (255, 255, 255), self.rect)
 
 
-def boards():
-    boards_list = []
+def borders():
+    borders_list = []
 
-    def down():
-        down = Board(1, 1, 1920, 1)
-        boards_list.append(down)
+    up = Border(1, 1, 1920, 1)
+    borders_list.append(up)
 
-    def up():
-        up = Board(1, 1080, 1920, 1)
-        boards_list.append(up)
+    down = Border(1, 1079, 1920, 1)
+    borders_list.append(down)
 
-    def left():
-        left = Board(1, 1, 1, 1080)
-        boards_list.append(left)
+    left = Border(1, 1, 1, 1080)
+    borders_list.append(left)
 
-    def right():
-        right = Board(1920, 1, 1, 1080)
-        boards_list.append(right)
+    right = Border(1919, 1, 1, 1080)
+    borders_list.append(right)
 
-    return boards_list
+    return borders_list
 
 
-board_list = boards()
+borders_list = borders()
 
 
 class Obstacle:
@@ -178,6 +174,10 @@ while run:
     x += xx
     y += yy
 
+    for i in borders_list:
+        if player1_rect.colliderect(i.rect):
+            pass
+
     for i in gold_list:
         if player1_rect.colliderect(i.rect):
             generate_new_obstacles()
@@ -205,7 +205,7 @@ while run:
     for obj in obstacles_list:
         obj.draw(window)
 
-    for obj in board_list:
+    for obj in borders_list:
         obj.draw(window)
 
     window.blit(player1_texture, player1_rect)
