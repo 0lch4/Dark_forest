@@ -27,7 +27,6 @@ player1_rect = player1_texture.get_rect()
 player1_rect.x = x
 player1_rect.y = y
 
-# tworzenie drzewa
 treeWidth = 70
 treeHeight = 100
 tree_texture = pygame.transform.scale(
@@ -64,6 +63,13 @@ o_key_pressed = False
 o_key_released = True
 
 
+def load(quantity, object):
+    for i in range(quantity):
+        x = random.randint(0, widthWindow)
+        y = random.randint(0, heightWindow)
+        object(x, y)
+
+
 def obstacles():
     obstacles_list = []
 
@@ -79,15 +85,9 @@ def obstacles():
                          stoneHeight, stone_texture)
         obstacles_list.append(stone)
 
-    for i in range(50):
-        n = random.randint(0, widthWindow)
-        m = random.randint(0, heightWindow)
-        tree(n, m)
+    tree = load(50, tree)
 
-    for i in range(50):
-        n = random.randint(0, widthWindow)
-        m = random.randint(0, heightWindow)
-        stone(n, m)
+    stone = load(50,  stone)
 
     return obstacles_list
 
@@ -102,10 +102,7 @@ def points():
         gold_list.append(gold)
         points_counter += 1
 
-    for i in range(1):
-        n = random.randint(0, widthWindow)
-        m = random.randint(0, heightWindow)
-        gold(n, m)
+    gold = load(1, gold)
 
     return gold_list
 
