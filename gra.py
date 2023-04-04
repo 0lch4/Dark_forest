@@ -194,7 +194,7 @@ while run:
     player1_rect = pygame.rect.Rect(x, y, 50, 50)
     # wczytanie klatki
     points_text = font.render(
-        f'Punkty: {points_counter}', True, (255, 255, 255))
+        f'Punkty : {points_counter}', True, (255, 255, 255))
     window.blit(points_text, (10, 10))
 
     pygame.display.update()
