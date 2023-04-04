@@ -1,6 +1,4 @@
 import pygame
-import math
-import sys
 import random
 import time
 
@@ -14,13 +12,14 @@ window = pygame.display.set_mode((widthWindow, heightWindow))
 points_counter = -1
 font = pygame.font.Font(None, 36)
 
-# tlo z obrazka
+x = 100
+y = 100
+o_key_pressed = False
+o_key_released = True
+
 background = pygame.image.load('textures/tlo.jpg')
 background = pygame.transform.scale(background, window.get_size())
 
-# tworzenie player1
-x = 100
-y = 100
 player1_texture = pygame.transform.scale(
     pygame.image.load('textures/player.png'), (50, 50))
 player1_rect = player1_texture.get_rect()
@@ -39,13 +38,11 @@ stone_texture = pygame.transform.scale(
     pygame.image.load('textures/kamien.png'), (stoneWidth, stoneHeight))
 stone_rect = stone_texture.get_rect
 
-
 goldWidth = 20
 goldHeight = 20
 gold_texture = pygame.transform.scale(
     pygame.image.load('textures/gold.png'), (goldWidth, goldHeight))
 gold_rect = gold_texture.get_rect
-# szablon przeszkody
 
 
 class Obstacle:
@@ -55,12 +52,6 @@ class Obstacle:
 
     def draw(self, surface):
         surface.blit(self.texture, self.rect)
-
-# zbior przeszkod
-
-
-o_key_pressed = False
-o_key_released = True
 
 
 def load(quantity, object):
@@ -72,8 +63,6 @@ def load(quantity, object):
 
 def obstacles():
     obstacles_list = []
-
-    # tworzy drzewo
 
     def tree(xtree, ytree):
         tree = Obstacle(xtree, ytree, treeWidth,
@@ -92,6 +81,9 @@ def obstacles():
     return obstacles_list
 
 
+obstacles_list = obstacles()
+
+
 def points():
     gold_list = []
 
@@ -107,7 +99,6 @@ def points():
     return gold_list
 
 
-obstacles_list = obstacles()
 gold_list = points()
 
 
@@ -133,7 +124,6 @@ while run:
         if keys[pygame.K_ESCAPE]:
             run = False
 
-    # player1 sterowanie
     speed = 15
     xx, yy = 0, 0
     if keys[pygame.K_d]:
@@ -172,24 +162,21 @@ while run:
                         y = i.rect.top - 50
                     else:
                         y = i.rect.bottom
-    # kolizje player1
 
     if o_key_pressed:
         generate_new_obstacles()
-    # tlo z obrazka
+
     window.blit(background, (0, 0))
 
-    # ladowanie przeszkod
     for gol in gold_list:
         gol.draw(window)
 
     for obj in obstacles_list:
         obj.draw(window)
 
-    # odswiezanie polozenia player1
     window.blit(player1_texture, player1_rect)
     player1_rect = pygame.rect.Rect(x, y, 50, 50)
-    # wczytanie klatki
+
     points_text = font.render(
         f'Punkty: {points_counter}', True, (255, 255, 255))
     window.blit(points_text, (10, 10))
