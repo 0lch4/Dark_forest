@@ -8,8 +8,8 @@ widthWindow = 1920
 heightWindow = 1080
 window = pygame.display.set_mode((widthWindow, heightWindow))
 points_counter = -1
+number_of_enemies = 1
 font = pygame.font.Font(None, 36)
-
 x = 100
 y = 100
 o_key_pressed = False
@@ -19,7 +19,7 @@ background = pygame.image.load('textures/tlo.jpg')
 background = pygame.transform.scale(background, window.get_size())
 
 player1_texture = pygame.transform.scale(
-    pygame.image.load('textures/player.png'), (50, 50))
+    pygame.image.load('textures/player.png'), (40, 40))
 player1_rect = player1_texture.get_rect()
 player1_rect.x = x
 player1_rect.y = y
@@ -41,6 +41,12 @@ goldHeight = 20
 gold_texture = pygame.transform.scale(
     pygame.image.load('textures/gold.png'), (goldWidth, goldHeight))
 gold_rect = gold_texture.get_rect()
+
+enemyWidth = 50
+enemyHeight = 50
+enemy_texture = pygame.transform.scale(
+    pygame.image.load('textures/enemy.png'), (enemyWidth, enemyHeight))
+enemy_rect = enemy_texture.get_rect()
 
 
 class Border:
@@ -72,15 +78,6 @@ def borders():
 borders_list = borders()
 
 
-class Obstacle:
-    def __init__(self, x, y, width, height, texture):
-        self.rect = pygame.Rect(x, y, width, height)
-        self.texture = texture
-
-    def draw(self, surface):
-        surface.blit(self.texture, self.rect)
-
-
 def load(quantity, object, lista, rect):
     for i in range(quantity):
         x = random.randint(0, widthWindow)
@@ -95,6 +92,15 @@ def load(quantity, object, lista, rect):
                     y = random.randint(0, heightWindow)
                     break
         object(x, y)
+
+
+class Obstacle:
+    def __init__(self, x, y, width, height, texture):
+        self.rect = pygame.Rect(x, y, width, height)
+        self.texture = texture
+
+    def draw(self, surface):
+        surface.blit(self.texture, self.rect)
 
 
 def obstacles():
@@ -117,6 +123,70 @@ def obstacles():
 
 
 obstacles_list = obstacles()
+
+
+class Enemy:
+    def __init__(self, x, y, width, height, texture):
+        self.rect = pygame.Rect(x, y, width, height)
+        self.texture = texture
+        self.speed = 5
+        self.direction = (1, 0)
+
+    def update(self, obstacles_list):
+        self.rect.x += self.speed * self.direction[0]
+        self.rect.y += self.speed * self.direction[1]
+
+        # Sprawdź, czy przeciwnik koliduje z przeszkodami
+        for i in obstacles_list:
+            if self.rect.colliderect(i.rect):
+                if self.rect.x < i.rect.left:
+                    self.rect.x = i.rect.left - 50
+                elif self.rect.x > i.rect.right:
+                    self.rect.x = i.rect.right
+                elif self.rect.y < i.rect.top:
+                    self.rect.y = i.rect.top - 50
+                else:
+                    self.rect.y = i.rect.bottom
+
+            for i in borders_list:
+                if self.rect.colliderect(i):
+                    if i == borders_list[0]:
+                        self.rect.y = + 5
+                    elif i == borders_list[1]:
+                        self.rect.y = - 55
+                    elif i == borders_list[2]:
+                        self.rect.x = + 5
+                    elif i == borders_list[3]:
+                        self.rect.x = - 55
+
+            if self.rect.colliderect(player1_rect):
+                quit()
+
+        if random.random() < 0.05:
+            self.change_direction()
+
+    def change_direction(self):
+        directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+        new_direction = self.direction
+        while new_direction == self.direction:
+            new_direction = random.choice(directions)
+        self.direction = new_direction
+
+
+def enemies():
+    enemy_list = []
+
+    def enemy(xenemy, yenemy):
+        enemy = Enemy(xenemy, yenemy, enemyWidth,
+                      enemyHeight, enemy_texture)
+        enemy_list.append(enemy)
+
+    load(number_of_enemies, enemy, obstacles_list, enemy_rect)
+
+    return enemy_list
+
+
+enemy_list = enemies()
 
 
 def points():
@@ -159,7 +229,7 @@ while run:
         if keys[pygame.K_ESCAPE]:
             run = False
 
-    speed = 15
+    speed = 10
     xx, yy = 0, 0
     if keys[pygame.K_d]:
         xx += speed
@@ -187,11 +257,11 @@ while run:
             if i == borders_list[0]:
                 y = i.rect.top + 5
             elif i == borders_list[1]:
-                y = i.rect.bottom - 55
+                y = i.rect.bottom - 45
             elif i == borders_list[2]:
                 x = i.rect.left + 5
             elif i == borders_list[3]:
-                x = i.rect.right - 55
+                x = i.rect.right - 45
 
     for i in gold_list:
         if player1_rect.colliderect(i.rect):
@@ -201,11 +271,11 @@ while run:
             for i in obstacles_list:
                 if player1_rect.colliderect(i.rect):
                     if x < i.rect.left:
-                        x = i.rect.left - 50
+                        x = i.rect.left - 40
                     elif x > i.rect.right:
                         x = i.rect.right
                     elif y < i.rect.top:
-                        y = i.rect.top - 50
+                        y = i.rect.top - 40
                     else:
                         y = i.rect.bottom
 
@@ -224,7 +294,11 @@ while run:
         obj.draw(window)
 
     window.blit(player1_texture, player1_rect)
-    player1_rect = pygame.rect.Rect(x, y, 50, 50)
+    player1_rect = pygame.rect.Rect(x, y, 40, 40)
+
+    for enemy in enemy_list:
+        enemy.update(obstacles_list)
+        window.blit(enemy.texture, enemy.rect)
 
     points_text = font.render(
         f'Punkty: {points_counter}', True, (255, 255, 255))
