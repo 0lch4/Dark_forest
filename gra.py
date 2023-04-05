@@ -51,7 +51,7 @@ gold_rect = gold_texture.get_rect()
 bushWidth = 40
 bushHeight = 40
 bush_texture = pygame.transform.scale(
-    pygame.image.load('textures/krzak1.png'), (bushWidth, bushHeight))
+    pygame.image.load('textures/krzak.png'), (bushWidth, bushHeight))
 bush_rect = bush_texture.get_rect()
 
 enemyWidth = 50
