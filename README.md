@@ -1,6 +1,6 @@
 # Coin_game
 My first project in Python
-Earn Gold, buy boosts and don't get caught by enemies<<<<<<< HEAD
+<<<<<<< HEAD
 Earn Gold, buy boosts and don't get caught by enemies
 =======
 Earn Gold, buy boosts and don't get caught by enemies
