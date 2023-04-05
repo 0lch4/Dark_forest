@@ -9,7 +9,7 @@ heightWindow = 1080
 window = pygame.display.set_mode((widthWindow, heightWindow))
 points_counter = -1
 number_enemies = 1
-number_obstacles = 20
+number_obstacles = 15
 font = pygame.font.Font(None, 36)
 x = 100
 y = 100
@@ -43,11 +43,46 @@ gold_texture = pygame.transform.scale(
     pygame.image.load('textures/gold.png'), (goldWidth, goldHeight))
 gold_rect = gold_texture.get_rect()
 
+
+bushWidth = 40
+bushHeight = 40
+bush_texture = pygame.transform.scale(
+    pygame.image.load('textures/krzak.png'), (bushWidth, bushHeight))
+bush_rect = bush_texture.get_rect()
+
 enemyWidth = 50
 enemyHeight = 50
 enemy_texture = pygame.transform.scale(
     pygame.image.load('textures/enemy.png'), (enemyWidth, enemyHeight))
 enemy_rect = enemy_texture.get_rect()
+
+
+def start():
+    start_width, start_height = 1920, 1080
+    start_surface = pygame.Surface((start_width, start_height))
+    start_surface.fill((123, 203, 237))
+    tekst = pygame.font.Font(None, 50)
+    tekst_lines = ["Welcome in Coin Game",
+                   "Move: W,A,S,D", "Buy refresh: O", "End: ESCAPE", "press space to continue"]
+    tekst_color = 0, 0, 0
+    tekst_height = 0
+    for i in tekst_lines:
+        tekst_surface = tekst.render(i, True, tekst_color)
+        tekst_x = 700
+        tekst_y = 390 + tekst_height
+        start_surface.blit(tekst_surface, (tekst_x, tekst_y))
+        tekst_height += tekst_surface.get_height() + 40
+
+    start_x = 1
+    start_y = 1
+    window.blit(start_surface, (start_x, start_y))
+    pygame.display.update()
+    waiting = True
+    while waiting:
+        for i in pygame.event.get():
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_SPACE]:
+                waiting = False
 
 
 def end():
@@ -130,8 +165,14 @@ def obstacles():
                          stoneHeight, stone_texture)
         obstacles_list.append(stone)
 
+    def bush(xbush, ybush):
+        bush = Obstacle(xbush, ybush, bushWidth,
+                        bushHeight, bush_texture)
+        obstacles_list.append(bush)
+
     load(number_obstacles, tree, obstacles_list, tree_rect)
     load(number_obstacles, stone, obstacles_list, stone_rect)
+    load(number_obstacles, bush, obstacles_list, bush_rect)
 
     return obstacles_list
 
@@ -243,6 +284,8 @@ def generate_new_enemy():
     enemy_list = enemies()
 
 
+start()
+
 run = True
 while run:
     pygame.time.Clock().tick(60)
@@ -267,6 +310,8 @@ while run:
         if o_key_released:
             o_key_pressed = True
             time.sleep(1)
+            if points_counter > 0:
+                points_counter -= 1
             o_key_released = False
         else:
             o_key_pressed = False
@@ -315,8 +360,8 @@ while run:
     for obj in obstacles_list:
         obj.draw(window)
 
-    for obj in borders_list:
-        obj.draw(window)
+    for border in borders_list:
+        border.draw(window)
 
     window.blit(player1_texture, player1_rect)
     player1_rect = pygame.rect.Rect(x, y, 40, 40)
