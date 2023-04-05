@@ -9,6 +9,7 @@ heightWindow = 1080
 window = pygame.display.set_mode((widthWindow, heightWindow))
 points_counter = -1
 number_enemies = 1
+number_obstacles = 20
 font = pygame.font.Font(None, 36)
 x = 100
 y = 100
@@ -129,8 +130,8 @@ def obstacles():
                          stoneHeight, stone_texture)
         obstacles_list.append(stone)
 
-    load(50, tree, obstacles_list, tree_rect)
-    load(50, stone, obstacles_list, stone_rect)
+    load(number_obstacles, tree, obstacles_list, tree_rect)
+    load(number_obstacles, stone, obstacles_list, stone_rect)
 
     return obstacles_list
 
@@ -210,11 +211,13 @@ def points():
     def gold(xgold, ygold):
         global points_counter
         global number_enemies
+        global number_obstacles
         gold = Obstacle(xgold, ygold, goldWidth,
                         goldHeight, gold_texture)
         gold_list.append(gold)
         points_counter += 1
         number_enemies += 1
+        number_obstacles += 1
 
     gold = load(1, gold, obstacles_list, gold_rect)
     return gold_list
