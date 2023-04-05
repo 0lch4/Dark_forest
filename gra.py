@@ -8,6 +8,7 @@ widthWindow = 1920
 heightWindow = 1080
 window = pygame.display.set_mode((widthWindow, heightWindow))
 points_counter = -1
+number_enemies = 1
 font = pygame.font.Font(None, 36)
 x = 100
 y = 100
@@ -46,6 +47,19 @@ enemyHeight = 50
 enemy_texture = pygame.transform.scale(
     pygame.image.load('textures/enemy.png'), (enemyWidth, enemyHeight))
 enemy_rect = enemy_texture.get_rect()
+
+
+def end():
+    end_width, end_height = 960, 540
+    end_surface = pygame.Surface((end_width, end_height))
+    end_texture = pygame.transform.scale(pygame.image.load(
+        "textures/end.png"), (end_width, end_height))
+    end_texture_rect = end_texture.get_rect()
+    end_surface.blit(end_texture, end_texture_rect)
+    end_x = (widthWindow) / 4
+    end_y = (heightWindow) / 4
+    window.blit(end_surface, (end_x, end_y))
+    pygame.display.update()
 
 
 def load(quantity, object, lista, rect):
@@ -159,6 +173,8 @@ class Enemy:
                         self.rect.x = - 55
 
             if self.rect.colliderect(player1_rect):
+                end()
+                time.sleep(2)
                 quit()
 
         if random.random() < 0.05:
@@ -180,7 +196,7 @@ def enemies():
                       enemyHeight, enemy_texture)
         enemy_list.append(enemy)
 
-    load(5, enemy, obstacles_list, enemy_rect)
+    load(number_enemies, enemy, obstacles_list, enemy_rect)
 
     return enemy_list
 
@@ -193,14 +209,14 @@ def points():
 
     def gold(xgold, ygold):
         global points_counter
-        global number_of_enemies
+        global number_enemies
         gold = Obstacle(xgold, ygold, goldWidth,
                         goldHeight, gold_texture)
         gold_list.append(gold)
         points_counter += 1
+        number_enemies += 1
 
     gold = load(1, gold, obstacles_list, gold_rect)
-
     return gold_list
 
 
