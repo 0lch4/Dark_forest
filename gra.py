@@ -89,6 +89,19 @@ def start():
                 waiting = False
 
 
+def end():
+    end_width, end_height = 960, 540
+    end_surface = pygame.Surface((end_width, end_height))
+    end_texture = pygame.transform.scale(pygame.image.load(
+        "textures/end.png"), (end_width, end_height))
+    end_texture_rect = end_texture.get_rect()
+    end_surface.blit(end_texture, end_texture_rect)
+    end_x = (widthWindow) / 4
+    end_y = (heightWindow) / 4
+    window.blit(end_surface, (end_x, end_y))
+    pygame.display.update()
+
+
 def speed_boost():
     speed_width, speed_height = 200, 100
     speed_surface = pygame.Surface((speed_width, speed_height))
@@ -123,19 +136,6 @@ def refresh():
     window.blit(refresh_surface, (refresh_x, refresh_y))
     pygame.display.update()
     time.sleep(1)
-
-
-def end():
-    end_width, end_height = 960, 540
-    end_surface = pygame.Surface((end_width, end_height))
-    end_texture = pygame.transform.scale(pygame.image.load(
-        "textures/end.png"), (end_width, end_height))
-    end_texture_rect = end_texture.get_rect()
-    end_surface.blit(end_texture, end_texture_rect)
-    end_x = (widthWindow) / 4
-    end_y = (heightWindow) / 4
-    window.blit(end_surface, (end_x, end_y))
-    pygame.display.update()
 
 
 def load(quantity, object, lista, rect):
@@ -345,6 +345,7 @@ while run:
         yy += speed
     if keys[pygame.K_w]:
         yy -= speed
+
     if keys[pygame.K_o]:
         if o_key_released:
             if points_counter > 0:
