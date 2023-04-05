@@ -28,19 +28,19 @@ treeWidth = 70
 treeHeight = 100
 tree_texture = pygame.transform.scale(
     pygame.image.load('textures/drzewo.png'), (treeWidth, treeHeight))
-tree_rect = tree_texture.get_rect
+tree_rect = tree_texture.get_rect()
 
 stoneWidth = 50
 stoneHeight = 50
 stone_texture = pygame.transform.scale(
     pygame.image.load('textures/kamien.png'), (stoneWidth, stoneHeight))
-stone_rect = stone_texture.get_rect
+stone_rect = stone_texture.get_rect()
 
 goldWidth = 20
 goldHeight = 20
 gold_texture = pygame.transform.scale(
     pygame.image.load('textures/gold.png'), (goldWidth, goldHeight))
-gold_rect = gold_texture.get_rect
+gold_rect = gold_texture.get_rect()
 
 
 class Border:
@@ -81,10 +81,19 @@ class Obstacle:
         surface.blit(self.texture, self.rect)
 
 
-def load(quantity, object):
+def load(quantity, object, lista, rect):
     for i in range(quantity):
         x = random.randint(0, widthWindow)
         y = random.randint(0, heightWindow)
+        collision = True
+        while collision:
+            collision = False
+            for o in lista:
+                if rect.move(x, y).colliderect(o.rect):
+                    collision = True
+                    x = random.randint(0, widthWindow)
+                    y = random.randint(0, heightWindow)
+                    break
         object(x, y)
 
 
@@ -101,9 +110,8 @@ def obstacles():
                          stoneHeight, stone_texture)
         obstacles_list.append(stone)
 
-    tree = load(50, tree)
-
-    stone = load(50,  stone)
+    load(50, tree, obstacles_list, tree_rect)
+    load(50, stone, obstacles_list, stone_rect)
 
     return obstacles_list
 
@@ -121,7 +129,7 @@ def points():
         gold_list.append(gold)
         points_counter += 1
 
-    gold = load(1, gold)
+    gold = load(1, gold, obstacles_list, gold_rect)
 
     return gold_list
 
