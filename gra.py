@@ -2,7 +2,6 @@ import pygame
 import random
 import time
 
-# tworzenie wyswietlacza
 pygame.init()
 widthWindow = 1920
 heightWindow = 1080
