@@ -8,7 +8,6 @@ widthWindow = 1920
 heightWindow = 1080
 window = pygame.display.set_mode((widthWindow, heightWindow))
 points_counter = -1
-number_of_enemies = 5
 font = pygame.font.Font(None, 36)
 x = 100
 y = 100
@@ -49,6 +48,22 @@ enemy_texture = pygame.transform.scale(
 enemy_rect = enemy_texture.get_rect()
 
 
+def load(quantity, object, lista, rect):
+    for i in range(quantity):
+        x = random.randint(0, widthWindow)
+        y = random.randint(0, heightWindow)
+        collision = True
+        while collision:
+            collision = False
+            for o in lista:
+                if rect.move(x, y).colliderect(o.rect):
+                    collision = True
+                    x = random.randint(0, widthWindow)
+                    y = random.randint(0, heightWindow)
+                    break
+        object(x, y)
+
+
 class Border:
     def __init__(self, x, y, width, height):
         self.rect = pygame.Rect(x, y, width, height)
@@ -76,22 +91,6 @@ def borders():
 
 
 borders_list = borders()
-
-
-def load(quantity, object, lista, rect):
-    for i in range(quantity):
-        x = random.randint(0, widthWindow)
-        y = random.randint(0, heightWindow)
-        collision = True
-        while collision:
-            collision = False
-            for o in lista:
-                if rect.move(x, y).colliderect(o.rect):
-                    collision = True
-                    x = random.randint(0, widthWindow)
-                    y = random.randint(0, heightWindow)
-                    break
-        object(x, y)
 
 
 class Obstacle:
@@ -181,7 +180,7 @@ def enemies():
                       enemyHeight, enemy_texture)
         enemy_list.append(enemy)
 
-    load(number_of_enemies, enemy, obstacles_list, enemy_rect)
+    load(5, enemy, obstacles_list, enemy_rect)
 
     return enemy_list
 
@@ -218,6 +217,11 @@ def generate_new_gold():
     global gold_list
     gold_list.clear()
     gold_list = points()
+
+
+def generate_new_enemy():
+    global enemy_list
+    enemy_list = enemies()
 
 
 run = True
@@ -268,6 +272,7 @@ while run:
         if player1_rect.colliderect(i.rect):
             generate_new_obstacles()
             generate_new_gold()
+            generate_new_enemy()
         else:
             for i in obstacles_list:
                 if player1_rect.colliderect(i.rect):
