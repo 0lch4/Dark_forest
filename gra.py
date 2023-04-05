@@ -194,6 +194,7 @@ def points():
 
     def gold(xgold, ygold):
         global points_counter
+        global number_of_enemies
         gold = Obstacle(xgold, ygold, goldWidth,
                         goldHeight, gold_texture)
         gold_list.append(gold)
