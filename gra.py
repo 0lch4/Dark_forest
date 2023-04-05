@@ -13,8 +13,12 @@ number_obstacles = 15
 font = pygame.font.Font(None, 36)
 x = 100
 y = 100
+p_key_pressed = False
+p_key_released = True
 o_key_pressed = False
 o_key_released = True
+speed = 8
+max_speed = 15
 
 background = pygame.image.load('textures/tlo.jpg')
 background = pygame.transform.scale(background, window.get_size())
@@ -47,7 +51,7 @@ gold_rect = gold_texture.get_rect()
 bushWidth = 40
 bushHeight = 40
 bush_texture = pygame.transform.scale(
-    pygame.image.load('textures/krzak.png'), (bushWidth, bushHeight))
+    pygame.image.load('textures/krzak1.png'), (bushWidth, bushHeight))
 bush_rect = bush_texture.get_rect()
 
 enemyWidth = 50
@@ -63,7 +67,7 @@ def start():
     start_surface.fill((123, 203, 237))
     tekst = pygame.font.Font(None, 50)
     tekst_lines = ["Welcome in Coin Game",
-                   "Move: W,A,S,D", "Buy refresh: O", "End: ESCAPE", "press space to continue"]
+                   "Move: W,A,S,D", "Buy refresh: O", "Buy speed boost: P", "End: ESCAPE", "press space to continue"]
     tekst_color = 0, 0, 0
     tekst_height = 0
     for i in tekst_lines:
@@ -83,6 +87,42 @@ def start():
             keys = pygame.key.get_pressed()
             if keys[pygame.K_SPACE]:
                 waiting = False
+
+
+def speed_boost():
+    speed_width, speed_height = 200, 100
+    speed_surface = pygame.Surface((speed_width, speed_height))
+    speed_surface.fill((123, 203, 237))
+    tekst_font = pygame.font.Font(None, 24)
+    if speed < 15:
+        tekst_surface = tekst_font.render("You use TURBO", True, (0, 0, 0))
+    else:
+        tekst_surface = tekst_font.render(
+            "You have MAX speed", True, (0, 0, 0))
+    tekst_x = (speed_width - tekst_surface.get_width()) / 2
+    tekst_y = (speed_height - tekst_surface.get_height()) / 2
+    speed_surface.blit(tekst_surface, (tekst_x, tekst_y))
+    speed_x = (widthWindow - speed_width) / 2
+    speed_y = (heightWindow - speed_height) / 2
+    window.blit(speed_surface, (speed_x, speed_y))
+    pygame.display.update()
+    time.sleep(1)
+
+
+def refresh():
+    refresh_width, refresh_height = 200, 100
+    refresh_surface = pygame.Surface((refresh_width, refresh_height))
+    refresh_surface.fill((123, 203, 237))
+    tekst_font = pygame.font.Font(None, 24)
+    tekst_surface = tekst_font.render("You use Refresh", True, (0, 0, 0))
+    tekst_x = (refresh_width - tekst_surface.get_width()) / 2
+    tekst_y = (refresh_height - tekst_surface.get_height()) / 2
+    refresh_surface.blit(tekst_surface, (tekst_x, tekst_y))
+    refresh_x = (widthWindow - refresh_width) / 2
+    refresh_y = (heightWindow - refresh_height) / 2
+    window.blit(refresh_surface, (refresh_x, refresh_y))
+    pygame.display.update()
+    time.sleep(1)
 
 
 def end():
@@ -296,7 +336,6 @@ while run:
         if keys[pygame.K_ESCAPE]:
             run = False
 
-    speed = 10
     xx, yy = 0, 0
     if keys[pygame.K_d]:
         xx += speed
@@ -308,14 +347,27 @@ while run:
         yy -= speed
     if keys[pygame.K_o]:
         if o_key_released:
-            o_key_pressed = True
-            time.sleep(1)
             if points_counter > 0:
-                points_counter -= 1
+                o_key_pressed = True
+                refresh()
             o_key_released = False
         else:
             o_key_pressed = False
             o_key_released = True
+
+    if keys[pygame.K_p]:
+        if p_key_released:
+            p_key_pressed = True
+            if speed <= max_speed and points_counter > 0:
+                speed_boost()
+                speed += 1
+                points_counter -= 1
+            elif speed == max_speed:
+                speed_boost
+            p_key_released = False
+        else:
+            p_key_pressed = False
+            p_key_released = True
 
     old_x, old_y = x, y
     x += xx
@@ -351,6 +403,8 @@ while run:
 
     if o_key_pressed:
         generate_new_obstacles()
+        generate_new_gold()
+        points_counter -= 2
 
     window.blit(background, (0, 0))
 
@@ -371,7 +425,7 @@ while run:
         window.blit(enemy.texture, enemy.rect)
 
     points_text = font.render(
-        f'Punkty: {points_counter}', True, (255, 255, 255))
+        f'Points: {points_counter}', True, (255, 255, 255))
     window.blit(points_text, (10, 10))
 
     pygame.display.update()
