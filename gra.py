@@ -55,6 +55,7 @@ bush_rect = bush_texture.get_rect()
 
 enemyWidth = 50
 enemyHeight = 50
+enemySpeed = 5
 enemy_texture = pygame.transform.scale(
     pygame.image.load('textures/enemy.png'), (enemyWidth, enemyHeight))
 enemy_rect = enemy_texture.get_rect()
@@ -220,10 +221,10 @@ obstacles_list = obstacles()
 
 
 class Enemy:
-    def __init__(self, x, y, width, height, texture):
+    def __init__(self, x, y, width, height, texture, speed):
         self.rect = pygame.Rect(x, y, width, height)
         self.texture = texture
-        self.speed = 5
+        self.speed = speed
         self.direction = (1, 0)
 
     def update(self, obstacles_list):
@@ -274,10 +275,16 @@ def enemies():
 
     def enemy(xenemy, yenemy):
         enemy = Enemy(xenemy, yenemy, enemyWidth,
-                      enemyHeight, enemy_texture)
+                      enemyHeight, enemy_texture, enemySpeed)
         enemy_list.append(enemy)
 
     load(number_enemies, enemy, obstacles_list, enemy_rect)
+    if number_enemies % 2 == 0:
+        load(number_enemies, enemy, obstacles_list, enemy_rect)
+        load(number_enemies, enemy, obstacles_list, enemy_rect)
+        load(number_enemies, enemy, obstacles_list, enemy_rect)
+        load(number_enemies, enemy, obstacles_list, enemy_rect)
+        load(number_enemies, enemy, obstacles_list, enemy_rect)
 
     return enemy_list
 
