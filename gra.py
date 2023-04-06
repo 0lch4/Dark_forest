@@ -7,6 +7,7 @@ widthWindow = 1920
 heightWindow = 1080
 window = pygame.display.set_mode((widthWindow, heightWindow))
 points_counter = -1
+level = 0
 number_enemies = 1
 number_obstacles = 15
 font = pygame.font.Font(None, 36)
@@ -53,12 +54,19 @@ bush_texture = pygame.transform.scale(
     pygame.image.load('textures/krzak.png'), (bushWidth, bushHeight))
 bush_rect = bush_texture.get_rect()
 
-enemyWidth = 50
-enemyHeight = 50
-enemySpeed = 5
-enemy_texture = pygame.transform.scale(
-    pygame.image.load('textures/enemy.png'), (enemyWidth, enemyHeight))
-enemy_rect = enemy_texture.get_rect()
+devilWidth = 50
+devilHeight = 50
+devilSpeed = 5
+devil_texture = pygame.transform.scale(
+    pygame.image.load('textures/enemy.png'), (devilWidth, devilHeight))
+devil_rect = devil_texture.get_rect()
+
+fastWidth = 40
+fastHeight = 40
+fastSpeed = 15
+fast_texture = pygame.transform.scale(
+    pygame.image.load('textures/fast.png'), (fastWidth, fastHeight))
+fast_rect = fast_texture.get_rect()
 
 
 def start():
@@ -273,12 +281,17 @@ class Enemy:
 def enemies():
     enemy_list = []
 
-    def enemy(xenemy, yenemy):
-        enemy = Enemy(xenemy, yenemy, enemyWidth,
-                      enemyHeight, enemy_texture, enemySpeed)
-        enemy_list.append(enemy)
+    def devil(xdevil, ydevil):
+        devil = Enemy(xdevil, ydevil, devilWidth,
+                      devilHeight, devil_texture, devilSpeed)
+        enemy_list.append(devil)
 
-    load(number_enemies, enemy, obstacles_list, enemy_rect)
+    def fast(xfast, yfast):
+        fast = Enemy(xfast, yfast, fastWidth,
+                     fastHeight, fast_texture, fastSpeed)
+        enemy_list.append(fast)
+
+    load(number_enemies, devil, obstacles_list, devil_rect)
 
     return enemy_list
 
@@ -293,12 +306,14 @@ def points():
         global points_counter
         global number_enemies
         global number_obstacles
+        global level
         gold = Obstacle(xgold, ygold, goldWidth,
                         goldHeight, gold_texture)
         gold_list.append(gold)
         points_counter += 1
         number_enemies += 1
         number_obstacles += 1
+        level += 1
 
     gold = load(1, gold, obstacles_list, gold_rect)
     return gold_list
@@ -426,7 +441,10 @@ while run:
         window.blit(enemy.texture, enemy.rect)
 
     points_text = font.render(
-        f'Points: {points_counter}', True, (255, 255, 255))
+        f'Coins: {points_counter}', True, (255, 255, 255))
+    window.blit(points_text, (1810, 10))
+    points_text = font.render(
+        f'Level: {level}', True, (255, 255, 255))
     window.blit(points_text, (10, 10))
 
     pygame.display.update()
