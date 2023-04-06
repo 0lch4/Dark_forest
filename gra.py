@@ -20,6 +20,10 @@ p_key_pressed = False
 p_key_released = True
 o_key_pressed = False
 o_key_released = True
+i_key_pressed = False
+i_key_released = True
+powershield = False
+
 speed = 8
 max_speed = 15
 
@@ -29,6 +33,8 @@ background = pygame.transform.scale(background, window.get_size())
 player1_texture = pygame.transform.scale(
     pygame.image.load('textures/player.png'), (40, 40))
 player1_rect = player1_texture.get_rect()
+player1_texture_shield1 = pygame.image.load('textures/playershield1.png')
+
 player1_rect.x = x
 player1_rect.y = y
 
@@ -96,7 +102,7 @@ def start():
     start_surface.fill((123, 203, 237))
     tekst = pygame.font.Font(None, 50)
     tekst_lines = ["Welcome in Coin Game",
-                   "Move: W,A,S,D", "Buy refresh: O", "Buy speed boost: P", "End: ESCAPE", "press space to continue"]
+                   "Move: W,A,S,D", "Buy shield: I" "Buy refresh: O", "Buy speed boost: P", "End: ESCAPE", "press space to continue"]
     tekst_color = 0, 0, 0
     tekst_height = 0
     for i in tekst_lines:
@@ -302,11 +308,6 @@ class Enemy:
                 elif i == borders_list[3]:
                     self.rect.x = - 55
 
-        if self.rect.colliderect(player1_rect):
-            end()
-            time.sleep(2)
-            quit()
-
         if random.random() < 0.05:
             self.change_direction()
 
@@ -316,6 +317,14 @@ class Enemy:
         while new_direction == self.direction:
             new_direction = random.choice(directions)
         self.direction = new_direction
+
+    def __del__(self):
+        del self.rect
+        del self.texture
+
+    def delete(self):
+        enemy_list.remove(self)
+        del self
 
 
 def enemies():
@@ -438,6 +447,17 @@ while run:
             o_key_pressed = False
             o_key_released = True
 
+    if keys[pygame.K_i]:
+        if i_key_released:
+            if points_counter > 0:
+                i_key_pressed = True
+                shield()
+                powershield = True
+            i_key_released = False
+        else:
+            i_key_pressed = False
+            i_key_released = True
+
     if keys[pygame.K_p]:
         if p_key_released:
             p_key_pressed = True
@@ -500,12 +520,24 @@ while run:
     for border in borders_list:
         border.draw(window)
 
-    window.blit(player1_texture, player1_rect)
-    player1_rect = pygame.rect.Rect(x, y, 40, 40)
+    if powershield == False:
+        window.blit(player1_texture, player1_rect)
+        player1_rect = pygame.rect.Rect(x, y, 40, 40)
+    elif powershield == True:
+        window.blit(player1_texture_shield1, player1_rect)
+        player1_rect = pygame.rect.Rect(x, y, 40, 40)
 
     for enemy in enemy_list:
         enemy.update(obstacles_list)
         window.blit(enemy.texture, enemy.rect)
+        if enemy.rect.colliderect(player1_rect):
+            if powershield == False:
+                end()
+                time.sleep(2)
+                quit()
+            elif powershield == True:
+                enemy.delete()
+                powershield = False
 
     points_text = font.render(
         f'Coins: {points_counter}', True, (255, 255, 255))
