@@ -8,8 +8,10 @@ heightWindow = 1080
 window = pygame.display.set_mode((widthWindow, heightWindow))
 points_counter = -1
 level = 0
-number_devils = 1
+number_devils = 0
 number_fasts = 0
+number_mutants = 0
+number_ghosts = 0
 number_obstacles = 15
 font = pygame.font.Font(None, 36)
 x = 100
@@ -58,6 +60,7 @@ bush_rect = bush_texture.get_rect()
 devilWidth = 50
 devilHeight = 50
 devilSpeed = 5
+devilCollision = 50
 devil_texture = pygame.transform.scale(
     pygame.image.load('textures/enemy.png'), (devilWidth, devilHeight))
 devil_rect = devil_texture.get_rect()
@@ -65,9 +68,26 @@ devil_rect = devil_texture.get_rect()
 fastWidth = 40
 fastHeight = 40
 fastSpeed = 15
+fastCollision = 40
 fast_texture = pygame.transform.scale(
     pygame.image.load('textures/fast.png'), (fastWidth, fastHeight))
 fast_rect = fast_texture.get_rect()
+
+mutantWidth = 100
+mutantHeight = 100
+mutantSpeed = 2
+mutantCollision = 100
+mutant_texture = pygame.transform.scale(
+    pygame.image.load('textures/mutant.png'), (mutantWidth, mutantHeight))
+mutant_rect = mutant_texture.get_rect()
+
+ghostWidth = 50
+ghostHeight = 50
+ghostSpeed = 10
+ghostCollision = 50
+ghost_texture = pygame.transform.scale(
+    pygame.image.load('textures/ghost.png'), (ghostWidth, ghostHeight))
+ghost_rect = ghost_texture.get_rect()
 
 
 def start():
@@ -230,11 +250,13 @@ obstacles_list = obstacles()
 
 
 class Enemy:
-    def __init__(self, x, y, width, height, texture, speed):
+    def __init__(self, x, y, width, height, texture, speed, collison, enemy_type):
         self.rect = pygame.Rect(x, y, width, height)
         self.texture = texture
         self.speed = speed
+        self.collison = collison
         self.direction = (1, 0)
+        self.type = enemy_type
 
     def update(self, obstacles_list):
         self.rect.x += self.speed * self.direction[0]
@@ -242,31 +264,33 @@ class Enemy:
 
         # Sprawdź, czy przeciwnik koliduje z przeszkodami
         for i in obstacles_list:
+            if self.type == 'ghost':
+                continue
             if self.rect.colliderect(i.rect):
                 if self.rect.x < i.rect.left:
-                    self.rect.x = i.rect.left - 50
+                    self.rect.x = i.rect.left - self.collison
                 elif self.rect.x > i.rect.right:
                     self.rect.x = i.rect.right
                 elif self.rect.y < i.rect.top:
-                    self.rect.y = i.rect.top - 50
+                    self.rect.y = i.rect.top - self.collison
                 else:
                     self.rect.y = i.rect.bottom
 
-            for i in borders_list:
-                if self.rect.colliderect(i):
-                    if i == borders_list[0]:
-                        self.rect.y = + 5
-                    elif i == borders_list[1]:
-                        self.rect.y = - 55
-                    elif i == borders_list[2]:
-                        self.rect.x = + 5
-                    elif i == borders_list[3]:
-                        self.rect.x = - 55
+        for i in borders_list:
+            if self.rect.colliderect(i):
+                if i == borders_list[0]:
+                    self.rect.y = + 5
+                elif i == borders_list[1]:
+                    self.rect.y = - 55
+                elif i == borders_list[2]:
+                    self.rect.x = + 5
+                elif i == borders_list[3]:
+                    self.rect.x = - 55
 
-            if self.rect.colliderect(player1_rect):
-                end()
-                time.sleep(2)
-                quit()
+        if self.rect.colliderect(player1_rect):
+            end()
+            time.sleep(2)
+            quit()
 
         if random.random() < 0.05:
             self.change_direction()
@@ -284,15 +308,29 @@ def enemies():
 
     def devil(xdevil, ydevil):
         devil = Enemy(xdevil, ydevil, devilWidth,
-                      devilHeight, devil_texture, devilSpeed)
+                      devilHeight, devil_texture, devilSpeed, devilCollision, 'devil')
         enemy_list.append(devil)
 
     def fast(xfast, yfast):
         fast = Enemy(xfast, yfast, fastWidth,
-                     fastHeight, fast_texture, fastSpeed)
+                     fastHeight, fast_texture, fastSpeed, fastCollision, 'fast')
         enemy_list.append(fast)
 
-    if level % 3 == 0:
+    def mutant(xmutant, ymutant):
+        mutant = Enemy(xmutant, ymutant, mutantWidth,
+                       mutantHeight, mutant_texture, mutantSpeed, mutantCollision, 'mutant')
+        enemy_list.append(mutant)
+
+    def ghost(xghost, yghost):
+        ghost = Enemy(xghost, yghost, ghostWidth,
+                      ghostHeight, ghost_texture, ghostSpeed, ghostCollision, 'ghost')
+        enemy_list.append(ghost)
+
+    if level % 5 == 0:
+        load(number_ghosts, ghost, obstacles_list, ghost_rect)
+    elif level % 4 == 0:
+        load(number_mutants, mutant, obstacles_list, mutant_rect)
+    elif level % 3 == 0:
         load(number_fasts, fast, obstacles_list, fast_rect)
     else:
         load(number_devils, devil, obstacles_list, devil_rect)
@@ -310,7 +348,9 @@ def points():
         global points_counter
         global number_devils
         global number_fasts
+        global number_mutants
         global number_obstacles
+        global number_ghosts
         global level
         gold = Obstacle(xgold, ygold, goldWidth,
                         goldHeight, gold_texture)
@@ -322,6 +362,10 @@ def points():
             number_devils += 1
         if level % 3 == 0:
             number_fasts += 1
+        if level % 4 == 0:
+            number_mutants += 1
+        if level % 5 == 0:
+            number_ghosts += 1
 
     gold = load(1, gold, obstacles_list, gold_rect)
     return gold_list
@@ -387,7 +431,7 @@ while run:
                 speed += 1
                 points_counter -= 1
             elif speed == max_speed:
-                speed_boost
+                speed_boost()
             p_key_released = False
         else:
             p_key_pressed = False
