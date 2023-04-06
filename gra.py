@@ -261,10 +261,10 @@ def obstacles():
         bush = Obstacle(xbush, ybush, bushWidth,
                         bushHeight, bush_texture)
         obstacles_list.append(bush)
-    if number_obstacles <= max_obstacles:
-        load(number_obstacles, tree, obstacles_list, tree_rect)
-        load(number_obstacles, stone, obstacles_list, stone_rect)
-        load(number_obstacles, bush, obstacles_list, bush_rect)
+
+    load(number_obstacles, tree, obstacles_list, tree_rect)
+    load(number_obstacles, stone, obstacles_list, stone_rect)
+    load(number_obstacles, bush, obstacles_list, bush_rect)
 
     return obstacles_list
 
@@ -381,8 +381,9 @@ def points():
                         goldHeight, gold_texture)
         gold_list.append(gold)
         points_counter += 1
-        number_obstacles += 1
         level += 1
+        if number_obstacles <= max_obstacles:
+            number_obstacles += 1
         if level % 2 == 0:
             number_devils += 1
         if level % 3 == 0:
