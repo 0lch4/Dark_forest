@@ -13,6 +13,7 @@ number_fasts = 0
 number_mutants = 0
 number_ghosts = 0
 number_obstacles = 15
+max_obstacles = 30
 font = pygame.font.Font(None, 36)
 x = 100
 y = 100
@@ -260,10 +261,10 @@ def obstacles():
         bush = Obstacle(xbush, ybush, bushWidth,
                         bushHeight, bush_texture)
         obstacles_list.append(bush)
-
-    load(number_obstacles, tree, obstacles_list, tree_rect)
-    load(number_obstacles, stone, obstacles_list, stone_rect)
-    load(number_obstacles, bush, obstacles_list, bush_rect)
+    if number_obstacles <= max_obstacles:
+        load(number_obstacles, tree, obstacles_list, tree_rect)
+        load(number_obstacles, stone, obstacles_list, stone_rect)
+        load(number_obstacles, bush, obstacles_list, bush_rect)
 
     return obstacles_list
 
