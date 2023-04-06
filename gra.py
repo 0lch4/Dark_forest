@@ -167,6 +167,22 @@ def refresh():
     time.sleep(1)
 
 
+def shield():
+    shield_width, shield_height = 200, 100
+    shield_surface = pygame.Surface((shield_width, shield_height))
+    shield_surface.fill((123, 203, 237))
+    tekst_font = pygame.font.Font(None, 24)
+    tekst_surface = tekst_font.render("You use Shield", True, (0, 0, 0))
+    tekst_x = (shield_width - tekst_surface.get_width()) / 2
+    tekst_y = (shield_height - tekst_surface.get_height()) / 2
+    shield_surface.blit(tekst_surface, (tekst_x, tekst_y))
+    refresh_x = (widthWindow - shield_width) / 2
+    refresh_y = (heightWindow - shield_height) / 2
+    window.blit(shield_surface, (refresh_x, refresh_y))
+    pygame.display.update()
+    time.sleep(1)
+
+
 def load(quantity, objectt, lista, rect):
     for i in range(quantity):
         x = random.randint(0, widthWindow)
