@@ -102,13 +102,13 @@ def start():
     start_surface.fill((123, 203, 237))
     tekst = pygame.font.Font(None, 50)
     tekst_lines = ["Welcome in Coin Game",
-                   "Move: W,A,S,D", "Buy shield: I" "Buy refresh: O", "Buy speed boost: P", "End: ESCAPE", "press space to continue"]
+                   "Move: W,A,S,D", "Buy shield: I", "Buy refresh: O", "Buy speed boost: P", "End: ESCAPE", "press space to continue"]
     tekst_color = 0, 0, 0
     tekst_height = 0
     for i in tekst_lines:
         tekst_surface = tekst.render(i, True, tekst_color)
         tekst_x = 700
-        tekst_y = 390 + tekst_height
+        tekst_y = 290 + tekst_height
         start_surface.blit(tekst_surface, (tekst_x, tekst_y))
         tekst_height += tekst_surface.get_height() + 40
 
