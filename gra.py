@@ -8,7 +8,8 @@ heightWindow = 1080
 window = pygame.display.set_mode((widthWindow, heightWindow))
 points_counter = -1
 level = 0
-number_enemies = 1
+number_devils = 1
+number_fasts = 0
 number_obstacles = 15
 font = pygame.font.Font(None, 36)
 x = 100
@@ -146,7 +147,7 @@ def refresh():
     time.sleep(1)
 
 
-def load(quantity, object, lista, rect):
+def load(quantity, objectt, lista, rect):
     for i in range(quantity):
         x = random.randint(0, widthWindow)
         y = random.randint(0, heightWindow)
@@ -159,7 +160,7 @@ def load(quantity, object, lista, rect):
                     x = random.randint(0, widthWindow)
                     y = random.randint(0, heightWindow)
                     break
-        object(x, y)
+        objectt(x, y)
 
 
 class Border:
@@ -291,7 +292,10 @@ def enemies():
                      fastHeight, fast_texture, fastSpeed)
         enemy_list.append(fast)
 
-    load(number_enemies, devil, obstacles_list, devil_rect)
+    if level % 3 == 0:
+        load(number_fasts, fast, obstacles_list, fast_rect)
+    else:
+        load(number_devils, devil, obstacles_list, devil_rect)
 
     return enemy_list
 
@@ -304,16 +308,20 @@ def points():
 
     def gold(xgold, ygold):
         global points_counter
-        global number_enemies
+        global number_devils
+        global number_fasts
         global number_obstacles
         global level
         gold = Obstacle(xgold, ygold, goldWidth,
                         goldHeight, gold_texture)
         gold_list.append(gold)
         points_counter += 1
-        number_enemies += 1
         number_obstacles += 1
         level += 1
+        if level % 2 == 0:
+            number_devils += 1
+        if level % 3 == 0:
+            number_fasts += 1
 
     gold = load(1, gold, obstacles_list, gold_rect)
     return gold_list
