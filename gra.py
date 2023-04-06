@@ -262,7 +262,6 @@ class Enemy:
         self.rect.x += self.speed * self.direction[0]
         self.rect.y += self.speed * self.direction[1]
 
-        # Sprawdź, czy przeciwnik koliduje z przeszkodami
         for i in obstacles_list:
             if self.type == 'ghost':
                 continue
