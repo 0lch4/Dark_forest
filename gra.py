@@ -175,7 +175,7 @@ def load(quantity, objectt, lista, rect):
         while collision:
             collision = False
             for o in lista:
-                if rect.move(x, y).colliderect(o.rect):
+                if rect.move(x, y).colliderect(o.rect) or rect.move(x, y).colliderect(player1_rect):
                     collision = True
                     x = random.randint(0, widthWindow)
                     y = random.randint(0, heightWindow)
