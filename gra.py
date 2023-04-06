@@ -279,12 +279,6 @@ def enemies():
         enemy_list.append(enemy)
 
     load(number_enemies, enemy, obstacles_list, enemy_rect)
-    if number_enemies % 2 == 0:
-        load(number_enemies, enemy, obstacles_list, enemy_rect)
-        load(number_enemies, enemy, obstacles_list, enemy_rect)
-        load(number_enemies, enemy, obstacles_list, enemy_rect)
-        load(number_enemies, enemy, obstacles_list, enemy_rect)
-        load(number_enemies, enemy, obstacles_list, enemy_rect)
 
     return enemy_list
 
