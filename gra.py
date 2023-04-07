@@ -85,7 +85,13 @@ mutantHeight = 100
 mutantSpeed = 2
 mutantCollision = 100
 mutant_texture = pygame.transform.scale(
-    pygame.image.load('textures/mutant.png'), (mutantWidth, mutantHeight))
+    pygame.image.load('textures/mutantL.png'), (mutantWidth, mutantHeight))
+mutant_rect = mutant_texture.get_rect()
+
+mutant_textureL = mutant_texture
+
+mutant_textureR = pygame.transform.scale(
+    pygame.image.load('textures/mutantR.png'), (mutantWidth, mutantHeight))
 mutant_rect = mutant_texture.get_rect()
 
 ghostWidth = 50
@@ -93,7 +99,13 @@ ghostHeight = 50
 ghostSpeed = 10
 ghostCollision = 50
 ghost_texture = pygame.transform.scale(
-    pygame.image.load('textures/ghost.png'), (ghostWidth, ghostHeight))
+    pygame.image.load('textures/ghostL.png'), (ghostWidth, ghostHeight))
+ghost_rect = ghost_texture.get_rect()
+
+ghost_textureL = ghost_texture
+
+ghost_textureR = pygame.transform.scale(
+    pygame.image.load('textures/ghostR.png'), (ghostWidth, ghostHeight))
 ghost_rect = ghost_texture.get_rect()
 
 
@@ -319,6 +331,21 @@ class Enemy:
             new_direction = random.choice(directions)
         self.direction = new_direction
 
+    def mirror(self, L, R):
+        self.L = L
+        self.R = R
+        new_direction = self.direction
+        if self.type == 'mutant':
+            if new_direction == (1, 0):
+                self.texture = R
+            elif new_direction == (-1, 0):
+                self.texture = L
+        elif self.type == 'ghost':
+            if new_direction == (1, 0):
+                self.texture = R
+            elif new_direction == (-1, 0):
+                self.texture = L
+
     def __del__(self):
         del self.rect
         del self.texture
@@ -531,6 +558,10 @@ while run:
 
     for enemy in enemy_list:
         enemy.update(obstacles_list)
+        if enemy.type == 'mutant':
+            enemy.mirror(mutant_textureL, mutant_textureR)
+        elif enemy.type == 'ghost':
+            enemy.mirror(ghost_textureL, ghost_textureR)
         window.blit(enemy.texture, enemy.rect)
         if enemy.rect.colliderect(player1_rect):
             if powershield == False:
