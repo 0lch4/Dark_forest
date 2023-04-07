@@ -35,8 +35,6 @@ intro2 = pygame.image.load("textures/intro2.png")
 intro3 = pygame.image.load("textures/intro3.png")
 pauza = pygame.image.load("textures/pauza.png")
 menu = pygame.image.load("textures/menu.png")
-
-
 background = pygame.image.load('textures/tlo.jpg')
 background = pygame.transform.scale(background, window.get_size())
 
