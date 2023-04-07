@@ -34,6 +34,8 @@ intro1 = pygame.image.load("textures/intro.png")
 intro2 = pygame.image.load("textures/intro2.png")
 intro3 = pygame.image.load("textures/intro3.png")
 pauza = pygame.image.load("textures/pauza.png")
+menu = pygame.image.load("textures/menu.png")
+
 
 background = pygame.image.load('textures/tlo.jpg')
 background = pygame.transform.scale(background, window.get_size())
@@ -117,8 +119,6 @@ ghost_rect = ghost_texture.get_rect()
 
 
 def start():
-    start_width, start_height = 1920, 1080
-    start_surface = pygame.Surface((start_width, start_height))
     window.blit(intro1, (1, 1))
     pygame.display.update()
     time.sleep(1)
@@ -127,23 +127,8 @@ def start():
     time.sleep(1)
     window.blit(intro3, (1, 1))
     pygame.display.update()
+    window.blit(menu, (1, 1))
     time.sleep(1)
-    start_surface.fill((123, 203, 237))
-    tekst = pygame.font.Font(None, 50)
-    tekst_lines = ["Welcome in Dark Forest",
-                   "Move: W,A,S,D", "Buy shield: I", "Buy refresh: O", "Buy speed boost: P", "End: ESCAPE", "press space to continue"]
-    tekst_color = 0, 0, 0
-    tekst_height = 0
-    for i in tekst_lines:
-        tekst_surface = tekst.render(i, True, tekst_color)
-        tekst_x = 700
-        tekst_y = 290 + tekst_height
-        start_surface.blit(tekst_surface, (tekst_x, tekst_y))
-        tekst_height += tekst_surface.get_height() + 40
-
-    start_x = 1
-    start_y = 1
-    window.blit(start_surface, (start_x, start_y))
     pygame.display.update()
     waiting = True
     while waiting:
@@ -154,77 +139,57 @@ def start():
 
 
 def end():
-    end_width, end_height = 960, 540
+    end_width, end_height = 1920, 1080
     end_surface = pygame.Surface((end_width, end_height))
     end_texture = pygame.transform.scale(pygame.image.load(
         "textures/end.png"), (end_width, end_height))
     end_texture_rect = end_texture.get_rect()
     end_surface.blit(end_texture, end_texture_rect)
-    end_x = (widthWindow) / 4
-    end_y = (heightWindow) / 4
+    end_x = 0
+    end_y = 0
     window.blit(end_surface, (end_x, end_y))
     pygame.display.update()
 
 
 def pause():
-    pauz = True
-    while pauz:
+    waiting = True
+    while waiting:
         window.blit(pauza, (1, 1))
         pygame.display.update()
-        w8 = pygame.event.wait()
-        if w8.type == pygame.KEYDOWN and w8.key == pygame.K_m:
-            pauz = False
-            time.sleep(1)
+        for i in pygame.event.get():
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_m]:
+                waiting = False
+                time.sleep(0.5)
 
 
 def speed_boost():
-    speed_width, speed_height = 200, 100
-    speed_surface = pygame.Surface((speed_width, speed_height))
-    speed_surface.fill((123, 203, 237))
-    tekst_font = pygame.font.Font(None, 24)
+    speed_boost_banner = pygame.transform.scale(
+        pygame.image.load("textures/turbo.png"), (300, 200))
+    max_speed_banner = pygame.transform.scale(
+        pygame.image.load("textures/maxspeed.png"), (300, 200))
     if speed < 15:
-        tekst_surface = tekst_font.render("You use TURBO", True, (0, 0, 0))
+        window.blit(speed_boost_banner,
+                    (widthWindow/2-140, heightWindow/2-140))
     else:
-        tekst_surface = tekst_font.render(
-            "You have MAX speed", True, (0, 0, 0))
-    tekst_x = (speed_width - tekst_surface.get_width()) / 2
-    tekst_y = (speed_height - tekst_surface.get_height()) / 2
-    speed_surface.blit(tekst_surface, (tekst_x, tekst_y))
-    speed_x = (widthWindow - speed_width) / 2
-    speed_y = (heightWindow - speed_height) / 2
-    window.blit(speed_surface, (speed_x, speed_y))
+        window.blit(max_speed_banner, (widthWindow /
+                    2 - 140, heightWindow/2 - 140))
     pygame.display.update()
     time.sleep(1)
 
 
 def refresh():
-    refresh_width, refresh_height = 200, 100
-    refresh_surface = pygame.Surface((refresh_width, refresh_height))
-    refresh_surface.fill((123, 203, 237))
-    tekst_font = pygame.font.Font(None, 24)
-    tekst_surface = tekst_font.render("You use Refresh", True, (0, 0, 0))
-    tekst_x = (refresh_width - tekst_surface.get_width()) / 2
-    tekst_y = (refresh_height - tekst_surface.get_height()) / 2
-    refresh_surface.blit(tekst_surface, (tekst_x, tekst_y))
-    refresh_x = (widthWindow - refresh_width) / 2
-    refresh_y = (heightWindow - refresh_height) / 2
-    window.blit(refresh_surface, (refresh_x, refresh_y))
+    refresh_banner = pygame.transform.scale(
+        pygame.image.load("textures/refresh.png"), (300, 200))
+    window.blit(refresh_banner, (widthWindow/2 - 140, heightWindow/2 - 140))
     pygame.display.update()
     time.sleep(1)
 
 
 def shield():
-    shield_width, shield_height = 200, 100
-    shield_surface = pygame.Surface((shield_width, shield_height))
-    shield_surface.fill((123, 203, 237))
-    tekst_font = pygame.font.Font(None, 24)
-    tekst_surface = tekst_font.render("You use Shield", True, (0, 0, 0))
-    tekst_x = (shield_width - tekst_surface.get_width()) / 2
-    tekst_y = (shield_height - tekst_surface.get_height()) / 2
-    shield_surface.blit(tekst_surface, (tekst_x, tekst_y))
-    refresh_x = (widthWindow - shield_width) / 2
-    refresh_y = (heightWindow - shield_height) / 2
-    window.blit(shield_surface, (refresh_x, refresh_y))
+    shield_banner = pygame.transform.scale(
+        pygame.image.load("textures/shield.png"), (300, 200))
+    window.blit(shield_banner, (widthWindow/2 - 140, heightWindow/2 - 140))
     pygame.display.update()
     time.sleep(1)
 
@@ -573,6 +538,7 @@ while run:
         generate_new_obstacles()
         generate_new_gold()
         points_counter -= 2
+        level -= 1
 
     if m_key_pressed:
         pause()
@@ -611,11 +577,12 @@ while run:
                 enemy.delete()
                 powershield = False
 
+    font = pygame.font.Font('font/snap.ttf', 30)
     points_text = font.render(
-        f'Coins: {points_counter}', True, (255, 255, 255))
-    window.blit(points_text, (1810, 10))
+        f'Gold: {points_counter}', True, (255, 0, 0))
+    window.blit(points_text, (1750, 10))
     points_text = font.render(
-        f'Level: {level}', True, (255, 255, 255))
-    window.blit(points_text, (10, 10))
+        f'Level: {level}', True, (255, 0, 0))
+    window.blit(points_text, (20, 10))
 
     pygame.display.update()
