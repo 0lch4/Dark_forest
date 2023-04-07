@@ -23,10 +23,17 @@ o_key_pressed = False
 o_key_released = True
 i_key_pressed = False
 i_key_released = True
+m_key_pressed = False
+m_key_released = True
 powershield = False
 
 speed = 8
 max_speed = 15
+
+intro1 = pygame.image.load("textures/intro.png")
+intro2 = pygame.image.load("textures/intro2.png")
+intro3 = pygame.image.load("textures/intro3.png")
+pauza = pygame.image.load("textures/pauza.png")
 
 background = pygame.image.load('textures/tlo.jpg')
 background = pygame.transform.scale(background, window.get_size())
@@ -112,9 +119,18 @@ ghost_rect = ghost_texture.get_rect()
 def start():
     start_width, start_height = 1920, 1080
     start_surface = pygame.Surface((start_width, start_height))
+    window.blit(intro1, (1, 1))
+    pygame.display.update()
+    time.sleep(1)
+    window.blit(intro2, (1, 1))
+    pygame.display.update()
+    time.sleep(1)
+    window.blit(intro3, (1, 1))
+    pygame.display.update()
+    time.sleep(1)
     start_surface.fill((123, 203, 237))
     tekst = pygame.font.Font(None, 50)
-    tekst_lines = ["Welcome in Coin Game",
+    tekst_lines = ["Welcome in Dark Forest",
                    "Move: W,A,S,D", "Buy shield: I", "Buy refresh: O", "Buy speed boost: P", "End: ESCAPE", "press space to continue"]
     tekst_color = 0, 0, 0
     tekst_height = 0
@@ -148,6 +164,17 @@ def end():
     end_y = (heightWindow) / 4
     window.blit(end_surface, (end_x, end_y))
     pygame.display.update()
+
+
+def pause():
+    pauz = True
+    while pauz:
+        window.blit(pauza, (1, 1))
+        pygame.display.update()
+        w8 = pygame.event.wait()
+        if w8.type == pygame.KEYDOWN and w8.key == pygame.K_m:
+            pauz = False
+            time.sleep(1)
 
 
 def speed_boost():
@@ -478,9 +505,10 @@ while run:
 
     if keys[pygame.K_i]:
         if i_key_released:
-            if points_counter > 0:
+            if points_counter >= 3:
                 i_key_pressed = True
                 shield()
+                points_counter -= 3
                 powershield = True
             i_key_released = False
         else:
@@ -490,16 +518,24 @@ while run:
     if keys[pygame.K_p]:
         if p_key_released:
             p_key_pressed = True
-            if speed <= max_speed and points_counter > 0:
+            if speed <= max_speed and points_counter >= 2:
                 speed_boost()
                 speed += 1
-                points_counter -= 1
+                points_counter -= 2
             elif speed == max_speed:
                 speed_boost()
             p_key_released = False
         else:
             p_key_pressed = False
             p_key_released = True
+
+    if keys[pygame.K_m]:
+        if m_key_released:
+            m_key_pressed = True
+            m_key_released = False
+        else:
+            m_key_pressed = False
+            m_key_released = True
 
     old_x, old_y = x, y
     x += xx
@@ -537,6 +573,9 @@ while run:
         generate_new_obstacles()
         generate_new_gold()
         points_counter -= 2
+
+    if m_key_pressed:
+        pause()
 
     window.blit(background, (0, 0))
 
