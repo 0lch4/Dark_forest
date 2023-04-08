@@ -139,6 +139,25 @@ def start():
 
 
 def deadscreen():
+    global level
+    global points_counter
+    global number_devils
+    global number_fasts
+    global number_mutants
+    global number_ghosts
+    global number_obstacles
+    global p_key_pressed
+    global p_key_released
+    global o_key_pressed
+    global o_key_released
+    global i_key_pressed
+    global i_key_released
+    global m_key_pressed
+    global m_key_released
+    global powershield
+    global speed
+    global x
+    global y
     waiting = True
     w8 = True
     end_width, end_height = 1920, 1080
@@ -165,14 +184,33 @@ def deadscreen():
                 waiting = False
                 window.blit(menu, (1, 1))
                 pygame.display.update()
-
                 while w8:
                     for i in pygame.event.get():
                         keys = pygame.key.get_pressed()
                         if keys[pygame.K_SPACE]:
                             time.sleep(0.5)
+                            points_counter = -1
+                            number_devils = 0
+                            number_fasts = 0
+                            number_mutants = 0
+                            number_ghosts = 0
+                            number_obstacles = 15
+                            p_key_pressed = False
+                            p_key_released = True
+                            o_key_pressed = False
+                            o_key_released = True
+                            i_key_pressed = False
+                            i_key_released = True
+                            m_key_pressed = False
+                            m_key_released = True
+                            powershield = False
+                            speed = 8
+                            x = 100
+                            y = 100
+                            level = 0
                             w8 = False
-
+                            pygame.display.update()
+                            break
             elif keys[pygame.K_ESCAPE]:
                 quit()
 
@@ -597,6 +635,10 @@ while run:
         if enemy.rect.colliderect(player1_rect):
             if powershield == False:
                 deadscreen()
+                generate_new_enemy()
+                generate_new_gold()
+                generate_new_obstacles()
+                break
             elif powershield == True:
                 enemy.delete()
                 powershield = False
