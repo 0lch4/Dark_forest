@@ -13,8 +13,8 @@ number_devils = 0
 number_fasts = 0
 number_mutants = 0
 number_ghosts = 0
-number_obstacles = 10
-max_obstacles = 21
+number_obstacles = 8
+max_obstacles = 19
 font = pygame.font.Font(None, 36)
 x = 100
 y = 100
@@ -156,8 +156,9 @@ ghost_corpses = pygame.transform.scale(pygame.image.load(
 ghost_dead_animation = [pygame.transform.scale(pygame.image.load('textures/ghostdead1L.png'), (ghostWidth, ghostHeight)), pygame.transform.scale(pygame.image.load(
     'textures/ghostdead2L.png'), (ghostWidth, ghostHeight)), pygame.transform.scale(pygame.image.load('textures/ghostdead3L.png'), (ghostWidth, ghostHeight))]
 
-
+move_sound = pygame.mixer.Sound('sounds/kroki.mp3')
 pickup_sound = pygame.mixer.Sound('sounds/pickup.mp3')
+intro_sound = pygame.mixer.Sound('sounds/intro.mp3')
 player_dead_sound = pygame.mixer.Sound('sounds/playerdead.mp3')
 ghost_dead_sound = pygame.mixer.Sound('sounds/ghostdead.mp3')
 devil_dead_sound = pygame.mixer.Sound('sounds/devildead.mp3')
@@ -178,27 +179,43 @@ shield_sound = pygame.mixer.Sound('sounds/shield.mp3')
 refresh_sound = pygame.mixer.Sound('sounds/refresh.mp3')
 
 
+def play_sound(sound):
+    if not pygame.mixer.get_busy():
+        sound.play()
+
+
+def stop_sound(sound):
+    sound.stop()
+
+
 def start():
     intro1 = pygame.image.load("textures/intro.png")
     intro2 = pygame.image.load("textures/intro2.png")
     intro3 = pygame.image.load("textures/intro3.png")
+    olchastudio = pygame.image.load("textures/olchastudio.png")
+    window.blit(olchastudio, (1, 1))
+    intro_sound.play()
+    pygame.display.update()
+    time.sleep(4.4)
     window.blit(intro1, (1, 1))
     pygame.display.update()
-    time.sleep(2)
+    time.sleep(2.4)
     window.blit(intro2, (1, 1))
     pygame.display.update()
-    time.sleep(2)
+    time.sleep(4.6)
     window.blit(intro3, (1, 1))
     pygame.display.update()
     window.blit(menu, (1, 1))
-    time.sleep(2)
+    time.sleep(4)
     pygame.display.update()
     waiting = True
     while waiting:
+        play_sound(intro_sound)
         for i in pygame.event.get():
             keys = pygame.key.get_pressed()
             if keys[pygame.K_SPACE]:
                 waiting = False
+                stop_sound(intro_sound)
 
 
 def deadscreen():
@@ -258,7 +275,7 @@ def deadscreen():
                             number_fasts = 0
                             number_mutants = 0
                             number_ghosts = 0
-                            number_obstacles = 15
+                            number_obstacles = 8
                             p_key_pressed = False
                             p_key_released = True
                             o_key_pressed = False
@@ -606,17 +623,7 @@ def generate_new_enemy():
     enemy_list = enemies()
 
 
-def play_sound(sound):
-    if not pygame.mixer.get_busy():
-        sound.play()
-
-
-def stop_sound(sound):
-    sound.stop()
-
-
 start()
-move_sound = pygame.mixer.Sound('sounds/kroki.mp3')
 pygame.mixer.music.load('sounds/music.mp3')
 pygame.mixer.music.set_volume(0.4)
 pygame.mixer.music.play(-1)
