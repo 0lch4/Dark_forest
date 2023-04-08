@@ -3,6 +3,7 @@ import random
 import time
 
 pygame.init()
+pygame.mouse.set_visible(False)
 widthWindow = 1920
 heightWindow = 1080
 window = pygame.display.set_mode((widthWindow, heightWindow))
@@ -12,8 +13,8 @@ number_devils = 0
 number_fasts = 0
 number_mutants = 0
 number_ghosts = 0
-number_obstacles = 15
-max_obstacles = 33
+number_obstacles = 10
+max_obstacles = 21
 font = pygame.font.Font(None, 36)
 x = 100
 y = 100
@@ -73,6 +74,25 @@ bushHeight = 40
 bush_texture = pygame.transform.scale(
     pygame.image.load('textures/krzak.png'), (bushWidth, bushHeight))
 bush_rect = bush_texture.get_rect()
+
+bonesWidth = 70
+bonesHeight = 30
+bones_texture = pygame.transform.scale(
+    pygame.image.load('textures/bones.png'), (bonesWidth, bonesHeight))
+bones_rect = bones_texture.get_rect()
+
+sarnaWidth = 50
+sarnaHeight = 30
+sarna_texture = pygame.transform.scale(
+    pygame.image.load('textures/sarna.png'), (bonesWidth, bonesHeight))
+sarna_rect = sarna_texture.get_rect()
+
+deadtreeWidth = 70
+deadtreeHeight = 100
+deadtree_texture = pygame.transform.scale(
+    pygame.image.load('textures/deadtree.png'), (deadtreeWidth, deadtreeHeight))
+deadtree_rect = deadtree_texture.get_rect()
+
 
 devilWidth = 50
 devilHeight = 50
@@ -327,7 +347,7 @@ class Border:
         self.rect = pygame.Rect(x, y, width, height)
 
     def draw(self, surface):
-        pygame.draw.rect(surface, (255, 255, 255), self.rect)
+        pygame.draw.rect(surface, (255, 0, 0), self.rect)
 
 
 def borders():
@@ -378,9 +398,27 @@ def obstacles():
                         bushHeight, bush_texture)
         obstacles_list.append(bush)
 
-    load(number_obstacles, tree, obstacles_list, tree_rect)
-    load(number_obstacles, stone, obstacles_list, stone_rect)
-    load(number_obstacles, bush, obstacles_list, bush_rect)
+    def bones(xbones, ybones):
+        bones = Obstacle(xbones, ybones, bonesWidth,
+                         bonesHeight, bones_texture)
+        obstacles_list.append(bones)
+
+    def sarna(xsarna, ysarna):
+        sarna = Obstacle(xsarna, ysarna, sarnaWidth,
+                         sarnaHeight, sarna_texture)
+        obstacles_list.append(sarna)
+
+    def deadtree(xdeadtree, ydeadtree):
+        deadtree = Obstacle(xdeadtree, ydeadtree, deadtreeWidth,
+                            deadtreeHeight, deadtree_texture)
+        obstacles_list.append(deadtree)
+
+    load(number_obstacles-1, tree, obstacles_list, tree_rect)
+    load(number_obstacles-4, stone, obstacles_list, stone_rect)
+    load(number_obstacles-2, bush, obstacles_list, bush_rect)
+    load(number_obstacles-3, bones, obstacles_list, bones_rect)
+    load(number_obstacles-5, sarna, obstacles_list, sarna_rect)
+    load(number_obstacles-2, deadtree, obstacles_list, deadtree_rect)
 
     return obstacles_list
 
