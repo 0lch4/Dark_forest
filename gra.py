@@ -184,14 +184,14 @@ def start():
     intro3 = pygame.image.load("textures/intro3.png")
     window.blit(intro1, (1, 1))
     pygame.display.update()
-    time.sleep(1)
+    time.sleep(2)
     window.blit(intro2, (1, 1))
     pygame.display.update()
-    time.sleep(1)
+    time.sleep(2)
     window.blit(intro3, (1, 1))
     pygame.display.update()
     window.blit(menu, (1, 1))
-    time.sleep(1)
+    time.sleep(2)
     pygame.display.update()
     waiting = True
     while waiting:
