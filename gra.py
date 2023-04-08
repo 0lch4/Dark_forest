@@ -40,7 +40,8 @@ player1_texture = pygame.transform.scale(
     pygame.image.load('textures/player.png'), (40, 40))
 player1_rect = player1_texture.get_rect()
 player1_texture_shield1 = pygame.image.load('textures/playershield1.png')
-
+player_dead_animation = [pygame.image.load('textures/playerdead1.png'), pygame.image.load(
+    'textures/playerdead2.png'), pygame.image.load('textures/playerdead3.png')]
 player1_rect.x = x
 player1_rect.y = y
 
@@ -341,6 +342,15 @@ def obstacles():
 obstacles_list = obstacles()
 
 
+def death_animation(death_frames):
+    global x
+    global y
+    for i in death_frames:
+        window.blit(i, (x, y))
+        pygame.display.update()
+        pygame.time.wait(100)
+
+
 class Enemy:
     def __init__(self, x, y, width, height, texture, speed, collison, enemy_type):
         self.rect = pygame.Rect(x, y, width, height)
@@ -635,6 +645,8 @@ while run:
         window.blit(enemy.texture, enemy.rect)
         if enemy.rect.colliderect(player1_rect):
             if powershield == False:
+                death_animation(player_dead_animation)
+                time.sleep(1)
                 deadscreen()
                 generate_new_enemy()
                 generate_new_gold()
