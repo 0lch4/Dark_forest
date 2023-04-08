@@ -6,10 +6,10 @@ pygame.init()
 widthWindow = 1920
 heightWindow = 1080
 window = pygame.display.set_mode((widthWindow, heightWindow))
-points_counter = -1
+points_counter = 100
 level = 0
 number_devils = 0
-number_fasts = 0
+number_fasts = 5
 number_mutants = 0
 number_ghosts = 0
 number_obstacles = 15
@@ -26,6 +26,8 @@ i_key_released = True
 m_key_pressed = False
 m_key_released = True
 powershield = False
+CX = 0
+CY = 0
 
 speed = 8
 max_speed = 15
@@ -39,9 +41,12 @@ background = pygame.transform.scale(background, window.get_size())
 player1_texture = pygame.transform.scale(
     pygame.image.load('textures/player.png'), (40, 40))
 player1_rect = player1_texture.get_rect()
+
 player1_texture_shield1 = pygame.image.load('textures/playershield1.png')
+
 player_dead_animation = [pygame.image.load('textures/playerdead1.png'), pygame.image.load(
     'textures/playerdead2.png'), pygame.image.load('textures/playerdead3.png')]
+
 player1_rect.x = x
 player1_rect.y = y
 
@@ -63,7 +68,6 @@ gold_texture = pygame.transform.scale(
     pygame.image.load('textures/gold.png'), (goldWidth, goldHeight))
 gold_rect = gold_texture.get_rect()
 
-
 bushWidth = 40
 bushHeight = 40
 bush_texture = pygame.transform.scale(
@@ -78,6 +82,12 @@ devil_texture = pygame.transform.scale(
     pygame.image.load('textures/enemy.png'), (devilWidth, devilHeight))
 devil_rect = devil_texture.get_rect()
 
+devil_corpses = pygame.transform.scale(pygame.image.load(
+    'textures/devildead3.png'), (devilWidth, devilHeight))
+devil_dead_animation = [pygame.transform.scale(pygame.image.load('textures/devildead1.png'), (devilWidth, devilHeight)), pygame.transform.scale(pygame.image.load(
+    'textures/devildead2.png'), (devilWidth, devilHeight)), pygame.transform.scale(pygame.image.load('textures/devildead3.png'), (devilWidth, devilHeight))]
+
+
 fastWidth = 40
 fastHeight = 40
 fastSpeed = 15
@@ -85,6 +95,10 @@ fastCollision = 40
 fast_texture = pygame.transform.scale(
     pygame.image.load('textures/fast.png'), (fastWidth, fastHeight))
 fast_rect = fast_texture.get_rect()
+fast_corpses = pygame.transform.scale(pygame.image.load(
+    'textures/fastdead3.png'), (fastWidth, fastHeight))
+fast_dead_animation = [pygame.transform.scale(pygame.image.load('textures/fastdead1.png'), (fastWidth, fastHeight)), pygame.transform.scale(pygame.image.load(
+    'textures/fastdead2.png'), (fastWidth, fastHeight)), pygame.transform.scale(pygame.image.load('textures/fastdead3.png'), (fastWidth, fastHeight))]
 
 mutantWidth = 100
 mutantHeight = 100
@@ -342,17 +356,26 @@ def obstacles():
 obstacles_list = obstacles()
 
 
-def death_animation(death_frames):
-    global x
-    global y
+def death_animation(death_frames, x, y):
     for i in death_frames:
         window.blit(i, (x, y))
         pygame.display.update()
         pygame.time.wait(100)
 
+    def __init__(self, x, y, texture):
+        self.rect = pygame.Rect(x, y)
+        self.texture = texture
+
+    def draw(self, surface):
+        surface.blit(self.texture, self.rect)
+
+
+dead_enemy_list = []
+
 
 class Enemy:
     def __init__(self, x, y, width, height, texture, speed, collison, enemy_type):
+        alive = True
         self.rect = pygame.Rect(x, y, width, height)
         self.texture = texture
         self.speed = speed
@@ -413,11 +436,9 @@ class Enemy:
             elif new_direction == (-1, 0):
                 self.texture = L
 
-    def __del__(self):
-        del self.rect
-        del self.texture
-
     def delete(self):
+        window.blit(fast_corpses, (self.rect.x, self.rect.y))
+        dead_enemy_list.append(self)
         enemy_list.remove(self)
         del self
 
@@ -474,6 +495,7 @@ def points():
         gold = Obstacle(xgold, ygold, goldWidth,
                         goldHeight, gold_texture)
         gold_list.append(gold)
+        dead_enemy_list.clear()
         points_counter += 1
         level += 1
         if number_obstacles <= max_obstacles:
@@ -645,7 +667,7 @@ while run:
         window.blit(enemy.texture, enemy.rect)
         if enemy.rect.colliderect(player1_rect):
             if powershield == False:
-                death_animation(player_dead_animation)
+                death_animation(player_dead_animation, x, y)
                 time.sleep(1)
                 deadscreen()
                 generate_new_enemy()
@@ -653,8 +675,20 @@ while run:
                 generate_new_obstacles()
                 break
             elif powershield == True:
+                if enemy.type == 'fast':
+                    death_animation(fast_dead_animation,
+                                    enemy.rect.x, enemy.rect.y)
+                elif enemy.type == 'devil':
+                    death_animation(devil_dead_animation,
+                                    enemy.rect.x, enemy.rect.y)
                 enemy.delete()
                 powershield = False
+
+    for enemy in dead_enemy_list:
+        if enemy.type == 'fast':
+            window.blit(fast_corpses, (enemy.rect.x, enemy.rect.y))
+        if enemy.type == 'devil':
+            window.blit(devil_corpses, (enemy.rect.x, enemy.rect.y))
 
     font = pygame.font.Font('font/snap.ttf', 30)
     points_text = font.render(
