@@ -30,12 +30,8 @@ powershield = False
 speed = 8
 max_speed = 15
 
-intro1 = pygame.image.load("textures/intro.png")
-intro2 = pygame.image.load("textures/intro2.png")
-intro3 = pygame.image.load("textures/intro3.png")
-pauza = pygame.image.load("textures/pauza.png")
+
 menu = pygame.image.load("textures/menu.png")
-dead = pygame.image.load("textures/deadscreen.png")
 background = pygame.image.load('textures/tlo.jpg')
 background = pygame.transform.scale(background, window.get_size())
 
@@ -119,6 +115,9 @@ ghost_rect = ghost_texture.get_rect()
 
 
 def start():
+    intro1 = pygame.image.load("textures/intro.png")
+    intro2 = pygame.image.load("textures/intro2.png")
+    intro3 = pygame.image.load("textures/intro3.png")
     window.blit(intro1, (1, 1))
     pygame.display.update()
     time.sleep(1)
@@ -139,6 +138,7 @@ def start():
 
 
 def deadscreen():
+    dead = pygame.image.load("textures/deadscreen.png")
     global level
     global points_counter
     global number_devils
@@ -216,6 +216,7 @@ def deadscreen():
 
 
 def pause():
+    pauza = pygame.image.load("textures/pauza.png")
     waiting = True
     while waiting:
         window.blit(pauza, (1, 1))
