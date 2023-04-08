@@ -35,8 +35,10 @@ intro2 = pygame.image.load("textures/intro2.png")
 intro3 = pygame.image.load("textures/intro3.png")
 pauza = pygame.image.load("textures/pauza.png")
 menu = pygame.image.load("textures/menu.png")
+dead = pygame.image.load("textures/deadscreen.png")
 background = pygame.image.load('textures/tlo.jpg')
 background = pygame.transform.scale(background, window.get_size())
+
 
 player1_texture = pygame.transform.scale(
     pygame.image.load('textures/player.png'), (40, 40))
@@ -147,6 +149,19 @@ def end():
     end_y = 0
     window.blit(end_surface, (end_x, end_y))
     pygame.display.update()
+
+
+def deadscreen():
+    waiting = True
+    window.blit(dead, (0, 0))
+    pygame.display.update()
+    while waiting:
+        for i in pygame.event.get():
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_SPACE]:
+                waiting = False
+            elif keys[pygame.K_ESCAPE]:
+                quit()
 
 
 def pause():
@@ -570,7 +585,7 @@ while run:
             if powershield == False:
                 end()
                 time.sleep(2)
-                quit()
+                deadscreen()
             elif powershield == True:
                 enemy.delete()
                 powershield = False
