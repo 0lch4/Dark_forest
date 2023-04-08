@@ -541,7 +541,22 @@ def generate_new_enemy():
     enemy_list = enemies()
 
 
+def play_sound(sound):
+    if not pygame.mixer.get_busy():
+        sound.play()
+
+
+def stop_sound(sound):
+    sound.stop()
+
+
 start()
+
+move_sound = pygame.mixer.Sound('sounds/kroki.mp3')
+pygame.mixer.music.load('sounds/music.mp3')
+pygame.mixer.music.set_volume(0.4)
+pygame.mixer.music.play(-1)
+
 
 run = True
 while run:
@@ -556,13 +571,18 @@ while run:
     xx, yy = 0, 0
     if keys[pygame.K_d]:
         xx += speed
-    if keys[pygame.K_a]:
+        play_sound(move_sound)
+    elif keys[pygame.K_a]:
         xx -= speed
-    if keys[pygame.K_s]:
+        play_sound(move_sound)
+    elif keys[pygame.K_s]:
         yy += speed
-    if keys[pygame.K_w]:
+        play_sound(move_sound)
+    elif keys[pygame.K_w]:
         yy -= speed
-
+        play_sound(move_sound)
+    else:
+        stop_sound(move_sound)
     if keys[pygame.K_o]:
         if o_key_released:
             if points_counter > 0:
