@@ -14,7 +14,7 @@ number_fasts = 0
 number_mutants = 0
 number_ghosts = 0
 number_obstacles = 8
-max_obstacles = 19
+max_obstacles = 18
 font = pygame.font.Font(None, 36)
 x = 100
 y = 100
@@ -35,8 +35,17 @@ max_speed = 15
 
 
 menu = pygame.image.load("textures/menu.png")
-background = pygame.image.load('textures/tlo.jpg')
-background = pygame.transform.scale(background, window.get_size())
+background1 = pygame.image.load('textures/tlo.jpg')
+background2 = pygame.image.load('textures/tlo2.jpg')
+background1 = pygame.transform.scale(background1, window.get_size())
+background2 = pygame.transform.scale(background2, window.get_size())
+background_list = [background1, background2]
+background = background1
+
+
+def random_background():
+    background = random.choice(background_list)
+    return background
 
 
 player1_texture = pygame.transform.scale(
@@ -430,12 +439,18 @@ def obstacles():
                             deadtreeHeight, deadtree_texture)
         obstacles_list.append(deadtree)
 
-    load(number_obstacles-1, tree, obstacles_list, tree_rect)
-    load(number_obstacles-4, stone, obstacles_list, stone_rect)
-    load(number_obstacles-2, bush, obstacles_list, bush_rect)
-    load(number_obstacles-3, bones, obstacles_list, bones_rect)
-    load(number_obstacles-5, sarna, obstacles_list, sarna_rect)
-    load(number_obstacles-2, deadtree, obstacles_list, deadtree_rect)
+    if background == background1:
+        load(number_obstacles, tree, obstacles_list, tree_rect)
+        load(number_obstacles-4, sarna, obstacles_list, sarna_rect)
+        load(number_obstacles-2, bush, obstacles_list, bush_rect)
+        load(number_obstacles-7, bones, obstacles_list, bones_rect)
+        load(number_obstacles-6, stone, obstacles_list, stone_rect)
+
+    if background == background2:
+        load(number_obstacles, deadtree, obstacles_list, deadtree_rect)
+        load(number_obstacles-2, bones, obstacles_list, bones_rect)
+        load(number_obstacles-1, stone, obstacles_list, stone_rect)
+        load(number_obstacles-2, sarna, obstacles_list, sarna_rect)
 
     return obstacles_list
 
@@ -714,6 +729,7 @@ while run:
 
     for gold in gold_list:
         if player1_rect.colliderect(gold.rect):
+            background = random_background()
             gold_list.remove(gold)
             generate_new_obstacles()
             generate_new_gold()
