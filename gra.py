@@ -7,7 +7,7 @@ widthWindow = 1920
 heightWindow = 1080
 window = pygame.display.set_mode((widthWindow, heightWindow))
 points_counter = -1
-level = 1
+level = 0
 number_devils = 0
 number_fasts = 0
 number_mutants = 0
@@ -488,6 +488,8 @@ def enemies():
 
 enemy_list = enemies()
 
+pickup_sound = pygame.mixer.Sound('sounds/pickup.mp3')
+
 
 def points():
     gold_list = []
@@ -503,6 +505,8 @@ def points():
         gold = Obstacle(xgold, ygold, goldWidth,
                         goldHeight, gold_texture)
         gold_list.append(gold)
+        if level != 0:
+            pickup_sound.play()
         dead_enemy_list.clear()
         points_counter += 1
         level += 1
@@ -534,6 +538,7 @@ def generate_new_gold():
     global gold_list
     gold_list.clear()
     gold_list = points()
+    play_sound(pickup_sound)
 
 
 def generate_new_enemy():
@@ -551,7 +556,7 @@ def stop_sound(sound):
 
 
 start()
-
+pickup_sound_played = False
 move_sound = pygame.mixer.Sound('sounds/kroki.mp3')
 pygame.mixer.music.load('sounds/music.mp3')
 pygame.mixer.music.set_volume(0.4)
@@ -567,7 +572,6 @@ while run:
             run = False
         if keys[pygame.K_ESCAPE]:
             run = False
-
     xx, yy = 0, 0
     if keys[pygame.K_d]:
         xx += speed
@@ -642,11 +646,13 @@ while run:
             elif i == borders_list[3]:
                 x = i.rect.right - 45
 
-    for i in gold_list:
-        if player1_rect.colliderect(i.rect):
+    for gold in gold_list:
+        if player1_rect.colliderect(gold.rect):
+            gold_list.remove(gold)
             generate_new_obstacles()
             generate_new_gold()
             generate_new_enemy()
+
         else:
             for i in obstacles_list:
                 if player1_rect.colliderect(i.rect):
