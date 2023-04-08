@@ -137,6 +137,27 @@ ghost_dead_animation = [pygame.transform.scale(pygame.image.load('textures/ghost
     'textures/ghostdead2L.png'), (ghostWidth, ghostHeight)), pygame.transform.scale(pygame.image.load('textures/ghostdead3L.png'), (ghostWidth, ghostHeight))]
 
 
+pickup_sound = pygame.mixer.Sound('sounds/pickup.mp3')
+player_dead_sound = pygame.mixer.Sound('sounds/playerdead.mp3')
+ghost_dead_sound = pygame.mixer.Sound('sounds/ghostdead.mp3')
+devil_dead_sound = pygame.mixer.Sound('sounds/devildead.mp3')
+devil_dead_sound.set_volume(0.5)
+monsters1_sound = pygame.mixer.Sound('sounds/monsters.mp3')
+monsters2_sound = pygame.mixer.Sound('sounds/monsters2.mp3')
+fast_dead_sound = pygame.mixer.Sound('sounds/fastdead.mp3')
+fast_dead_sound.set_volume(0.5)
+mutant_dead_sound = pygame.mixer.Sound('sounds/mutantdead.mp3')
+monsters1_sound = pygame.mixer.Sound('sounds/monsters.mp3')
+monsters1_sound.set_volume(0.5)
+monsters2_sound = pygame.mixer.Sound('sounds/monsters2.mp3')
+
+monsters_sounds = [monsters1_sound, monsters2_sound]
+
+speed_sound = pygame.mixer.Sound('sounds/speed.mp3')
+shield_sound = pygame.mixer.Sound('sounds/shield.mp3')
+refresh_sound = pygame.mixer.Sound('sounds/refresh.mp3')
+
+
 def start():
     intro1 = pygame.image.load("textures/intro.png")
     intro2 = pygame.image.load("textures/intro2.png")
@@ -257,6 +278,7 @@ def speed_boost():
     max_speed_banner = pygame.transform.scale(
         pygame.image.load("textures/maxspeed.png"), (300, 200))
     if speed < 15:
+        speed_sound.play()
         window.blit(speed_boost_banner,
                     (widthWindow/2-140, heightWindow/2-140))
     else:
@@ -267,6 +289,7 @@ def speed_boost():
 
 
 def refresh():
+    refresh_sound.play()
     refresh_banner = pygame.transform.scale(
         pygame.image.load("textures/refresh.png"), (300, 200))
     window.blit(refresh_banner, (widthWindow/2 - 140, heightWindow/2 - 140))
@@ -275,6 +298,7 @@ def refresh():
 
 
 def shield():
+    shield_sound.play()
     shield_banner = pygame.transform.scale(
         pygame.image.load("textures/shield.png"), (300, 200))
     window.blit(shield_banner, (widthWindow/2 - 140, heightWindow/2 - 140))
@@ -488,8 +512,6 @@ def enemies():
 
 enemy_list = enemies()
 
-pickup_sound = pygame.mixer.Sound('sounds/pickup.mp3')
-
 
 def points():
     gold_list = []
@@ -556,7 +578,6 @@ def stop_sound(sound):
 
 
 start()
-pickup_sound_played = False
 move_sound = pygame.mixer.Sound('sounds/kroki.mp3')
 pygame.mixer.music.load('sounds/music.mp3')
 pygame.mixer.music.set_volume(0.4)
@@ -574,17 +595,17 @@ while run:
             run = False
     xx, yy = 0, 0
     if keys[pygame.K_d]:
+        play_sound(move_sound)
         xx += speed
-        play_sound(move_sound)
     elif keys[pygame.K_a]:
+        play_sound(move_sound)
         xx -= speed
-        play_sound(move_sound)
     elif keys[pygame.K_s]:
+        play_sound(move_sound)
         yy += speed
-        play_sound(move_sound)
     elif keys[pygame.K_w]:
-        yy -= speed
         play_sound(move_sound)
+        yy -= speed
     else:
         stop_sound(move_sound)
     if keys[pygame.K_o]:
@@ -699,8 +720,14 @@ while run:
         elif enemy.type == 'ghost':
             enemy.mirror(ghost_textureL, ghost_textureR)
         window.blit(enemy.texture, enemy.rect)
+
+        if abs(player1_rect.x - enemy.rect.x) <= 200 and abs(player1_rect.y - enemy.rect.y) <= 200:
+            random_monster_sound = random.choice(monsters_sounds)
+            play_sound(random_monster_sound)
+
         if enemy.rect.colliderect(player1_rect):
             if powershield == False:
+                player_dead_sound.play()
                 death_animation(player_dead_animation, x, y)
                 time.sleep(1)
                 deadscreen()
@@ -710,15 +737,19 @@ while run:
                 break
             elif powershield == True:
                 if enemy.type == 'fast':
+                    fast_dead_sound.play()
                     death_animation(fast_dead_animation,
                                     enemy.rect.x, enemy.rect.y)
                 elif enemy.type == 'devil':
+                    devil_dead_sound.play()
                     death_animation(devil_dead_animation,
                                     enemy.rect.x, enemy.rect.y)
                 elif enemy.type == 'mutant':
+                    mutant_dead_sound.play()
                     death_animation(mutant_dead_animation,
                                     enemy.rect.x, enemy.rect.y)
                 elif enemy.type == 'ghost':
+                    ghost_dead_sound.play()
                     death_animation(ghost_dead_animation,
                                     enemy.rect.x, enemy.rect.y)
                 enemy.delete()
