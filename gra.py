@@ -6,8 +6,8 @@ pygame.init()
 widthWindow = 1920
 heightWindow = 1080
 window = pygame.display.set_mode((widthWindow, heightWindow))
-points_counter = 100
-level = 2
+points_counter = -1
+level = 1
 number_devils = 0
 number_fasts = 0
 number_mutants = 0
@@ -131,6 +131,10 @@ ghost_textureL = ghost_texture
 ghost_textureR = pygame.transform.scale(
     pygame.image.load('textures/ghostR.png'), (ghostWidth, ghostHeight))
 ghost_rect = ghost_texture.get_rect()
+ghost_corpses = pygame.transform.scale(pygame.image.load(
+    'textures/ghostdead3L.png'), (ghostWidth, ghostHeight))
+ghost_dead_animation = [pygame.transform.scale(pygame.image.load('textures/ghostdead1L.png'), (ghostWidth, ghostHeight)), pygame.transform.scale(pygame.image.load(
+    'textures/ghostdead2L.png'), (ghostWidth, ghostHeight)), pygame.transform.scale(pygame.image.load('textures/ghostdead3L.png'), (ghostWidth, ghostHeight))]
 
 
 def start():
@@ -688,6 +692,9 @@ while run:
                 elif enemy.type == 'mutant':
                     death_animation(mutant_dead_animation,
                                     enemy.rect.x, enemy.rect.y)
+                elif enemy.type == 'ghost':
+                    death_animation(ghost_dead_animation,
+                                    enemy.rect.x, enemy.rect.y)
                 enemy.delete()
                 powershield = False
 
@@ -698,6 +705,8 @@ while run:
             window.blit(devil_corpses, (enemy.rect.x, enemy.rect.y))
         if enemy.type == 'mutant':
             window.blit(mutant_corpses, (enemy.rect.x, enemy.rect.y))
+        if enemy.type == 'ghost':
+            window.blit(ghost_corpses, (enemy.rect.x, enemy.rect.y))
 
     font = pygame.font.Font('font/snap.ttf', 30)
     points_text = font.render(
