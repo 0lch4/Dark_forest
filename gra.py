@@ -138,7 +138,9 @@ def start():
                 waiting = False
 
 
-def end():
+def deadscreen():
+    waiting = True
+    w8 = True
     end_width, end_height = 1920, 1080
     end_surface = pygame.Surface((end_width, end_height))
     end_texture = pygame.transform.scale(pygame.image.load(
@@ -149,17 +151,28 @@ def end():
     end_y = 0
     window.blit(end_surface, (end_x, end_y))
     pygame.display.update()
-
-
-def deadscreen():
-    waiting = True
+    time.sleep(2)
     window.blit(dead, (0, 0))
+    Dfont = pygame.font.Font('font/snap.ttf', 100)
+    points_text = Dfont.render(
+        f'Your score: {level}', True, (255, 0, 0))
+    window.blit(points_text, (widthWindow/4 + 70, heightWindow/4))
     pygame.display.update()
     while waiting:
         for i in pygame.event.get():
             keys = pygame.key.get_pressed()
             if keys[pygame.K_SPACE]:
                 waiting = False
+                window.blit(menu, (1, 1))
+                pygame.display.update()
+
+                while w8:
+                    for i in pygame.event.get():
+                        keys = pygame.key.get_pressed()
+                        if keys[pygame.K_SPACE]:
+                            time.sleep(0.5)
+                            w8 = False
+
             elif keys[pygame.K_ESCAPE]:
                 quit()
 
@@ -583,8 +596,6 @@ while run:
         window.blit(enemy.texture, enemy.rect)
         if enemy.rect.colliderect(player1_rect):
             if powershield == False:
-                end()
-                time.sleep(2)
                 deadscreen()
             elif powershield == True:
                 enemy.delete()
