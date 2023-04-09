@@ -32,8 +32,6 @@ u_key_released = True
 r_key_pressed = False
 r_key_released = True
 powershield = False
-CX = 0
-CY = 0
 gun_on = False
 
 speed = 8
