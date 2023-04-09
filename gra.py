@@ -7,7 +7,7 @@ pygame.mouse.set_visible(False)
 widthWindow = 1920
 heightWindow = 1080
 window = pygame.display.set_mode((widthWindow, heightWindow))
-points_counter = 5
+points_counter = -1
 level = 0
 number_devils = 0
 number_fasts = 0
@@ -89,7 +89,7 @@ player_plazmaRS_texture = pygame.transform.scale(
     pygame.image.load('textures/playerpalzmaPS.png'), (40, 40))
 
 player_plazmaTS_texture = pygame.transform.scale(
-    pygame.image.load('textures/playerpalzmaTS.png'), (40, 40))
+    pygame.image.load('textures/playerplazmaTS.png'), (40, 40))
 
 player_plazmaDS_texture = pygame.transform.scale(
     pygame.image.load('textures/playerpalzmaDS.png'), (40, 40))
