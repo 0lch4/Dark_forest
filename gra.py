@@ -7,7 +7,7 @@ pygame.mouse.set_visible(False)
 widthWindow = 1920
 heightWindow = 1080
 window = pygame.display.set_mode((widthWindow, heightWindow))
-points_counter = -1
+points_counter = 5
 level = 0
 number_devils = 0
 number_fasts = 0
@@ -58,13 +58,41 @@ player1_texture = pygame.transform.scale(
     pygame.image.load('textures/player.png'), (40, 40))
 player1_rect = player1_texture.get_rect()
 
-player1_texture_shield1 = pygame.image.load('textures/playershield1.png')
+player1_texture_shield = pygame.image.load('textures/playershield1.png')
 
 player_dead_animation = [pygame.image.load('textures/playerdead1.png'), pygame.image.load(
     'textures/playerdead2.png'), pygame.image.load('textures/playerdead3.png')]
 
 player1_rect.x = x
 player1_rect.y = y
+
+last_texture = player1_texture
+last2_texture = player1_texture
+
+player_plazmaL_texture = pygame.transform.scale(
+    pygame.image.load('textures/playerplazmaL.png'), (40, 40))
+
+player_plazmaR_texture = pygame.transform.scale(
+    pygame.image.load('textures/playerplazmaR.png'), (40, 40))
+
+player_plazmaT_texture = pygame.transform.scale(
+    pygame.image.load('textures/playerplazmaT.png'), (40, 40))
+
+player_plazmaD_texture = pygame.transform.scale(
+    pygame.image.load('textures/playerplazmaB.png'), (40, 40))
+
+
+player_plazmaLS_texture = pygame.transform.scale(
+    pygame.image.load('textures/playerpalzmaLS.png'), (40, 40))
+
+player_plazmaRS_texture = pygame.transform.scale(
+    pygame.image.load('textures/playerpalzmaPS.png'), (40, 40))
+
+player_plazmaTS_texture = pygame.transform.scale(
+    pygame.image.load('textures/playerpalzmaTS.png'), (40, 40))
+
+player_plazmaDS_texture = pygame.transform.scale(
+    pygame.image.load('textures/playerpalzmaDS.png'), (40, 40))
 
 
 bulletWidth = 15
@@ -945,8 +973,49 @@ while run:
         window.blit(player1_texture, player1_rect)
         player1_rect = pygame.rect.Rect(x, y, 40, 40)
     elif powershield == True and gun_on == False:
-        window.blit(player1_texture_shield1, player1_rect)
+        window.blit(player1_texture_shield, player1_rect)
         player1_rect = pygame.rect.Rect(x, y, 40, 40)
+    elif powershield == False and gun_on == True:
+        if keys[pygame.K_d]:
+            window.blit(player_plazmaR_texture, player1_rect)
+            last_texture = player_plazmaR_texture
+            player1_rect = pygame.rect.Rect(x, y, 40, 40)
+        elif keys[pygame.K_a]:
+            window.blit(player_plazmaL_texture, player1_rect)
+            player1_rect = pygame.rect.Rect(x, y, 40, 40)
+            last_texture = player_plazmaL_texture
+        elif keys[pygame.K_s]:
+            window.blit(player_plazmaD_texture, player1_rect)
+            player1_rect = pygame.rect.Rect(x, y, 40, 40)
+            last_texture = player_plazmaD_texture
+        elif keys[pygame.K_w]:
+            window.blit(player_plazmaT_texture, player1_rect)
+            player1_rect = pygame.rect.Rect(x, y, 40, 40)
+            last_texture = player_plazmaT_texture
+        else:
+            window.blit(last_texture, player1_rect)
+            player1_rect = pygame.rect.Rect(x, y, 40, 40)
+
+    elif powershield == True and gun_on == True:
+        if keys[pygame.K_d]:
+            window.blit(player_plazmaRS_texture, player1_rect)
+            player1_rect = pygame.rect.Rect(x, y, 40, 40)
+            last2_texture = player_plazmaRS_texture
+        elif keys[pygame.K_a]:
+            window.blit(player_plazmaLS_texture, player1_rect)
+            player1_rect = pygame.rect.Rect(x, y, 40, 40)
+            last2_texture = player_plazmaLS_texture
+        elif keys[pygame.K_s]:
+            window.blit(player_plazmaDS_texture, player1_rect)
+            player1_rect = pygame.rect.Rect(x, y, 40, 40)
+            last2_texture = player_plazmaDS_texture
+        elif keys[pygame.K_w]:
+            window.blit(player_plazmaTS_texture, player1_rect)
+            player1_rect = pygame.rect.Rect(x, y, 40, 40)
+            last2_texture = player_plazmaTS_texture
+        else:
+            window.blit(last2_texture, player1_rect)
+            player1_rect = pygame.rect.Rect(x, y, 40, 40)
 
     if keys[pygame.K_SPACE] and bullet_fired == True and magazine > 0:
         if bullet_direction == 'right':
