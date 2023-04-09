@@ -129,7 +129,7 @@ bullet_boom3_texture = pygame.transform.scale(
 bullet_boom_list = [bullet_boom1_texture,
                     bullet_boom2_texture, bullet_boom3_texture]
 
-bullet_speed = 50
+bullet_speed = 70
 bullet_direction = 'right'
 bullet_fired = True
 
@@ -288,8 +288,7 @@ def stop_sound(sound):
 
 
 def start():
-    pass
-    """intro1 = pygame.image.load("textures/intro.png")
+    intro1 = pygame.image.load("textures/intro.png")
     intro2 = pygame.image.load("textures/intro2.png")
     intro3 = pygame.image.load("textures/intro3.png")
     olchastudio = pygame.image.load("textures/olchastudio.png")
@@ -316,7 +315,6 @@ def start():
             if keys[pygame.K_SPACE]:
                 waiting = False
                 stop_sound(intro_sound)
-"""
 
 
 def deadscreen():
@@ -407,7 +405,7 @@ def pause():
         pygame.display.update()
         for i in pygame.event.get():
             keys = pygame.key.get_pressed()
-            if keys[pygame.K_u]:
+            if keys[pygame.K_m]:
                 waiting = False
                 time.sleep(0.5)
 
@@ -418,7 +416,7 @@ def gun1():
         pygame.image.load("textures/gunpick.png"), (300, 200))
     window.blit(shield_banner, (widthWindow/2 - 140, heightWindow/2 - 140))
     pygame.display.update()
-    time.sleep(1)
+    time.sleep(0.5)
 
 
 def gun2():
@@ -427,7 +425,7 @@ def gun2():
         pygame.image.load("textures/gunhide.png"), (300, 200))
     window.blit(shield_banner, (widthWindow/2 - 140, heightWindow/2 - 140))
     pygame.display.update()
-    time.sleep(1)
+    time.sleep(0.5)
 
 
 def speed_boost():
@@ -943,10 +941,12 @@ while run:
         pause()
 
     if u_key_pressed:
-        if points_counter >= 2:
+        if points_counter >= 3:
             magazine += 10
-            points_counter -= 2
+            points_counter -= 3
             reload()
+        else:
+            u_key_pressed = False
 
     if r_key_pressed:
         if gun_on == False:
@@ -1017,7 +1017,7 @@ while run:
             window.blit(last2_texture, player1_rect)
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
 
-    if keys[pygame.K_SPACE] and bullet_fired == True and magazine > 0:
+    if keys[pygame.K_SPACE] and bullet_fired == True and magazine > 0 and gun_on == True:
         if bullet_direction == 'right':
             new_bullet = Bullet(player1_rect.x, player1_rect.y, bullet_speed, bulletWidth, bulletHeight,
                                 bullet_direction, bullet_textureR)
