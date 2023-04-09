@@ -15,6 +15,7 @@ number_mutants = 0
 number_ghosts = 0
 number_obstacles = 8
 max_obstacles = 18
+magazine = 0
 font = pygame.font.Font(None, 36)
 x = 100
 y = 100
@@ -26,6 +27,8 @@ i_key_pressed = False
 i_key_released = True
 m_key_pressed = False
 m_key_released = True
+u_key_pressed = False
+u_key_released = True
 powershield = False
 CX = 0
 CY = 0
@@ -95,7 +98,7 @@ bullet_boom3_texture = pygame.transform.scale(
 bullet_boom_list = [bullet_boom1_texture,
                     bullet_boom2_texture, bullet_boom3_texture]
 
-bullet_speed = 20
+bullet_speed = 50
 bullet_direction = 'right'
 bullet_fired = True
 
@@ -140,6 +143,13 @@ deadtreeHeight = 100
 deadtree_texture = pygame.transform.scale(
     pygame.image.load('textures/deadtree.png'), (deadtreeWidth, deadtreeHeight))
 deadtree_rect = deadtree_texture.get_rect()
+
+
+nature_destroy_animation = [pygame.transform.scale(pygame.image.load('textures/destroyednature1.png'), (50, 50)), pygame.transform.scale(
+    pygame.image.load('textures/destroyednature2.png'), (50, 50)), pygame.transform.scale(pygame.image.load('textures/destroyednature3.png'), (50, 50)),]
+
+nature_corpses = pygame.transform.scale(
+    pygame.image.load('textures/destroyednature3.png'), (50, 50))
 
 
 devilWidth = 50
@@ -359,7 +369,7 @@ def pause():
         pygame.display.update()
         for i in pygame.event.get():
             keys = pygame.key.get_pressed()
-            if keys[pygame.K_m]:
+            if keys[pygame.K_u]:
                 waiting = False
                 time.sleep(0.5)
 
@@ -388,12 +398,27 @@ def refresh():
     pygame.display.update()
     time.sleep(1)
 
+    refresh_sound.play()
+    refresh_banner = pygame.transform.scale(
+        pygame.image.load("textures/refresh.png"), (300, 200))
+    window.blit(refresh_banner, (widthWindow/2 - 140, heightWindow/2 - 140))
+    pygame.display.update()
+    time.sleep(1)
+
 
 def shield():
     shield_sound.play()
     shield_banner = pygame.transform.scale(
         pygame.image.load("textures/shield.png"), (300, 200))
     window.blit(shield_banner, (widthWindow/2 - 140, heightWindow/2 - 140))
+    pygame.display.update()
+    time.sleep(1)
+
+
+def reload():
+    refresh_banner = pygame.transform.scale(
+        pygame.image.load("textures/reload.png"), (300, 200))
+    window.blit(refresh_banner, (widthWindow/2 - 140, heightWindow/2 - 140))
     pygame.display.update()
     time.sleep(1)
 
@@ -446,6 +471,8 @@ def borders():
 
 borders_list = borders()
 
+destroyed_obstacles_list = []
+
 
 class Obstacle:
     def __init__(self, x, y, width, height, texture):
@@ -454,6 +481,12 @@ class Obstacle:
 
     def draw(self, surface):
         surface.blit(self.texture, self.rect)
+
+    def delete(self):
+        window.blit(nature_corpses, (self.rect.x, self.rect.y))
+        destroyed_obstacles_list.append(self)
+        obstacles_list.remove(self)
+        del self
 
 
 def obstacles():
@@ -511,11 +544,8 @@ obstacles_list = obstacles()
 def death_animation(death_frames, x, y):
     for i in death_frames:
         window.blit(i, (x, y))
-        pygame.display.update()
         pygame.time.wait(100)
-
-
-dead_enemy_list = []
+        pygame.display.update()
 
 
 class Bullet:
@@ -548,6 +578,7 @@ class Bullet:
 
 
 bullets_list = []
+dead_enemy_list = []
 
 
 class Enemy:
@@ -613,7 +644,7 @@ class Enemy:
                 self.texture = L
 
     def delete(self):
-        window.blit(fast_corpses, (self.rect.x, self.rect.y))
+        window.blit(nature_corpses, (self.rect.x, self.rect.y))
         dead_enemy_list.append(self)
         enemy_list.remove(self)
         del self
@@ -668,12 +699,14 @@ def points():
         global number_obstacles
         global number_ghosts
         global level
+        global bullet_fired
         gold = Obstacle(xgold, ygold, goldWidth,
                         goldHeight, gold_texture)
         gold_list.append(gold)
         if level != 0:
             pickup_sound.play()
         dead_enemy_list.clear()
+        destroyed_obstacles_list.clear()
         points_counter += 1
         level += 1
         if number_obstacles <= max_obstacles:
@@ -790,6 +823,14 @@ while run:
             m_key_pressed = False
             m_key_released = True
 
+    if keys[pygame.K_u]:
+        if u_key_released:
+            u_key_pressed = True
+            u_key_released = False
+        else:
+            u_key_pressed = False
+            u_key_released = True
+
     old_x, old_y = x, y
     x += xx
     y += yy
@@ -807,11 +848,13 @@ while run:
 
     for gold in gold_list:
         if player1_rect.colliderect(gold.rect):
+            bullet_fired = True
             background = random_background()
             gold_list.remove(gold)
             generate_new_obstacles()
             generate_new_gold()
             generate_new_enemy()
+            bullet_fired = True
 
         else:
             for i in obstacles_list:
@@ -834,6 +877,10 @@ while run:
     if m_key_pressed:
         pause()
 
+    if u_key_pressed:
+        magazine = 10
+        reload()
+
     window.blit(background, (0, 0))
 
     for gol in gold_list:
@@ -852,33 +899,65 @@ while run:
         window.blit(player1_texture_shield1, player1_rect)
         player1_rect = pygame.rect.Rect(x, y, 40, 40)
 
-    if keys[pygame.K_SPACE] and bullet_fired == True:
+    if keys[pygame.K_SPACE] and bullet_fired == True and magazine > 0:
         if bullet_direction == 'right':
             new_bullet = Bullet(player1_rect.x, player1_rect.y, bullet_speed, bulletWidth, bulletHeight,
                                 bullet_direction, bullet_textureR)
             bullets_list.append(new_bullet)
+            magazine -= 1
         elif bullet_direction == 'left':
             new_bullet = Bullet(player1_rect.x, player1_rect.y, bullet_speed, bulletWidth, bulletHeight,
                                 bullet_direction, bullet_textureL)
             bullets_list.append(new_bullet)
+            magazine -= 1
         elif bullet_direction == 'top':
             new_bullet = Bullet(player1_rect.x, player1_rect.y, bullet_speed, bulletxWidth, bulletxHeight,
                                 bullet_direction, bullet_textureT)
             bullets_list.append(new_bullet)
+            magazine -= 1
         elif bullet_direction == 'down':
             new_bullet = Bullet(player1_rect.x, player1_rect.y, bullet_speed, bulletxWidth, bulletxHeight,
                                 bullet_direction, bullet_textureD)
             bullets_list.append(new_bullet)
-        bullet_fired = False
+            magazine -= 1
 
     for bullet in bullets_list:
         bullet.update()
+        bullet_fired = False
+        if bullet.rect.left > 2000 or bullet.rect.right < 0 or bullet.rect.top > 1200 or bullet.rect.bottom < 0:
+            bullet.delete()
+            bullet_fired = True
         for obstacle in obstacles_list:
             if bullet.rect.colliderect(obstacle.rect):
                 death_animation(bullet_boom_list, bullet.rect.x, bullet.rect.y)
-                bullet_fired = True
+                death_animation(nature_destroy_animation,
+                                obstacle.rect.x, obstacle.rect.y)
                 bullet.delete()
+                obstacle.delete()
+                bullet_fired = True
                 break
+        for enemy in enemy_list:
+            if bullet.rect.colliderect(enemy.rect):
+                if enemy.type == 'fast':
+                    fast_dead_sound.play()
+                    death_animation(fast_dead_animation,
+                                    enemy.rect.x, enemy.rect.y)
+                elif enemy.type == 'devil':
+                    devil_dead_sound.play()
+                    death_animation(devil_dead_animation,
+                                    enemy.rect.x, enemy.rect.y)
+                elif enemy.type == 'mutant':
+                    mutant_dead_sound.play()
+                    death_animation(mutant_dead_animation,
+                                    enemy.rect.x, enemy.rect.y)
+                elif enemy.type == 'ghost':
+                    ghost_dead_sound.play()
+                    death_animation(ghost_dead_animation,
+                                    enemy.rect.x, enemy.rect.y)
+                enemy.delete()
+                bullet.delete()
+                bullet_fired = True
+
         bullet.draw(window)
 
     pygame.display.update()
@@ -934,6 +1013,9 @@ while run:
             window.blit(mutant_corpses, (enemy.rect.x, enemy.rect.y))
         if enemy.type == 'ghost':
             window.blit(ghost_corpses, (enemy.rect.x, enemy.rect.y))
+
+    for obstacle in destroyed_obstacles_list:
+        window.blit(nature_corpses, (obstacle.rect.x, obstacle.rect.y))
 
     font = pygame.font.Font('font/snap.ttf', 30)
     points_text = font.render(
