@@ -29,9 +29,12 @@ m_key_pressed = False
 m_key_released = True
 u_key_pressed = False
 u_key_released = True
+r_key_pressed = False
+r_key_released = True
 powershield = False
 CX = 0
 CY = 0
+gun_on = False
 
 speed = 8
 max_speed = 15
@@ -230,7 +233,12 @@ monsters1_sound = pygame.mixer.Sound('sounds/monsters.mp3')
 monsters1_sound.set_volume(0.5)
 monsters2_sound = pygame.mixer.Sound('sounds/monsters2.mp3')
 monsters2_sound.set_volume(0.5)
-
+destruction_sound = pygame.mixer.Sound('sounds/destruction.mp3')
+destruction_sound.set_volume(0.2)
+gun_sound = pygame.mixer.Sound('sounds/gunsound.mp3')
+gun_sound.set_volume(0.6)
+reload_sound = pygame.mixer.Sound('sounds/reload.mp3')
+reload_sound.set_volume(0.2)
 
 monsters_sounds = [monsters1_sound, monsters2_sound]
 
@@ -304,6 +312,7 @@ def deadscreen():
     global speed
     global x
     global y
+    global magazine
     waiting = True
     w8 = True
     end_width, end_height = 1920, 1080
@@ -354,6 +363,7 @@ def deadscreen():
                             x = 100
                             y = 100
                             level = 0
+                            magazine = 0
                             w8 = False
                             pygame.display.update()
                             break
@@ -372,6 +382,24 @@ def pause():
             if keys[pygame.K_u]:
                 waiting = False
                 time.sleep(0.5)
+
+
+def gun1():
+    gun_sound.play()
+    shield_banner = pygame.transform.scale(
+        pygame.image.load("textures/gunpick.png"), (300, 200))
+    window.blit(shield_banner, (widthWindow/2 - 140, heightWindow/2 - 140))
+    pygame.display.update()
+    time.sleep(1)
+
+
+def gun2():
+    gun_sound.play()
+    shield_banner = pygame.transform.scale(
+        pygame.image.load("textures/gunhide.png"), (300, 200))
+    window.blit(shield_banner, (widthWindow/2 - 140, heightWindow/2 - 140))
+    pygame.display.update()
+    time.sleep(1)
 
 
 def speed_boost():
@@ -416,6 +444,7 @@ def shield():
 
 
 def reload():
+    reload_sound.play()
     refresh_banner = pygame.transform.scale(
         pygame.image.load("textures/reload.png"), (300, 200))
     window.blit(refresh_banner, (widthWindow/2 - 140, heightWindow/2 - 140))
@@ -544,7 +573,7 @@ obstacles_list = obstacles()
 def death_animation(death_frames, x, y):
     for i in death_frames:
         window.blit(i, (x, y))
-        pygame.time.wait(100)
+        pygame.time.wait(50)
         pygame.display.update()
 
 
@@ -831,6 +860,14 @@ while run:
             u_key_pressed = False
             u_key_released = True
 
+    if keys[pygame.K_r]:
+        if r_key_released:
+            r_key_pressed = True
+            r_key_released = False
+        else:
+            r_key_pressed = False
+            r_key_released = True
+
     old_x, old_y = x, y
     x += xx
     y += yy
@@ -878,8 +915,20 @@ while run:
         pause()
 
     if u_key_pressed:
-        magazine = 10
-        reload()
+        if points_counter >= 2:
+            magazine += 10
+            points_counter -= 2
+            reload()
+
+    if r_key_pressed:
+        if gun_on == False:
+            gun1()
+            gun_on = True
+            speed -= 3
+        elif gun_on == True:
+            gun2()
+            gun_on = False
+            speed += 3
 
     window.blit(background, (0, 0))
 
@@ -892,10 +941,10 @@ while run:
     for border in borders_list:
         border.draw(window)
 
-    if powershield == False:
+    if powershield == False and gun_on == False:
         window.blit(player1_texture, player1_rect)
         player1_rect = pygame.rect.Rect(x, y, 40, 40)
-    elif powershield == True:
+    elif powershield == True and gun_on == False:
         window.blit(player1_texture_shield1, player1_rect)
         player1_rect = pygame.rect.Rect(x, y, 40, 40)
 
@@ -905,21 +954,25 @@ while run:
                                 bullet_direction, bullet_textureR)
             bullets_list.append(new_bullet)
             magazine -= 1
+            gun_sound.play()
         elif bullet_direction == 'left':
             new_bullet = Bullet(player1_rect.x, player1_rect.y, bullet_speed, bulletWidth, bulletHeight,
                                 bullet_direction, bullet_textureL)
             bullets_list.append(new_bullet)
             magazine -= 1
+            gun_sound.play()
         elif bullet_direction == 'top':
             new_bullet = Bullet(player1_rect.x, player1_rect.y, bullet_speed, bulletxWidth, bulletxHeight,
                                 bullet_direction, bullet_textureT)
             bullets_list.append(new_bullet)
             magazine -= 1
+            gun_sound.play()
         elif bullet_direction == 'down':
             new_bullet = Bullet(player1_rect.x, player1_rect.y, bullet_speed, bulletxWidth, bulletxHeight,
                                 bullet_direction, bullet_textureD)
             bullets_list.append(new_bullet)
             magazine -= 1
+            gun_sound.play()
 
     for bullet in bullets_list:
         bullet.update()
@@ -929,6 +982,7 @@ while run:
             bullet_fired = True
         for obstacle in obstacles_list:
             if bullet.rect.colliderect(obstacle.rect):
+                destruction_sound.play()
                 death_animation(bullet_boom_list, bullet.rect.x, bullet.rect.y)
                 death_animation(nature_destroy_animation,
                                 obstacle.rect.x, obstacle.rect.y)
@@ -1024,5 +1078,7 @@ while run:
     points_text = font.render(
         f'Level: {level}', True, (255, 0, 0))
     window.blit(points_text, (20, 10))
-
+    points_text = font.render(
+        f'Bullets: {magazine}', True, (255, 0, 0))
+    window.blit(points_text, (850, 10))
     pygame.display.update()
