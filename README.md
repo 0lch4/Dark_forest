@@ -2,6 +2,7 @@
 My first game in Python
 
 Earn Gold, buy boosts and don't get caught by enemies
+
 press m in game to show more tips
 
 Pygame liblary
