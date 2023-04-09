@@ -175,17 +175,22 @@ devil_dead_sound.set_volume(0.5)
 monsters1_sound = pygame.mixer.Sound('sounds/monsters.mp3')
 monsters2_sound = pygame.mixer.Sound('sounds/monsters2.mp3')
 fast_dead_sound = pygame.mixer.Sound('sounds/fastdead.mp3')
-fast_dead_sound.set_volume(0.5)
+fast_dead_sound.set_volume(0.3)
 mutant_dead_sound = pygame.mixer.Sound('sounds/mutantdead.mp3')
 monsters1_sound = pygame.mixer.Sound('sounds/monsters.mp3')
 monsters1_sound.set_volume(0.5)
 monsters2_sound = pygame.mixer.Sound('sounds/monsters2.mp3')
+monsters2_sound.set_volume(0.5)
+
 
 monsters_sounds = [monsters1_sound, monsters2_sound]
 
 speed_sound = pygame.mixer.Sound('sounds/speed.mp3')
+speed_sound.set_volume(0.5)
 shield_sound = pygame.mixer.Sound('sounds/shield.mp3')
+shield_sound.set_volume(0.5)
 refresh_sound = pygame.mixer.Sound('sounds/refresh.mp3')
+refresh_sound.set_volume(0.5)
 
 
 def play_sound(sound):
