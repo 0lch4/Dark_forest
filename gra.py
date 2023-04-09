@@ -198,34 +198,33 @@ def stop_sound(sound):
 
 
 def start():
-     intro1 = pygame.image.load("textures/intro.png")
-     intro2 = pygame.image.load("textures/intro2.png")
-     intro3 = pygame.image.load("textures/intro3.png")
-     olchastudio = pygame.image.load("textures/olchastudio.png")
-     window.blit(olchastudio, (1, 1))
-     intro_sound.play()
-     pygame.display.update()
-     time.sleep(4.4)
-     window.blit(intro1, (1, 1))
-     pygame.display.update()
-     time.sleep(2.4)
-     window.blit(intro2, (1, 1))
-     pygame.display.update()
-     time.sleep(4.6)
-     window.blit(intro3, (1, 1))
-     pygame.display.update()
-     window.blit(menu, (1, 1))
-     time.sleep(4)
-     pygame.display.update()
-     waiting = True
-     while waiting:
-         play_sound(intro_sound)
-         for i in pygame.event.get():
-             keys = pygame.key.get_pressed()
-             if keys[pygame.K_SPACE]:
-                 waiting = False
-                 stop_sound(intro_sound)
-    pass
+    intro1 = pygame.image.load("textures/intro.png")
+    intro2 = pygame.image.load("textures/intro2.png")
+    intro3 = pygame.image.load("textures/intro3.png")
+    olchastudio = pygame.image.load("textures/olchastudio.png")
+    window.blit(olchastudio, (1, 1))
+    intro_sound.play()
+    pygame.display.update()
+    time.sleep(4.4)
+    window.blit(intro1, (1, 1))
+    pygame.display.update()
+    time.sleep(2.4)
+    window.blit(intro2, (1, 1))
+    pygame.display.update()
+    time.sleep(4.6)
+    window.blit(intro3, (1, 1))
+    pygame.display.update()
+    window.blit(menu, (1, 1))
+    time.sleep(4)
+    pygame.display.update()
+    waiting = True
+    while waiting:
+        play_sound(intro_sound)
+        for i in pygame.event.get():
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_SPACE]:
+                waiting = False
+                stop_sound(intro_sound)
 
 
 def deadscreen():
