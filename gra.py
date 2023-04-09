@@ -60,6 +60,45 @@ player_dead_animation = [pygame.image.load('textures/playerdead1.png'), pygame.i
 player1_rect.x = x
 player1_rect.y = y
 
+
+bulletWidth = 15
+bulletHeight = 5
+bullet_textureR = pygame.transform.scale(
+    pygame.image.load('textures/bulletR.png'), (bulletWidth, bulletHeight))
+bulletR_rect = bullet_textureR.get_rect()
+
+bullet_textureL = pygame.transform.scale(
+    pygame.image.load('textures/bulletL.png'), (bulletWidth, bulletHeight))
+bulletL_rect = bullet_textureL.get_rect()
+
+bulletxWidth = 5
+bulletxHeight = 15
+
+bullet_textureT = pygame.transform.scale(
+    pygame.image.load('textures/bulletT.png'), (bulletxWidth, bulletxHeight))
+bulletT_rect = bullet_textureT.get_rect()
+
+bullet_textureD = pygame.transform.scale(
+    pygame.image.load('textures/bulletD.png'), (bulletxWidth, bulletxHeight))
+bulletD_rect = bullet_textureD.get_rect()
+
+
+bullet_boom1_texture = pygame.transform.scale(
+    pygame.image.load('textures/bulletboom1.png'), (20, 20))
+
+bullet_boom2_texture = pygame.transform.scale(
+    pygame.image.load('textures/bulletboom2.png'), (20, 20))
+
+bullet_boom3_texture = pygame.transform.scale(
+    pygame.image.load('textures/bulletboom3.png'), (20, 20))
+
+bullet_boom_list = [bullet_boom1_texture,
+                    bullet_boom2_texture, bullet_boom3_texture]
+
+bullet_speed = 20
+bullet_direction = 'right'
+bullet_fired = True
+
 treeWidth = 70
 treeHeight = 100
 tree_texture = pygame.transform.scale(
@@ -203,7 +242,8 @@ def stop_sound(sound):
 
 
 def start():
-    intro1 = pygame.image.load("textures/intro.png")
+    pass
+    """intro1 = pygame.image.load("textures/intro.png")
     intro2 = pygame.image.load("textures/intro2.png")
     intro3 = pygame.image.load("textures/intro3.png")
     olchastudio = pygame.image.load("textures/olchastudio.png")
@@ -230,6 +270,7 @@ def start():
             if keys[pygame.K_SPACE]:
                 waiting = False
                 stop_sound(intro_sound)
+"""
 
 
 def deadscreen():
@@ -473,20 +514,44 @@ def death_animation(death_frames, x, y):
         pygame.display.update()
         pygame.time.wait(100)
 
-    def __init__(self, x, y, texture):
-        self.rect = pygame.Rect(x, y)
-        self.texture = texture
-
-    def draw(self, surface):
-        surface.blit(self.texture, self.rect)
-
 
 dead_enemy_list = []
 
 
+class Bullet:
+    def __init__(self, x, y, speed, bulletWidth, bulletHeight, direction, texture):
+        self.x = x
+        self.y = y
+        self.speed = speed
+        self.direction = direction
+        self.texture = texture
+        self.bulletHeight = bulletHeight
+        self.bulletWidth = bulletWidth
+        self.rect = pygame.Rect(x, y, bulletWidth, bulletHeight)
+
+    def update(self):
+        if self.direction == 'left':
+            self.rect.move_ip(-self.speed, 0)
+        elif self.direction == 'right':
+            self.rect.move_ip(self.speed, 0)
+        elif self.direction == 'top':
+            self.rect.move_ip(0, -self.speed)
+        elif self.direction == 'down':
+            self.rect.move_ip(0, self.speed)
+
+    def draw(self, window):
+        window.blit(self.texture, (self.rect.x, self.rect.y))
+
+    def delete(self):
+        bullets_list.remove(self)
+        del self
+
+
+bullets_list = []
+
+
 class Enemy:
     def __init__(self, x, y, width, height, texture, speed, collison, enemy_type):
-        alive = True
         self.rect = pygame.Rect(x, y, width, height)
         self.texture = texture
         self.speed = speed
@@ -664,15 +729,19 @@ while run:
             run = False
     xx, yy = 0, 0
     if keys[pygame.K_d]:
+        bullet_direction = 'right'
         play_sound(move_sound)
         xx += speed
     elif keys[pygame.K_a]:
+        bullet_direction = 'left'
         play_sound(move_sound)
         xx -= speed
     elif keys[pygame.K_s]:
+        bullet_direction = 'down'
         play_sound(move_sound)
         yy += speed
     elif keys[pygame.K_w]:
+        bullet_direction = 'top'
         play_sound(move_sound)
         yy -= speed
     else:
@@ -782,6 +851,37 @@ while run:
     elif powershield == True:
         window.blit(player1_texture_shield1, player1_rect)
         player1_rect = pygame.rect.Rect(x, y, 40, 40)
+
+    if keys[pygame.K_SPACE] and bullet_fired == True:
+        if bullet_direction == 'right':
+            new_bullet = Bullet(player1_rect.x, player1_rect.y, bullet_speed, bulletWidth, bulletHeight,
+                                bullet_direction, bullet_textureR)
+            bullets_list.append(new_bullet)
+        elif bullet_direction == 'left':
+            new_bullet = Bullet(player1_rect.x, player1_rect.y, bullet_speed, bulletWidth, bulletHeight,
+                                bullet_direction, bullet_textureL)
+            bullets_list.append(new_bullet)
+        elif bullet_direction == 'top':
+            new_bullet = Bullet(player1_rect.x, player1_rect.y, bullet_speed, bulletxWidth, bulletxHeight,
+                                bullet_direction, bullet_textureT)
+            bullets_list.append(new_bullet)
+        elif bullet_direction == 'down':
+            new_bullet = Bullet(player1_rect.x, player1_rect.y, bullet_speed, bulletxWidth, bulletxHeight,
+                                bullet_direction, bullet_textureD)
+            bullets_list.append(new_bullet)
+        bullet_fired = False
+
+    for bullet in bullets_list:
+        bullet.update()
+        for obstacle in obstacles_list:
+            if bullet.rect.colliderect(obstacle.rect):
+                death_animation(bullet_boom_list, bullet.rect.x, bullet.rect.y)
+                bullet_fired = True
+                bullet.delete()
+                break
+        bullet.draw(window)
+
+    pygame.display.update()
 
     for enemy in enemy_list:
         enemy.update(obstacles_list)
