@@ -1,5 +1,7 @@
-# Dark_forest_v1.0 avilable!!
+# Dark forest
 My first game in Python
+
+Version: https://img.shields.io/badge/Version-1.0-red
 
 Earn Gold, buy boosts and don't get caught by enemies
 press m in game to show more tips
