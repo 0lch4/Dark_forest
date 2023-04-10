@@ -811,6 +811,19 @@ def dead_nature():
         window.blit(nature_corpses, (obstacle.rect.x, obstacle.rect.y))
 
 
+def counters():
+    font = pygame.font.Font('font/snap.ttf', 30)
+    points_text = font.render(
+        f'Gold: {points_counter}', True, (255, 0, 0))
+    window.blit(points_text, (1750, 10))
+    points_text = font.render(
+        f'Level: {level}', True, (255, 0, 0))
+    window.blit(points_text, (20, 10))
+    points_text = font.render(
+        f'Bullets: {magazine}', True, (255, 0, 0))
+    window.blit(points_text, (850, 10))
+
+
 start()
 pygame.mixer.music.load('sounds/music.mp3')
 pygame.mixer.music.set_volume(0.4)
@@ -1140,15 +1153,6 @@ while run:
 
     enemy_corpses()
     dead_nature()
+    counters()
 
-    font = pygame.font.Font('font/snap.ttf', 30)
-    points_text = font.render(
-        f'Gold: {points_counter}', True, (255, 0, 0))
-    window.blit(points_text, (1750, 10))
-    points_text = font.render(
-        f'Level: {level}', True, (255, 0, 0))
-    window.blit(points_text, (20, 10))
-    points_text = font.render(
-        f'Bullets: {magazine}', True, (255, 0, 0))
-    window.blit(points_text, (850, 10))
     pygame.display.update()
