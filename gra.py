@@ -34,9 +34,6 @@ r_key_released = True
 powershield = False
 gun_on = False
 
-speed = 8
-max_speed = 15
-
 
 menu = pygame.image.load("textures/menu.png")
 background1 = pygame.image.load('textures/tlo.jpg')
@@ -51,6 +48,9 @@ def random_background():
     background = random.choice(background_list)
     return background
 
+
+speed = 8
+max_speed = 15
 
 player1_texture = pygame.transform.scale(
     pygame.image.load('textures/player.png'), (40, 40))
@@ -408,13 +408,6 @@ def refresh():
     pygame.display.update()
     time.sleep(1)
 
-    refresh_sound.play()
-    refresh_banner = pygame.transform.scale(
-        pygame.image.load("textures/refresh.png"), (300, 200))
-    window.blit(refresh_banner, (widthWindow/2 - 140, heightWindow/2 - 140))
-    pygame.display.update()
-    time.sleep(1)
-
 
 def shield():
     shield_sound.play()
@@ -427,9 +420,9 @@ def shield():
 
 def reload():
     reload_sound.play()
-    refresh_banner = pygame.transform.scale(
+    reload_banner = pygame.transform.scale(
         pygame.image.load("textures/reload.png"), (300, 200))
-    window.blit(refresh_banner, (widthWindow/2 - 140, heightWindow/2 - 140))
+    window.blit(reload_banner, (widthWindow/2 - 140, heightWindow/2 - 140))
     pygame.display.update()
     time.sleep(1)
 
@@ -798,6 +791,18 @@ def generate_new_enemy():
     enemy_list = enemies()
 
 
+def enemy_corpses():
+    for enemy in dead_enemy_list:
+        if enemy.type == 'fast':
+            window.blit(fast_corpses, (enemy.rect.x, enemy.rect.y))
+        if enemy.type == 'devil':
+            window.blit(devil_corpses, (enemy.rect.x, enemy.rect.y))
+        if enemy.type == 'mutant':
+            window.blit(mutant_corpses, (enemy.rect.x, enemy.rect.y))
+        if enemy.type == 'ghost':
+            window.blit(ghost_corpses, (enemy.rect.x, enemy.rect.y))
+
+
 start()
 pygame.mixer.music.load('sounds/music.mp3')
 pygame.mixer.music.set_volume(0.4)
@@ -1124,17 +1129,7 @@ while run:
                                     enemy.rect.x, enemy.rect.y)
                 enemy.delete()
                 powershield = False
-
-    for enemy in dead_enemy_list:
-        if enemy.type == 'fast':
-            window.blit(fast_corpses, (enemy.rect.x, enemy.rect.y))
-        if enemy.type == 'devil':
-            window.blit(devil_corpses, (enemy.rect.x, enemy.rect.y))
-        if enemy.type == 'mutant':
-            window.blit(mutant_corpses, (enemy.rect.x, enemy.rect.y))
-        if enemy.type == 'ghost':
-            window.blit(ghost_corpses, (enemy.rect.x, enemy.rect.y))
-
+    enemy_corpses()
     for obstacle in destroyed_obstacles_list:
         window.blit(nature_corpses, (obstacle.rect.x, obstacle.rect.y))
 
