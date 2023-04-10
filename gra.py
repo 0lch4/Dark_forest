@@ -897,7 +897,6 @@ while run:
             r_key_pressed = False
             r_key_released = True
 
-    old_x, old_y = x, y
     x += xx
     y += yy
 
