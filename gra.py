@@ -700,7 +700,7 @@ class Bullet:
 
     def draw(self, window):
         window.blit(self.texture, (self.rect.x, self.rect.y))
-    
+
     def delete(self):
         bullets_list.remove(self)
         del self
@@ -771,21 +771,38 @@ def generate_new_enemy():
 
 def death_animation(death_frames, x, y):
     for i in death_frames:
+        status()
+        corpses()
         for enemy in enemy_list:
             enemy.draw(window)
-        for enemy in dead_enemy_list:
-            if enemy.type == 'fast':
-                window.blit(fast_corpses, (enemy.rect.x, enemy.rect.y))
-            if enemy.type == 'devil':
-                window.blit(devil_corpses, (enemy.rect.x, enemy.rect.y))
-            if enemy.type == 'mutant':
-                window.blit(mutant_corpses, (enemy.rect.x, enemy.rect.y))
-            if enemy.type == 'ghost':
-                window.blit(ghost_corpses, (enemy.rect.x, enemy.rect.y))
-                
         window.blit(i, (x, y))
         pygame.time.wait(50)
         pygame.display.update()
+
+
+def corpses():
+    for enemy in dead_enemy_list:
+        if enemy.type == 'fast':
+            window.blit(fast_corpses, (enemy.rect.x, enemy.rect.y))
+        if enemy.type == 'devil':
+            window.blit(devil_corpses, (enemy.rect.x, enemy.rect.y))
+        if enemy.type == 'mutant':
+            window.blit(mutant_corpses, (enemy.rect.x, enemy.rect.y))
+        if enemy.type == 'ghost':
+            window.blit(ghost_corpses, (enemy.rect.x, enemy.rect.y))
+
+
+def status():
+    font = pygame.font.Font('font/snap.ttf', 30)
+    points_text = font.render(
+        f'Gold: {points_counter}', True, (255, 0, 0))
+    window.blit(points_text, (1750, 10))
+    points_text = font.render(
+        f'Level: {level}', True, (255, 0, 0))
+    window.blit(points_text, (20, 10))
+    points_text = font.render(
+        f'Bullets: {magazine}', True, (255, 0, 0))
+    window.blit(points_text, (850, 10))
 
 
 start()
@@ -957,9 +974,9 @@ while run:
         border.draw(window)
 
     for obstacle in destroyed_obstacles_list:
-        scaled_corpse = pygame.transform.scale(nature_corpses, (obstacle.rect.width, obstacle.rect.height))
+        scaled_corpse = pygame.transform.scale(
+            nature_corpses, (obstacle.rect.width, obstacle.rect.height))
         window.blit(scaled_corpse, (obstacle.rect.x, obstacle.rect.y))
-
 
     if powershield == False and gun_on == False:
         window.blit(player1_texture, player1_rect)
@@ -1118,25 +1135,7 @@ while run:
                                     enemy.rect.x, enemy.rect.y)
                 enemy.delete()
                 powershield = False
+    status()
+    corpses()
 
-    for enemy in dead_enemy_list:
-        if enemy.type == 'fast':
-            window.blit(fast_corpses, (enemy.rect.x, enemy.rect.y))
-        if enemy.type == 'devil':
-            window.blit(devil_corpses, (enemy.rect.x, enemy.rect.y))
-        if enemy.type == 'mutant':
-            window.blit(mutant_corpses, (enemy.rect.x, enemy.rect.y))
-        if enemy.type == 'ghost':
-            window.blit(ghost_corpses, (enemy.rect.x, enemy.rect.y))
-
-    font = pygame.font.Font('font/snap.ttf', 30)
-    points_text = font.render(
-        f'Gold: {points_counter}', True, (255, 0, 0))
-    window.blit(points_text, (1750, 10))
-    points_text = font.render(
-        f'Level: {level}', True, (255, 0, 0))
-    window.blit(points_text, (20, 10))
-    points_text = font.render(
-        f'Bullets: {magazine}', True, (255, 0, 0))
-    window.blit(points_text, (850, 10))
     pygame.display.update()
