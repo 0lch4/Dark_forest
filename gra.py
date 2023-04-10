@@ -131,48 +131,6 @@ bullet_speed = 70
 bullet_direction = 'right'
 bullet_fired = True
 
-treeWidth = 70
-treeHeight = 100
-tree_texture = pygame.transform.scale(
-    pygame.image.load('textures/drzewo.png'), (treeWidth, treeHeight))
-tree_rect = tree_texture.get_rect()
-
-stoneWidth = 50
-stoneHeight = 50
-stone_texture = pygame.transform.scale(
-    pygame.image.load('textures/kamien.png'), (stoneWidth, stoneHeight))
-stone_rect = stone_texture.get_rect()
-
-goldWidth = 20
-goldHeight = 20
-gold_texture = pygame.transform.scale(
-    pygame.image.load('textures/gold.png'), (goldWidth, goldHeight))
-gold_rect = gold_texture.get_rect()
-
-bushWidth = 40
-bushHeight = 40
-bush_texture = pygame.transform.scale(
-    pygame.image.load('textures/krzak.png'), (bushWidth, bushHeight))
-bush_rect = bush_texture.get_rect()
-
-bonesWidth = 70
-bonesHeight = 30
-bones_texture = pygame.transform.scale(
-    pygame.image.load('textures/bones.png'), (bonesWidth, bonesHeight))
-bones_rect = bones_texture.get_rect()
-
-sarnaWidth = 50
-sarnaHeight = 30
-sarna_texture = pygame.transform.scale(
-    pygame.image.load('textures/sarna.png'), (bonesWidth, bonesHeight))
-sarna_rect = sarna_texture.get_rect()
-
-deadtreeWidth = 70
-deadtreeHeight = 100
-deadtree_texture = pygame.transform.scale(
-    pygame.image.load('textures/deadtree.png'), (deadtreeWidth, deadtreeHeight))
-deadtree_rect = deadtree_texture.get_rect()
-
 
 nature_destroy_animation = [pygame.transform.scale(pygame.image.load('textures/destroyednature1.png'), (50, 50)), pygame.transform.scale(
     pygame.image.load('textures/destroyednature2.png'), (50, 50)), pygame.transform.scale(pygame.image.load('textures/destroyednature3.png'), (50, 50)),]
@@ -545,6 +503,42 @@ class Obstacle:
 def obstacles():
     obstacles_list = []
 
+    treeWidth = 70
+    treeHeight = 100
+    tree_texture = pygame.transform.scale(
+        pygame.image.load('textures/drzewo.png'), (treeWidth, treeHeight))
+    tree_rect = tree_texture.get_rect()
+
+    stoneWidth = 50
+    stoneHeight = 50
+    stone_texture = pygame.transform.scale(
+        pygame.image.load('textures/kamien.png'), (stoneWidth, stoneHeight))
+    stone_rect = stone_texture.get_rect()
+
+    bushWidth = 40
+    bushHeight = 40
+    bush_texture = pygame.transform.scale(
+        pygame.image.load('textures/krzak.png'), (bushWidth, bushHeight))
+    bush_rect = bush_texture.get_rect()
+
+    bonesWidth = 70
+    bonesHeight = 30
+    bones_texture = pygame.transform.scale(
+        pygame.image.load('textures/bones.png'), (bonesWidth, bonesHeight))
+    bones_rect = bones_texture.get_rect()
+
+    sarnaWidth = 50
+    sarnaHeight = 30
+    sarna_texture = pygame.transform.scale(
+        pygame.image.load('textures/sarna.png'), (bonesWidth, bonesHeight))
+    sarna_rect = sarna_texture.get_rect()
+
+    deadtreeWidth = 70
+    deadtreeHeight = 100
+    deadtree_texture = pygame.transform.scale(
+        pygame.image.load('textures/deadtree.png'), (deadtreeWidth, deadtreeHeight))
+    deadtree_rect = deadtree_texture.get_rect()
+
     def tree(xtree, ytree):
         tree = Obstacle(xtree, ytree, treeWidth,
                         treeHeight, tree_texture)
@@ -743,6 +737,12 @@ enemy_list = enemies()
 
 def points():
     gold_list = []
+
+    goldWidth = 20
+    goldHeight = 20
+    gold_texture = pygame.transform.scale(
+        pygame.image.load('textures/gold.png'), (goldWidth, goldHeight))
+    gold_rect = gold_texture.get_rect()
 
     def gold(xgold, ygold):
         global points_counter
