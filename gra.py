@@ -8,7 +8,7 @@ pygame.mouse.set_visible(False)
 widthWindow = 1920
 heightWindow = 1080
 window = pygame.display.set_mode((widthWindow, heightWindow))
-points_counter = -1
+points_counter = 100
 level = 0
 number_devils = 0
 number_fasts = 0
@@ -265,33 +265,7 @@ def stop_sound(sound):
 
 
 def start():
-    intro1 = pygame.image.load("textures/intro.png")
-    intro2 = pygame.image.load("textures/intro2.png")
-    intro3 = pygame.image.load("textures/intro3.png")
-    olchastudio = pygame.image.load("textures/olchastudio.png")
-    window.blit(olchastudio, (1, 1))
-    intro_sound.play()
-    pygame.display.update()
-    time.sleep(4.4)
-    window.blit(intro1, (1, 1))
-    pygame.display.update()
-    time.sleep(2.4)
-    window.blit(intro2, (1, 1))
-    pygame.display.update()
-    time.sleep(4.6)
-    window.blit(intro3, (1, 1))
-    pygame.display.update()
-    window.blit(menu, (1, 1))
-    time.sleep(4)
-    pygame.display.update()
-    waiting = True
-    while waiting:
-        play_sound(intro_sound)
-        for i in pygame.event.get():
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_SPACE]:
-                waiting = False
-                stop_sound(intro_sound)
+    pass
 
 
 def load(quantity, objectt, lista, rect):
@@ -300,8 +274,12 @@ def load(quantity, objectt, lista, rect):
             x = random.randint(0, widthWindow)
             y = random.randint(0, heightWindow)
         elif background == background2:
-            x = random.randint(0, 1750)
-            y = random.randint(0, 990)
+            if lista == obstacles_list:
+                x = random.randint(0, 1750)
+                y = random.randint(0, 990)
+            else:
+                x = random.randint(0, widthWindow)
+                y = random.randint(0, heightWindow)
         collision = True
         while collision:
             collision = False
@@ -494,6 +472,9 @@ def borders():
     return borders_list
 
 
+borders_list = borders()
+
+
 class Obstacle:
     def __init__(self, x, y, width, height, texture):
         self.rect = pygame.Rect(x, y, width, height)
@@ -558,33 +539,7 @@ def obstacles():
     return obstacles_list
 
 
-class Bullet:
-    def __init__(self, x, y, speed, bulletWidth, bulletHeight, direction, texture):
-        self.x = x
-        self.y = y
-        self.speed = speed
-        self.direction = direction
-        self.texture = texture
-        self.bulletHeight = bulletHeight
-        self.bulletWidth = bulletWidth
-        self.rect = pygame.Rect(x, y, bulletWidth, bulletHeight)
-
-    def update(self):
-        if self.direction == 'left':
-            self.rect.move_ip(-self.speed, 0)
-        elif self.direction == 'right':
-            self.rect.move_ip(self.speed, 0)
-        elif self.direction == 'top':
-            self.rect.move_ip(0, -self.speed)
-        elif self.direction == 'down':
-            self.rect.move_ip(0, self.speed)
-
-    def draw(self, window):
-        window.blit(self.texture, (self.rect.x, self.rect.y))
-
-    def delete(self):
-        bullets_list.remove(self)
-        del self
+obstacles_list = obstacles()
 
 
 class Enemy:
@@ -649,6 +604,9 @@ class Enemy:
             elif new_direction == (-1, 0):
                 self.texture = L
 
+    def draw(self, surface):
+        surface.blit(self.texture, self.rect)
+
     def delete(self):
         window.blit(nature_corpses, (self.rect.x, self.rect.y))
         dead_enemy_list.append(self)
@@ -689,6 +647,38 @@ def enemies():
         load(number_devils, devil, obstacles_list, devil_rect)
 
     return enemy_list
+
+
+enemy_list = enemies()
+
+
+class Bullet:
+    def __init__(self, x, y, speed, bulletWidth, bulletHeight, direction, texture):
+        self.x = x
+        self.y = y
+        self.speed = speed
+        self.direction = direction
+        self.texture = texture
+        self.bulletHeight = bulletHeight
+        self.bulletWidth = bulletWidth
+        self.rect = pygame.Rect(x, y, bulletWidth, bulletHeight)
+
+    def update(self):
+        if self.direction == 'left':
+            self.rect.move_ip(-self.speed, 0)
+        elif self.direction == 'right':
+            self.rect.move_ip(self.speed, 0)
+        elif self.direction == 'top':
+            self.rect.move_ip(0, -self.speed)
+        elif self.direction == 'down':
+            self.rect.move_ip(0, self.speed)
+
+    def draw(self, window):
+        window.blit(self.texture, (self.rect.x, self.rect.y))
+
+    def delete(self):
+        bullets_list.remove(self)
+        del self
 
 
 def points():
@@ -733,6 +723,9 @@ def points():
     return gold_list
 
 
+gold_list = points()
+
+
 def generate_new_obstacles():
     global obstacles_list
     obstacles_list.clear()
@@ -753,15 +746,10 @@ def generate_new_enemy():
 
 def death_animation(death_frames, x, y):
     for i in death_frames:
+        enemy.draw(window)
         window.blit(i, (x, y))
         pygame.time.wait(50)
         pygame.display.update()
-
-
-enemy_list = enemies()
-gold_list = points()
-obstacles_list = obstacles()
-borders_list = borders()
 
 
 start()
@@ -931,6 +919,9 @@ while run:
     for border in borders_list:
         border.draw(window)
 
+    for obstacle in destroyed_obstacles_list:
+        window.blit(nature_corpses, (obstacle.rect.x, obstacle.rect.y))
+
     if powershield == False and gun_on == False:
         window.blit(player1_texture, player1_rect)
         player1_rect = pygame.rect.Rect(x, y, 40, 40)
@@ -1098,9 +1089,6 @@ while run:
             window.blit(mutant_corpses, (enemy.rect.x, enemy.rect.y))
         if enemy.type == 'ghost':
             window.blit(ghost_corpses, (enemy.rect.x, enemy.rect.y))
-
-    for obstacle in destroyed_obstacles_list:
-        window.blit(nature_corpses, (obstacle.rect.x, obstacle.rect.y))
 
     font = pygame.font.Font('font/snap.ttf', 30)
     points_text = font.render(
