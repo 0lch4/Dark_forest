@@ -1,6 +1,7 @@
 import pygame
 import random
 import time
+import sys
 
 # values:
 pygame.init()
@@ -395,7 +396,7 @@ def deadscreen():
                             pygame.display.update()
                             break
             elif keys[pygame.K_ESCAPE]:
-                quit()
+                sys.exit()
 
 
 def pause():
@@ -701,7 +702,7 @@ class Bullet:
 
     def draw(self, window):
         window.blit(self.texture, (self.rect.x, self.rect.y))
-
+    
     def delete(self):
         bullets_list.remove(self)
         del self
@@ -772,7 +773,18 @@ def generate_new_enemy():
 
 def death_animation(death_frames, x, y):
     for i in death_frames:
-        enemy.draw(window)
+        for enemy in enemy_list:
+            enemy.draw(window)
+        for enemy in dead_enemy_list:
+            if enemy.type == 'fast':
+                window.blit(fast_corpses, (enemy.rect.x, enemy.rect.y))
+            if enemy.type == 'devil':
+                window.blit(devil_corpses, (enemy.rect.x, enemy.rect.y))
+            if enemy.type == 'mutant':
+                window.blit(mutant_corpses, (enemy.rect.x, enemy.rect.y))
+            if enemy.type == 'ghost':
+                window.blit(ghost_corpses, (enemy.rect.x, enemy.rect.y))
+                
         window.blit(i, (x, y))
         pygame.time.wait(50)
         pygame.display.update()
@@ -908,6 +920,7 @@ while run:
                         y = i.rect.bottom
 
     if o_key_pressed:
+        refresh()
         generate_new_obstacles()
         generate_new_gold()
         points_counter -= 2
