@@ -1,7 +1,7 @@
 # Dark forest
 My first game in Python
 
-Version: https://img.shields.io/badge/Version-1.0-red
+Version: ![GitHub forks](https://img.shields.io/badge/Version-1.0-red)
 
 Earn Gold, buy boosts and don't get caught by enemies
 
