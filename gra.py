@@ -511,7 +511,6 @@ class Obstacle:
         surface.blit(self.texture, self.rect)
 
     def delete(self):
-        window.blit(nature_corpses, (self.rect.x, self.rect.y))
         destroyed_obstacles_list.append(self)
         obstacles_list.remove(self)
         del self
@@ -635,7 +634,6 @@ class Enemy:
         surface.blit(self.texture, self.rect)
 
     def delete(self):
-        window.blit(nature_corpses, (self.rect.x, self.rect.y))
         dead_enemy_list.append(self)
         enemy_list.remove(self)
         del self
@@ -959,7 +957,9 @@ while run:
         border.draw(window)
 
     for obstacle in destroyed_obstacles_list:
-        window.blit(nature_corpses, (obstacle.rect.x, obstacle.rect.y))
+        scaled_corpse = pygame.transform.scale(nature_corpses, (obstacle.rect.width, obstacle.rect.height))
+        window.blit(scaled_corpse, (obstacle.rect.x, obstacle.rect.y))
+
 
     if powershield == False and gun_on == False:
         window.blit(player1_texture, player1_rect)
