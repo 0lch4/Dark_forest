@@ -244,6 +244,8 @@ def stop_sound(sound):
 
 
 def start():
+    pass
+    '''
     intro1 = pygame.image.load("textures/intro.png")
     intro2 = pygame.image.load("textures/intro2.png")
     intro3 = pygame.image.load("textures/intro3.png")
@@ -271,6 +273,7 @@ def start():
             if keys[pygame.K_SPACE]:
                 waiting = False
                 stop_sound(intro_sound)
+'''
 
 
 def deadscreen():
@@ -803,6 +806,11 @@ def enemy_corpses():
             window.blit(ghost_corpses, (enemy.rect.x, enemy.rect.y))
 
 
+def dead_nature():
+    for obstacle in destroyed_obstacles_list:
+        window.blit(nature_corpses, (obstacle.rect.x, obstacle.rect.y))
+
+
 start()
 pygame.mixer.music.load('sounds/music.mp3')
 pygame.mixer.music.set_volume(0.4)
@@ -1129,9 +1137,9 @@ while run:
                                     enemy.rect.x, enemy.rect.y)
                 enemy.delete()
                 powershield = False
+
     enemy_corpses()
-    for obstacle in destroyed_obstacles_list:
-        window.blit(nature_corpses, (obstacle.rect.x, obstacle.rect.y))
+    dead_nature()
 
     font = pygame.font.Font('font/snap.ttf', 30)
     points_text = font.render(
