@@ -474,7 +474,7 @@ def shield():
     time.sleep(1)
 
 
-def reload():
+def reeload():
     reload_sound.play()
     refresh_banner = pygame.transform.scale(
         pygame.image.load("textures/reload.png"), (300, 200))
@@ -953,7 +953,7 @@ while run:
         if points_counter >= 3:
             magazine += 10
             points_counter -= 3
-            reload()
+            reeload()
         else:
             u_key_pressed = False
 
