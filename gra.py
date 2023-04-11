@@ -9,7 +9,7 @@ pygame.mouse.set_visible(False)
 widthWindow = 1920
 heightWindow = 1080
 window = pygame.display.set_mode((widthWindow, heightWindow))
-points_counter = -1
+points_counter = 100
 level = 0
 number_devils = 0
 number_fasts = 0
@@ -60,6 +60,7 @@ def random_background():
 player1_texture = pygame.transform.scale(
     pygame.image.load('textures/player.png'), (40, 40))
 player1_rect = player1_texture.get_rect()
+player1_mask = pygame.mask.from_surface(player1_texture)
 # with shield
 player1_texture_shield = pygame.image.load('textures/playershield1.png')
 player_dead_animation = [pygame.image.load('textures/playerdead1.png'), pygame.image.load(
@@ -84,8 +85,6 @@ player_plazmaDS_texture = pygame.transform.scale(
 
 last_texture = player1_texture
 last2_texture = player1_texture
-player1_rect.x = x
-player1_rect.y = y
 
 # bullet textures:
 bullet_speed = 70
@@ -97,18 +96,21 @@ bulletHeight = 5
 bullet_textureR = pygame.transform.scale(
     pygame.image.load('textures/bulletR.png'), (bulletWidth, bulletHeight))
 bulletR_rect = bullet_textureR.get_rect()
+bulletR_mask = pygame.mask.from_surface(bullet_textureR)
 bullet_textureL = pygame.transform.scale(
     pygame.image.load('textures/bulletL.png'), (bulletWidth, bulletHeight))
 bulletL_rect = bullet_textureL.get_rect()
-
+bulletL_mask = pygame.mask.from_surface(bullet_textureL)
 bulletxWidth = 5
 bulletxHeight = 15
 bullet_textureT = pygame.transform.scale(
     pygame.image.load('textures/bulletT.png'), (bulletxWidth, bulletxHeight))
 bulletT_rect = bullet_textureT.get_rect()
+bulletT_mask = pygame.mask.from_surface(bullet_textureT)
 bullet_textureD = pygame.transform.scale(
     pygame.image.load('textures/bulletD.png'), (bulletxWidth, bulletxHeight))
 bulletD_rect = bullet_textureD.get_rect()
+bulletD_mask = pygame.mask.from_surface(bullet_textureD)
 # bullet explosion
 bullet_boom1_texture = pygame.transform.scale(
     pygame.image.load('textures/bulletboom1.png'), (20, 20))
@@ -127,6 +129,7 @@ devilCollision = 50
 devil_texture = pygame.transform.scale(
     pygame.image.load('textures/enemy.png'), (devilWidth, devilHeight))
 devil_rect = devil_texture.get_rect()
+devil_mask = pygame.mask.from_surface(devil_texture)
 
 devil_corpses = pygame.transform.scale(pygame.image.load(
     'textures/devildead3.png'), (devilWidth, devilHeight))
@@ -141,6 +144,7 @@ fastCollision = 40
 fast_texture = pygame.transform.scale(
     pygame.image.load('textures/fast.png'), (fastWidth, fastHeight))
 fast_rect = fast_texture.get_rect()
+fast_mask = pygame.mask.from_surface(fast_texture)
 fast_corpses = pygame.transform.scale(pygame.image.load(
     'textures/fastdead3.png'), (fastWidth, fastHeight))
 fast_dead_animation = [pygame.transform.scale(pygame.image.load('textures/fastdead1.png'), (fastWidth, fastHeight)), pygame.transform.scale(pygame.image.load(
@@ -154,10 +158,10 @@ mutantCollision = 100
 mutant_texture = pygame.transform.scale(
     pygame.image.load('textures/mutantL.png'), (mutantWidth, mutantHeight))
 mutant_rect = mutant_texture.get_rect()
+mutant_mask = pygame.mask.from_surface(mutant_texture)
 mutant_textureL = mutant_texture
 mutant_textureR = pygame.transform.scale(
     pygame.image.load('textures/mutantR.png'), (mutantWidth, mutantHeight))
-mutant_rect = mutant_texture.get_rect()
 mutant_corpses = pygame.transform.scale(pygame.image.load(
     'textures/mutantdead3L.png'), (mutantWidth, mutantHeight))
 mutant_dead_animation = [pygame.transform.scale(pygame.image.load('textures/mutantdead1L.png'), (mutantWidth, mutantHeight)), pygame.transform.scale(pygame.image.load(
@@ -170,10 +174,10 @@ ghostCollision = 50
 ghost_texture = pygame.transform.scale(
     pygame.image.load('textures/ghostL.png'), (ghostWidth, ghostHeight))
 ghost_rect = ghost_texture.get_rect()
+ghost_mask = pygame.mask.from_surface(ghost_texture)
 ghost_textureL = ghost_texture
 ghost_textureR = pygame.transform.scale(
     pygame.image.load('textures/ghostR.png'), (ghostWidth, ghostHeight))
-ghost_rect = ghost_texture.get_rect()
 ghost_corpses = pygame.transform.scale(pygame.image.load(
     'textures/ghostdead3L.png'), (ghostWidth, ghostHeight))
 ghost_dead_animation = [pygame.transform.scale(pygame.image.load('textures/ghostdead1L.png'), (ghostWidth, ghostHeight)), pygame.transform.scale(pygame.image.load(
@@ -186,36 +190,44 @@ treeHeight = 100
 tree_texture = pygame.transform.scale(
     pygame.image.load('textures/drzewo.png'), (treeWidth, treeHeight))
 tree_rect = tree_texture.get_rect()
+tree_mask = pygame.mask.from_surface(tree_texture)
 
 stoneWidth = 50
 stoneHeight = 50
 stone_texture = pygame.transform.scale(
     pygame.image.load('textures/kamien.png'), (stoneWidth, stoneHeight))
 stone_rect = stone_texture.get_rect()
+stone_mask = pygame.mask.from_surface(stone_texture)
+
 
 bushWidth = 40
 bushHeight = 40
 bush_texture = pygame.transform.scale(
     pygame.image.load('textures/krzak.png'), (bushWidth, bushHeight))
 bush_rect = bush_texture.get_rect()
+bush_mask = pygame.mask.from_surface(bush_texture)
 
 bonesWidth = 70
 bonesHeight = 30
 bones_texture = pygame.transform.scale(
     pygame.image.load('textures/bones.png'), (bonesWidth, bonesHeight))
 bones_rect = bones_texture.get_rect()
+bones_mask = pygame.mask.from_surface(bones_texture)
 
 sarnaWidth = 50
 sarnaHeight = 30
 sarna_texture = pygame.transform.scale(
     pygame.image.load('textures/sarna.png'), (bonesWidth, bonesHeight))
 sarna_rect = sarna_texture.get_rect()
+sarna_mask = pygame.mask.from_surface(sarna_texture)
+
 
 deadtreeWidth = 70
 deadtreeHeight = 100
 deadtree_texture = pygame.transform.scale(
     pygame.image.load('textures/deadtree.png'), (deadtreeWidth, deadtreeHeight))
 deadtree_rect = deadtree_texture.get_rect()
+deadtree_mask = pygame.mask.from_surface(deadtree_texture)
 
 nature_destroy_animation = [pygame.transform.scale(pygame.image.load('textures/destroyednature1.png'), (50, 50)), pygame.transform.scale(
     pygame.image.load('textures/destroyednature2.png'), (50, 50)), pygame.transform.scale(pygame.image.load('textures/destroyednature3.png'), (50, 50)),]
@@ -266,6 +278,10 @@ def stop_sound(sound):
 
 
 def start():
+    pass
+
+
+"""
     intro1 = pygame.image.load("textures/intro.png")
     intro2 = pygame.image.load("textures/intro2.png")
     intro3 = pygame.image.load("textures/intro3.png")
@@ -293,6 +309,7 @@ def start():
             if keys[pygame.K_SPACE]:
                 waiting = False
                 stop_sound(intro_sound)
+"""
 
 
 def load(quantity, objectt, lista, rect):
@@ -516,6 +533,7 @@ class Obstacle:
     def __init__(self, x, y, width, height, texture):
         self.rect = pygame.Rect(x, y, width, height)
         self.texture = texture
+        self.mask = pygame.mask.from_surface(texture)
 
     def draw(self, surface):
         surface.blit(self.texture, self.rect)
@@ -825,28 +843,38 @@ while run:
             run = False
         if keys[pygame.K_ESCAPE]:
             run = False
-    xx, yy = 0, 0
-    if keys[pygame.K_d]:
-        bullet_direction = 'right'
-        play_sound(move_sound)
-        xx += speed
-    elif keys[pygame.K_a]:
-        bullet_direction = 'left'
-        play_sound(move_sound)
-        xx -= speed
-    elif keys[pygame.K_s]:
-        bullet_direction = 'down'
-        play_sound(move_sound)
-        yy += speed
-    elif keys[pygame.K_w]:
-        bullet_direction = 'top'
-        play_sound(move_sound)
-        yy -= speed
-    else:
-        stop_sound(move_sound)
 
-    x += xx
-    y += yy
+    xx, yy = 0, 0
+
+    if keys[pygame.K_d]:
+        xx += speed
+        play_sound(move_sound)
+        bullet_direction = 'right'
+    elif keys[pygame.K_a]:
+        xx -= speed
+        play_sound(move_sound)
+        bullet_direction = 'left'
+    elif keys[pygame.K_s]:
+        yy += speed
+        play_sound(move_sound)
+        bullet_direction = 'down'
+    elif keys[pygame.K_w]:
+        yy -= speed
+        play_sound(move_sound)
+        bullet_direction = 'top'
+    prev_pos = player1_rect.copy()
+
+    player1_rect.move_ip(xx, yy)
+    x, y = player1_rect.x, player1_rect.y
+
+    for obstacle in obstacles_list:
+        mask = obstacle.mask
+        offset = (obstacle.rect.x - player1_rect.x,
+                  obstacle.rect.y - player1_rect.y)
+        if player1_mask.overlap(mask, offset):
+            player1_rect = prev_pos
+            x, y = player1_rect.x, player1_rect.y
+            break
 
     if keys[pygame.K_o]:
         if o_key_released:
@@ -929,15 +957,17 @@ while run:
 
         else:
             for i in obstacles_list:
-                if player1_rect.colliderect(i.rect):
-                    if x < i.rect.left:
-                        x = i.rect.left - 40
-                    elif x > i.rect.right:
-                        x = i.rect.right
-                    elif y < i.rect.top:
-                        y = i.rect.top - 40
+                mask = i.mask
+                offset = (i.rect.x - player1_rect.x, i.rect.y - player1_rect.y)
+                if player1_mask.overlap(mask, offset):
+                    if offset[0] > 0:
+                        player1_rect.right = player1_rect.right - 40
+                    elif offset[0] < 0:
+                        player1_rect.left = player1_rect.left + 40
+                    elif offset[1] > 0:
+                        player1_rect.bottom = player1_rect.right - 40
                     else:
-                        y = i.rect.bottom
+                        player1_rect.top = player1_rect.right + 40
 
     if o_key_pressed:
         refresh()
