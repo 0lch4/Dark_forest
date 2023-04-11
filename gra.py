@@ -2,6 +2,7 @@ import pygame
 import random
 import time
 import sys
+import math
 
 # values:
 pygame.init()
@@ -9,7 +10,7 @@ pygame.mouse.set_visible(False)
 widthWindow = 1920
 heightWindow = 1080
 window = pygame.display.set_mode((widthWindow, heightWindow))
-points_counter = -1
+points_counter = 0
 level = 0
 number_devils = 0
 number_fasts = 0
@@ -282,6 +283,7 @@ shield_sound = pygame.mixer.Sound('sounds/shield.mp3')
 shield_sound.set_volume(0.5)
 refresh_sound = pygame.mixer.Sound('sounds/refresh.mp3')
 refresh_sound.set_volume(0.5)
+gold_sound = pygame.mixer.Sound('sounds/gold.mp3')
 
 
 def play_sound(sound):
@@ -326,8 +328,8 @@ def start():
 def load(quantity, objectt, lista, rect):
     for i in range(quantity):
         if background == background1:
-            x = random.randint(10, widthWindow)
-            y = random.randint(10, heightWindow)
+            x = random.randint(20, widthWindow)
+            y = random.randint(20, heightWindow)
         elif background == background2:
             if lista == enemy_list:
                 for enemy in enemy_list:
@@ -335,8 +337,12 @@ def load(quantity, objectt, lista, rect):
                         x = random.randint(0, widthWindow)
                         y = random.randint(0, heightWindow)
             if lista == obstacles_list:
-                x = random.randint(10, 1750)
-                y = random.randint(10, 990)
+                if player1_rect.right < widthWindow - 100:
+                    x = random.randint(10, 1750)
+                    y = random.randint(10, 990)
+                else:
+                    x = random.randint(0, player1_rect.left - 100)
+                    y = random.randint(10, 990)
             elif lista == enemy_list:
                 for enemy in enemy_list:
                     if abs(player1_rect.x - enemy.rect.x) <= 200 and abs(player1_rect.y - enemy.rect.y) <= 200:
@@ -351,9 +357,13 @@ def load(quantity, objectt, lista, rect):
             for o in lista:
                 if rect.move(x, y).colliderect(o.rect) or rect.move(x, y).colliderect(player1_rect):
                     collision = True
-                    x = random.randint(0, widthWindow)
-                    y = random.randint(0, heightWindow)
                     break
+                elif math.dist((x, y), player1_rect.center) < 100:
+                    collision = True
+                    break
+            if collision:
+                x = random.randint(0, widthWindow)
+                y = random.randint(0, heightWindow)
         objectt(x, y)
 
 
@@ -394,9 +404,25 @@ def deadscreen():
     time.sleep(2)
     window.blit(dead, (0, 0))
     Dfont = pygame.font.Font('font/snap.ttf', 100)
+
+    with open('best_score.txt', 'r') as f:
+        best_score = int(f.read())
+
+    if level > best_score:
+        with open('best_score.txt', 'w') as f:
+            f.write(str(level))
+        points2_text = Dfont.render(
+            f'Your record{level}', True, (255, 0, 0))
+        window.blit(points2_text, (widthWindow/4-80, heightWindow/4+100))
+    else:
+        points2_text = Dfont.render(
+            f'Your record: {best_score} levels', True, (255, 0, 0))
+        window.blit(points2_text, (widthWindow/4-80, heightWindow/4+100))
+
     points_text = Dfont.render(
-        f'Your score: {level}', True, (255, 0, 0))
-    window.blit(points_text, (widthWindow/4 + 70, heightWindow/4))
+        f'You survive: {level} levels', True, (255, 0, 0))
+    window.blit(points_text, (widthWindow/4 - 80, heightWindow/4))
+
     pygame.display.update()
     while waiting:
         for i in pygame.event.get():
@@ -410,7 +436,7 @@ def deadscreen():
                         keys = pygame.key.get_pressed()
                         if keys[pygame.K_SPACE]:
                             time.sleep(0.5)
-                            points_counter = -1
+                            points_counter = 0
                             number_devils = 0
                             number_fasts = 0
                             number_mutants = 0
@@ -512,15 +538,17 @@ def reeload():
 
 
 class Border:
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, color=(255, 0, 0)):
         self.rect = pygame.Rect(x, y, width, height)
+        self.color = color
 
     def draw(self, surface):
-        pygame.draw.rect(surface, (255, 0, 0), self.rect)
+        pygame.draw.rect(surface, self.color, self.rect)
 
 
 def borders():
     borders_list = []
+    global right
 
     up = Border(1, 1, 1920, 1)
     borders_list.append(up)
@@ -531,7 +559,7 @@ def borders():
     left = Border(1, 1, 1, 1080)
     borders_list.append(left)
 
-    right = Border(1919, 1, 1, 1080)
+    right = Border(1919, 1, 1, 1080, (255, 0, 0))
     borders_list.append(right)
 
     return borders_list
@@ -770,7 +798,6 @@ def points():
             pickup_sound.play()
         dead_enemy_list.clear()
         destroyed_obstacles_list.clear()
-        points_counter += 1
         level += 1
         if number_obstacles <= max_obstacles:
             number_obstacles += 1
@@ -968,17 +995,24 @@ while run:
                 y = i.rect.bottom - 40
             elif i == borders_list[2]:
                 x = i.rect.left + 5
-            elif i == borders_list[3]:
-                x = i.rect.right - 40
+            if right.color == (255, 0, 0):
+                if i == borders_list[3]:
+                    x = i.rect.right - 40
 
     for gold in gold_list:
         if player1_rect.colliderect(gold.rect):
-            background = random_background()
+            gold_sound.play()
+            points_counter += 1
+            right.color = (0, 255, 0)
             gold_list.remove(gold)
-            generate_new_obstacles()
-            generate_new_gold()
-            generate_new_enemy()
-            bullet_fired = True
+    if right.color == (0, 255, 0) and player1_rect.colliderect(right.rect):
+        background = random_background()
+        generate_new_obstacles()
+        generate_new_gold()
+        generate_new_enemy()
+        bullet_fired = True
+        right.color = (255, 0, 0)
+        x = 0
 
     for i in obstacles_list:
         mask = i.mask
@@ -1035,7 +1069,6 @@ while run:
     for border in borders_list:
         border.draw(window)
 
-    status()
     corpses()
 
     for obstacle in destroyed_obstacles_list:
@@ -1089,6 +1122,7 @@ while run:
         else:
             window.blit(last2_texture, player1_rect)
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
+    status()
 
     if keys[pygame.K_SPACE] and bullet_fired == True and magazine > 0 and gun_on == True:
         if bullet_direction == 'right':
@@ -1199,7 +1233,6 @@ while run:
                     enemy.delete()
                     bullet.delete()
                     bullet_fired = True
-
             bullet.draw(window)
         except:
             pass
