@@ -842,23 +842,25 @@ while run:
     xx, yy = 0, 0
 
     if keys[pygame.K_d]:
-        xx += speed
         play_sound(move_sound)
+        xx += speed
         bullet_direction = 'right'
     elif keys[pygame.K_a]:
-        xx -= speed
         play_sound(move_sound)
+        xx -= speed
         bullet_direction = 'left'
     elif keys[pygame.K_s]:
-        yy += speed
         play_sound(move_sound)
+        yy += speed
         bullet_direction = 'down'
     elif keys[pygame.K_w]:
-        yy -= speed
         play_sound(move_sound)
+        yy -= speed
         bullet_direction = 'top'
-    prev_pos = player1_rect.copy()
+    else:
+        stop_sound(move_sound)
 
+    prev_pos = player1_rect.copy()
     player1_rect.move_ip(xx, yy)
     x, y = player1_rect.x, player1_rect.y
 
