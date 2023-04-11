@@ -34,6 +34,7 @@ u_key_released = True
 r_key_pressed = False
 r_key_released = True
 powershield = False
+deadtype = None
 gun_on = False
 speed = 8
 max_speed = 15
@@ -136,6 +137,11 @@ devil_corpses = pygame.transform.scale(pygame.image.load(
 devil_dead_animation = [pygame.transform.scale(pygame.image.load('textures/devildead1.png'), (devilWidth, devilHeight)), pygame.transform.scale(pygame.image.load(
     'textures/devildead2.png'), (devilWidth, devilHeight)), pygame.transform.scale(pygame.image.load('textures/devildead3.png'), (devilWidth, devilHeight))]
 
+devil_bullet_dead_animation = [pygame.transform.scale(pygame.image.load('textures/devildead1v2.png'), (devilWidth, devilHeight)), pygame.transform.scale(pygame.image.load(
+    'textures/devildead2v2.png'), (devilWidth, devilHeight)), pygame.transform.scale(pygame.image.load('textures/devildead3v2.png'), (devilWidth, devilHeight))]
+
+devil_bullet_corpses = pygame.transform.scale(pygame.image.load(
+    'textures/devildead3v2.png'), (devilWidth, devilHeight))
 
 fastWidth = 40
 fastHeight = 40
@@ -150,6 +156,10 @@ fast_corpses = pygame.transform.scale(pygame.image.load(
 fast_dead_animation = [pygame.transform.scale(pygame.image.load('textures/fastdead1.png'), (fastWidth, fastHeight)), pygame.transform.scale(pygame.image.load(
     'textures/fastdead2.png'), (fastWidth, fastHeight)), pygame.transform.scale(pygame.image.load('textures/fastdead3.png'), (fastWidth, fastHeight))]
 
+fast_bullet_corpses = pygame.transform.scale(pygame.image.load(
+    'textures/fastdead3v2.png'), (100, 100))
+fast_bullet_dead_animation = [pygame.transform.scale(pygame.image.load('textures/fastdead1v2.png'), (fastWidth, fastHeight)), pygame.transform.scale(pygame.image.load(
+    'textures/fastdead2v2.png'), (60, 60)), pygame.transform.scale(pygame.image.load('textures/fastdead3v2.png'), (60, 60))]
 
 mutantWidth = 100
 mutantHeight = 100
@@ -166,6 +176,12 @@ mutant_corpses = pygame.transform.scale(pygame.image.load(
     'textures/mutantdead3L.png'), (mutantWidth, mutantHeight))
 mutant_dead_animation = [pygame.transform.scale(pygame.image.load('textures/mutantdead1L.png'), (mutantWidth, mutantHeight)), pygame.transform.scale(pygame.image.load(
     'textures/mutantdead2L.png'), (mutantWidth, mutantHeight)), pygame.transform.scale(pygame.image.load('textures/mutantdead3L.png'), (mutantWidth, mutantHeight))]
+
+mutant_bullet2_dead_animation = [pygame.transform.scale(pygame.image.load('textures/mutantL.dead1v3.png'), (mutantWidth, mutantHeight)), pygame.transform.scale(pygame.image.load(
+    'textures/mutantL.dead2v3.png'), (mutantWidth, mutantHeight)), pygame.transform.scale(pygame.image.load('textures/mutantL.dead3v3.png'), (mutantWidth, mutantHeight))]
+mutant_bullet2_corpses = pygame.transform.scale(pygame.image.load(
+    'textures/mutantL.dead3v3.png'), (mutantWidth, mutantHeight))
+
 
 ghostWidth = 50
 ghostHeight = 50
@@ -592,15 +608,21 @@ obstacles_list = obstacles()
 
 
 class Enemy:
-    def __init__(self, x, y, width, height, texture, speed, collison, enemy_type):
+    def __init__(self, x, y, width, height, texture, speed, collision, enemy_type):
         self.rect = pygame.Rect(x, y, width, height)
         self.texture = texture
         self.speed = speed
-        self.collison = collison
+        self.collision = collision
         self.direction = (1, 0)
         self.type = enemy_type
+        self.mask = pygame.mask.from_surface(texture)
+        self.prev_pos = self.rect.copy()
+        self.x = self.rect.x
+        self.y = self.rect.y
 
     def update(self, obstacles_list):
+        self.prev_pos = self.rect.copy()
+        self.x, self.y = self.rect.x, self.rect.y
         self.rect.x += self.speed * self.direction[0]
         self.rect.y += self.speed * self.direction[1]
 
@@ -608,14 +630,8 @@ class Enemy:
             if self.type == 'ghost':
                 continue
             if self.rect.colliderect(i.rect):
-                if self.rect.x < i.rect.left:
-                    self.rect.x = i.rect.left - self.collison
-                elif self.rect.x > i.rect.right:
-                    self.rect.x = i.rect.right
-                elif self.rect.y < i.rect.top:
-                    self.rect.y = i.rect.top - self.collison
-                else:
-                    self.rect.y = i.rect.bottom
+                self.rect = self.prev_pos
+                break
 
         for i in borders_list:
             if self.rect.colliderect(i):
@@ -802,11 +818,23 @@ def death_animation(death_frames, x, y):
 def corpses():
     for enemy in dead_enemy_list:
         if enemy.type == 'fast':
-            window.blit(fast_corpses, (enemy.rect.x, enemy.rect.y))
+            if enemy.killed_by == 'bullet':
+                window.blit(fast_bullet_corpses,
+                            (enemy.rect.x-20, enemy.rect.y-20))
+            elif enemy.killed_by == 'shield':
+                window.blit(fast_bullet_corpses,
+                            (enemy.rect.x-20, enemy.rect.y-20))
         if enemy.type == 'devil':
-            window.blit(devil_corpses, (enemy.rect.x, enemy.rect.y))
+            if enemy.killed_by == 'bullet':
+                window.blit(devil_bullet_corpses, (enemy.rect.x, enemy.rect.y))
+            elif enemy.killed_by == 'shield':
+                window.blit(devil_corpses, (enemy.rect.x, enemy.rect.y))
         if enemy.type == 'mutant':
-            window.blit(mutant_corpses, (enemy.rect.x, enemy.rect.y))
+            if enemy.killed_by == 'shield':
+                window.blit(mutant_bullet2_corpses,
+                            (enemy.rect.x, enemy.rect.y))
+            elif enemy.killed_by == 'bullet':
+                window.blit(mutant_corpses, (enemy.rect.x, enemy.rect.y))
         if enemy.type == 'ghost':
             window.blit(ghost_corpses, (enemy.rect.x, enemy.rect.y))
 
@@ -1111,6 +1139,7 @@ while run:
                 generate_new_obstacles()
                 break
             elif powershield == True:
+                enemy.killed_by = 'shield'
                 if enemy.type == 'fast':
                     fast_dead_sound.play()
                     death_animation(fast_dead_animation,
@@ -1150,17 +1179,18 @@ while run:
                     break
             for enemy in enemy_list:
                 if bullet.rect.colliderect(enemy.rect):
+                    enemy.killed_by = 'bullet'
                     if enemy.type == 'fast':
                         fast_dead_sound.play()
-                        death_animation(fast_dead_animation,
+                        death_animation(fast_bullet_dead_animation,
                                         enemy.rect.x, enemy.rect.y)
                     elif enemy.type == 'devil':
                         devil_dead_sound.play()
-                        death_animation(devil_dead_animation,
+                        death_animation(devil_bullet_dead_animation,
                                         enemy.rect.x, enemy.rect.y)
                     elif enemy.type == 'mutant':
                         mutant_dead_sound.play()
-                        death_animation(mutant_dead_animation,
+                        death_animation(mutant_bullet2_dead_animation,
                                         enemy.rect.x, enemy.rect.y)
                     elif enemy.type == 'ghost':
                         ghost_dead_sound.play()
