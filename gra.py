@@ -9,7 +9,7 @@ pygame.mouse.set_visible(False)
 widthWindow = 1920
 heightWindow = 1080
 window = pygame.display.set_mode((widthWindow, heightWindow))
-points_counter = 100
+points_counter = -1
 level = 0
 number_devils = 0
 number_fasts = 0
@@ -278,10 +278,6 @@ def stop_sound(sound):
 
 
 def start():
-    pass
-
-
-"""
     intro1 = pygame.image.load("textures/intro.png")
     intro2 = pygame.image.load("textures/intro2.png")
     intro3 = pygame.image.load("textures/intro3.png")
@@ -309,7 +305,6 @@ def start():
             if keys[pygame.K_SPACE]:
                 waiting = False
                 stop_sound(intro_sound)
-"""
 
 
 def load(quantity, objectt, lista, rect):
