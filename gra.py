@@ -9,7 +9,7 @@ pygame.mouse.set_visible(False)
 widthWindow = 1920
 heightWindow = 1080
 window = pygame.display.set_mode((widthWindow, heightWindow))
-points_counter = 100
+points_counter = -1
 level = 0
 number_devils = 0
 number_fasts = 0
@@ -301,9 +301,19 @@ def load(quantity, objectt, lista, rect):
             x = random.randint(0, widthWindow)
             y = random.randint(0, heightWindow)
         elif background == background2:
+            if lista == enemy_list:
+                for enemy in enemy_list:
+                    if abs(player1_rect.x - enemy.rect.x) <= 200 and abs(player1_rect.y - enemy.rect.y) <= 200:
+                        x = random.randint(0, widthWindow)
+                        y = random.randint(0, heightWindow)
             if lista == obstacles_list:
                 x = random.randint(0, 1750)
                 y = random.randint(0, 990)
+            elif lista == enemy_list:
+                for enemy in enemy_list:
+                    if abs(player1_rect.x - enemy.rect.x) <= 200 and abs(player1_rect.y - enemy.rect.y) <= 200:
+                        x = random.randint(0, widthWindow)
+                        y = random.randint(0, heightWindow)
             else:
                 x = random.randint(0, widthWindow)
                 y = random.randint(0, heightWindow)
@@ -838,6 +848,10 @@ while run:
         yy -= speed
     else:
         stop_sound(move_sound)
+
+    x += xx
+    y += yy
+
     if keys[pygame.K_o]:
         if o_key_released:
             if points_counter > 0:
@@ -897,9 +911,6 @@ while run:
             r_key_pressed = False
             r_key_released = True
 
-    x += xx
-    y += yy
-
     for i in borders_list:
         if player1_rect.colliderect(i):
             if i == borders_list[0]:
@@ -913,7 +924,6 @@ while run:
 
     for gold in gold_list:
         if player1_rect.colliderect(gold.rect):
-            bullet_fired = True
             background = random_background()
             gold_list.remove(gold)
             generate_new_obstacles()
@@ -956,10 +966,13 @@ while run:
             gun1()
             gun_on = True
             speed -= 3
+            r_key_pressed = False
+
         elif gun_on == True:
             gun2()
             gun_on = False
             speed += 3
+            r_key_pressed = False
 
     window.blit(background, (0, 0))
 
@@ -971,6 +984,9 @@ while run:
 
     for border in borders_list:
         border.draw(window)
+
+    status()
+    corpses()
 
     for obstacle in destroyed_obstacles_list:
         scaled_corpse = pygame.transform.scale(
@@ -1134,7 +1150,5 @@ while run:
                                     enemy.rect.x, enemy.rect.y)
                 enemy.delete()
                 powershield = False
-    status()
-    corpses()
 
     pygame.display.update()
