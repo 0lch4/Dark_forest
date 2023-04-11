@@ -298,8 +298,8 @@ def start():
 def load(quantity, objectt, lista, rect):
     for i in range(quantity):
         if background == background1:
-            x = random.randint(0, widthWindow)
-            y = random.randint(0, heightWindow)
+            x = random.randint(10, widthWindow)
+            y = random.randint(10, heightWindow)
         elif background == background2:
             if lista == enemy_list:
                 for enemy in enemy_list:
@@ -307,8 +307,8 @@ def load(quantity, objectt, lista, rect):
                         x = random.randint(0, widthWindow)
                         y = random.randint(0, heightWindow)
             if lista == obstacles_list:
-                x = random.randint(0, 1750)
-                y = random.randint(0, 990)
+                x = random.randint(10, 1750)
+                y = random.randint(10, 990)
             elif lista == enemy_list:
                 for enemy in enemy_list:
                     if abs(player1_rect.x - enemy.rect.x) <= 200 and abs(player1_rect.y - enemy.rect.y) <= 200:
@@ -781,10 +781,6 @@ def generate_new_enemy():
 
 def death_animation(death_frames, x, y):
     for i in death_frames:
-        status()
-        corpses()
-        for enemy in enemy_list:
-            enemy.draw(window)
         window.blit(i, (x, y))
         pygame.time.wait(50)
         pygame.display.update()
@@ -1019,7 +1015,6 @@ while run:
         else:
             window.blit(last_texture, player1_rect)
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
-
     elif powershield == True and gun_on == True:
         if keys[pygame.K_d]:
             window.blit(player_plazmaRS_texture, player1_rect)
@@ -1067,48 +1062,6 @@ while run:
             magazine -= 1
             gun_sound.play()
 
-    for bullet in bullets_list:
-        bullet.update()
-        bullet_fired = False
-        if bullet.rect.left > 2000 or bullet.rect.right < 0 or bullet.rect.top > 1200 or bullet.rect.bottom < 0:
-            bullet.delete()
-            bullet_fired = True
-        for obstacle in obstacles_list:
-            if bullet.rect.colliderect(obstacle.rect):
-                destruction_sound.play()
-                death_animation(bullet_boom_list, bullet.rect.x, bullet.rect.y)
-                death_animation(nature_destroy_animation,
-                                obstacle.rect.x, obstacle.rect.y)
-                bullet.delete()
-                obstacle.delete()
-                bullet_fired = True
-                break
-        for enemy in enemy_list:
-            if bullet.rect.colliderect(enemy.rect):
-                if enemy.type == 'fast':
-                    fast_dead_sound.play()
-                    death_animation(fast_dead_animation,
-                                    enemy.rect.x, enemy.rect.y)
-                elif enemy.type == 'devil':
-                    devil_dead_sound.play()
-                    death_animation(devil_dead_animation,
-                                    enemy.rect.x, enemy.rect.y)
-                elif enemy.type == 'mutant':
-                    mutant_dead_sound.play()
-                    death_animation(mutant_dead_animation,
-                                    enemy.rect.x, enemy.rect.y)
-                elif enemy.type == 'ghost':
-                    ghost_dead_sound.play()
-                    death_animation(ghost_dead_animation,
-                                    enemy.rect.x, enemy.rect.y)
-                enemy.delete()
-                bullet.delete()
-                bullet_fired = True
-
-        bullet.draw(window)
-
-    pygame.display.update()
-
     for enemy in enemy_list:
         enemy.update(obstacles_list)
         if enemy.type == 'mutant':
@@ -1151,4 +1104,47 @@ while run:
                 enemy.delete()
                 powershield = False
 
+    for bullet in bullets_list:
+        try:
+            bullet.update()
+            bullet_fired = False
+            if bullet.rect.left > 2000 or bullet.rect.right < 0 or bullet.rect.top > 1200 or bullet.rect.bottom < 0:
+                bullet.delete()
+                bullet_fired = True
+            for obstacle in obstacles_list:
+                if bullet.rect.colliderect(obstacle.rect):
+                    destruction_sound.play()
+                    death_animation(bullet_boom_list,
+                                    bullet.rect.x, bullet.rect.y)
+                    death_animation(nature_destroy_animation,
+                                    obstacle.rect.x, obstacle.rect.y)
+                    bullet.delete()
+                    obstacle.delete()
+                    bullet_fired = True
+                    break
+            for enemy in enemy_list:
+                if bullet.rect.colliderect(enemy.rect):
+                    if enemy.type == 'fast':
+                        fast_dead_sound.play()
+                        death_animation(fast_dead_animation,
+                                        enemy.rect.x, enemy.rect.y)
+                    elif enemy.type == 'devil':
+                        devil_dead_sound.play()
+                        death_animation(devil_dead_animation,
+                                        enemy.rect.x, enemy.rect.y)
+                    elif enemy.type == 'mutant':
+                        mutant_dead_sound.play()
+                        death_animation(mutant_dead_animation,
+                                        enemy.rect.x, enemy.rect.y)
+                    elif enemy.type == 'ghost':
+                        ghost_dead_sound.play()
+                        death_animation(ghost_dead_animation,
+                                        enemy.rect.x, enemy.rect.y)
+                    enemy.delete()
+                    bullet.delete()
+                    bullet_fired = True
+
+            bullet.draw(window)
+        except:
+            pass
     pygame.display.update()
