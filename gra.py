@@ -412,7 +412,7 @@ def deadscreen():
         with open('best_score.txt', 'w') as f:
             f.write(str(level))
         points2_text = Dfont.render(
-            f'Your record: {level}', True, (255, 0, 0))
+            f'Your record: {level} levels', True, (255, 0, 0))
         window.blit(points2_text, (widthWindow/4-80, heightWindow/4+100))
     else:
         points2_text = Dfont.render(
