@@ -2,6 +2,7 @@ import pygame
 import random
 import time
 import sys
+import asyncio
 
 # values:
 pygame.init()
@@ -797,9 +798,13 @@ def generate_new_enemy():
     enemy_list = enemies()
 
 
-def death_animation(death_frames, x, y):
+async def death_animation(screen, death_frames, obstacle_rect, background):
+    obstacle_width, obstacle_height = obstacle_rect.size
+    surface = pygame.Surface((obstacle_width, obstacle_height))
+    surface.blit(background, (0, 0))  # narysuj tło gry na powierzchni
     for i in death_frames:
-        window.blit(i, (x, y))
+        surface.blit(i, (0, 0))
+        screen.blit(surface, obstacle_rect)
         pygame.time.wait(50)
         pygame.display.update()
 
@@ -940,11 +945,11 @@ while run:
             if i == borders_list[0]:
                 y = i.rect.top + 5
             elif i == borders_list[1]:
-                y = i.rect.bottom - 45
+                y = i.rect.bottom - 40
             elif i == borders_list[2]:
                 x = i.rect.left + 5
             elif i == borders_list[3]:
-                x = i.rect.right - 45
+                x = i.rect.right - 40
 
     for gold in gold_list:
         if player1_rect.colliderect(gold.rect):
@@ -955,19 +960,18 @@ while run:
             generate_new_enemy()
             bullet_fired = True
 
-        else:
-            for i in obstacles_list:
-                mask = i.mask
-                offset = (i.rect.x - player1_rect.x, i.rect.y - player1_rect.y)
-                if player1_mask.overlap(mask, offset):
-                    if offset[0] > 0:
-                        player1_rect.right = player1_rect.right - 40
-                    elif offset[0] < 0:
-                        player1_rect.left = player1_rect.left + 40
-                    elif offset[1] > 0:
-                        player1_rect.bottom = player1_rect.right - 40
-                    else:
-                        player1_rect.top = player1_rect.right + 40
+    for i in obstacles_list:
+        mask = i.mask
+        offset = (i.rect.x - player1_rect.x, i.rect.y - player1_rect.y)
+        if player1_mask.overlap(mask, offset):
+            if offset[0] > 0:
+                player1_rect.right = player1_rect.right - 40
+            elif offset[0] < 0:
+                player1_rect.left = player1_rect.left + 40
+            elif offset[1] > 0:
+                player1_rect.bottom = player1_rect.right - 40
+            else:
+                player1_rect.top = player1_rect.right + 40
 
     if o_key_pressed:
         refresh()
@@ -1146,8 +1150,8 @@ while run:
                     destruction_sound.play()
                     death_animation(bullet_boom_list,
                                     bullet.rect.x, bullet.rect.y)
-                    death_animation(nature_destroy_animation,
-                                    obstacle.rect.x, obstacle.rect.y)
+                    death_animation(
+                        screen, nature_destroy_animation, obstacle.rect, background)
                     bullet.delete()
                     obstacle.delete()
                     bullet_fired = True
