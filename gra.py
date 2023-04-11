@@ -2,7 +2,6 @@ import pygame
 import random
 import time
 import sys
-import asyncio
 
 # values:
 pygame.init()
@@ -798,13 +797,9 @@ def generate_new_enemy():
     enemy_list = enemies()
 
 
-async def death_animation(screen, death_frames, obstacle_rect, background):
-    obstacle_width, obstacle_height = obstacle_rect.size
-    surface = pygame.Surface((obstacle_width, obstacle_height))
-    surface.blit(background, (0, 0))  # narysuj tło gry na powierzchni
+def death_animation(death_frames, x, y):
     for i in death_frames:
-        surface.blit(i, (0, 0))
-        screen.blit(surface, obstacle_rect)
+        window.blit(i, (x, y))
         pygame.time.wait(50)
         pygame.display.update()
 
@@ -1150,8 +1145,8 @@ while run:
                     destruction_sound.play()
                     death_animation(bullet_boom_list,
                                     bullet.rect.x, bullet.rect.y)
-                    death_animation(
-                        screen, nature_destroy_animation, obstacle.rect, background)
+                    death_animation(nature_destroy_animation,
+                                    obstacle.rect.x, obstacle.rect.y)
                     bullet.delete()
                     obstacle.delete()
                     bullet_fired = True
