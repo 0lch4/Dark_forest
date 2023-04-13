@@ -10,8 +10,8 @@ pygame.mouse.set_visible(False)
 widthWindow = 1920
 heightWindow = 1080
 window = pygame.display.set_mode((widthWindow, heightWindow))
-points_counter = 0
-level = 0
+points_counter = 200
+level = 49
 number_devils = 0
 number_fasts = 0
 number_mutants = 0
@@ -37,24 +37,34 @@ r_key_released = True
 powershield = False
 deadtype = None
 gun_on = False
-speed = 8
+speed = 18
 max_speed = 15
+bossHP =2
 destroyed_obstacles_list = []
 bullets_list = []
 dead_enemy_list = []
+boss_list=[]
+dead_boss_list = []
 
 # background:
 menu = pygame.image.load("textures/menu.png")
 background1 = pygame.image.load('textures/tlo.jpg')
 background2 = pygame.image.load('textures/tlo2.jpg')
+background3 = pygame.image.load('textures/tlo3.jpg')
+background4 = pygame.image.load('textures/tlo4.jpg')
 background1 = pygame.transform.scale(background1, window.get_size())
 background2 = pygame.transform.scale(background2, window.get_size())
-background_list = [background1, background2]
-background = background1
+background3 = pygame.transform.scale(background3, window.get_size())
+background4 = pygame.transform.scale(background4, window.get_size())
+background_list = [background1, background2,background3]
+background = background3    
 
 
 def random_background():
-    background = random.choice(background_list)
+    if level %50 == 0:
+        background = background4
+    else:
+        background = random.choice(background_list)
     return background
 
 
@@ -253,6 +263,13 @@ nature_corpses = pygame.transform.scale(
     pygame.image.load('textures/destroyednature3.png'), (50, 50))
 
 
+boss_texture = pygame.transform.scale(
+pygame.image.load('textures/enemy.png'), (300, 300))
+boss_rect = boss_texture.get_rect()
+boss_mask = pygame.mask.from_surface(boss_texture)
+boss_dead_animation = mutant_dead_animation
+boss_corpses= devil_corpses
+
 # sounds
 move_sound = pygame.mixer.Sound('sounds/kroki.mp3')
 pickup_sound = pygame.mixer.Sound('sounds/pickup.mp3')
@@ -284,6 +301,10 @@ shield_sound.set_volume(0.5)
 refresh_sound = pygame.mixer.Sound('sounds/refresh.mp3')
 refresh_sound.set_volume(0.5)
 gold_sound = pygame.mixer.Sound('sounds/gold.mp3')
+boss_dead_sound = pygame.mixer.Sound('sounds/boss_death.mp3')
+boss_dead_sound.set_volume(0.3)
+boss_sound = pygame.mixer.Sound('sounds/boss_sound.mp3')
+boss_sound.set_volume(0.2)
 
 
 def play_sound(sound):
@@ -296,6 +317,8 @@ def stop_sound(sound):
 
 
 def start():
+    pass
+'''
     intro1 = pygame.image.load("textures/intro.png")
     intro2 = pygame.image.load("textures/intro2.png")
     intro3 = pygame.image.load("textures/intro3.png")
@@ -323,48 +346,125 @@ def start():
             if keys[pygame.K_SPACE]:
                 waiting = False
                 stop_sound(intro_sound)
+'''
 
 
 def load(quantity, objectt, lista, rect):
     for i in range(quantity):
-        if background == background1:
-            x = random.randint(20, widthWindow)
-            y = random.randint(20, heightWindow)
-        elif background == background2:
-            if lista == enemy_list:
-                for enemy in enemy_list:
-                    if abs(player1_rect.x - enemy.rect.x) <= 200 and abs(player1_rect.y - enemy.rect.y) <= 200:
-                        x = random.randint(0, widthWindow)
-                        y = random.randint(0, heightWindow)
-            if lista == obstacles_list:
-                if player1_rect.right < widthWindow - 100:
-                    x = random.randint(10, 1750)
-                    y = random.randint(10, 990)
+            if background == background1:
+                x = random.randint(20, widthWindow)
+                y = random.randint(20, heightWindow)
+            elif background == background3:
+                x = random.randint(20, widthWindow)
+                y = random.randint(20, heightWindow)
+            elif background == background2:
+                if lista == enemy_list:
+                    for enemy in enemy_list:
+                        if abs(player1_rect.x - enemy.rect.x) <= 200 and abs(player1_rect.y - enemy.rect.y) <= 200:
+                            x = random.randint(0, widthWindow)
+                            y = random.randint(0, heightWindow)
+                if lista == obstacles_list:
+                    if player1_rect.right < widthWindow - 100:
+                        x = random.randint(10, 1750)
+                        y = random.randint(10, 990)
+                    else:
+                        x = random.randint(0, player1_rect.left - 100)
+                        y = random.randint(10, 990)
+                elif lista == enemy_list:
+                    for enemy in enemy_list:
+                        if abs(player1_rect.x - enemy.rect.x) <= 200 and abs(player1_rect.y - enemy.rect.y) <= 200:
+                            x = random.randint(0, widthWindow)
+                            y = random.randint(0, heightWindow)
                 else:
-                    x = random.randint(0, player1_rect.left - 100)
-                    y = random.randint(10, 990)
-            elif lista == enemy_list:
-                for enemy in enemy_list:
-                    if abs(player1_rect.x - enemy.rect.x) <= 200 and abs(player1_rect.y - enemy.rect.y) <= 200:
-                        x = random.randint(0, widthWindow)
-                        y = random.randint(0, heightWindow)
-            else:
-                x = random.randint(0, widthWindow)
-                y = random.randint(0, heightWindow)
-        collision = True
-        while collision:
-            collision = False
-            for o in lista:
-                if rect.move(x, y).colliderect(o.rect) or rect.move(x, y).colliderect(player1_rect):
-                    collision = True
-                    break
-                elif math.dist((x, y), player1_rect.center) < 100:
-                    collision = True
-                    break
-            if collision:
-                x = random.randint(70, widthWindow)
-                y = random.randint(50, heightWindow)
-        objectt(x, y)
+                    x = random.randint(0, widthWindow)
+                    y = random.randint(0, heightWindow)
+            collision = True
+            while collision:
+                collision = False
+                for o in lista:
+                    if rect.move(x, y).colliderect(o.rect) or rect.move(x, y).colliderect(player1_rect):
+                        collision = True
+                        break
+                    elif math.dist((x, y), player1_rect.center) < 100:
+                        collision = True
+                        break
+                if collision:
+                    x = random.randint(70, widthWindow)
+                    y = random.randint(50, heightWindow)
+            if background != background4:
+                objectt(x, y)
+
+
+def bossload(quantity, objectt):
+    for i in range(quantity):
+            x = random.randint(70, widthWindow-70)
+            y = random.randint(70, heightWindow-70)
+            objectt(x, y)
+            for enemy in enemy_list:
+                if abs(player1_rect.x - enemy.rect.x) <= 200 and abs(player1_rect.y - enemy.rect.y) <= 200:
+                    x = random.randint(70, widthWindow-70)
+                    y = random.randint(70, heightWindow-70)
+                    objectt(x, y)
+                    
+
+class Boss:
+    def __init__(self, x, y, width, height, texture, speed, collision):
+        self.rect = pygame.Rect(x, y, width, height)
+        self.texture = texture
+        self.speed = speed
+        self.collision = collision
+        self.direction = (1, 0)
+        self.mask = pygame.mask.from_surface(texture)
+        self.prev_pos = self.rect.copy()
+        self.x = self.rect.x
+        self.y = self.rect.y
+
+    def update(self,obstacles_list):
+        self.prev_pos = self.rect.copy()
+        self.x, self.y = self.rect.x, self.rect.y
+        self.rect.x += self.speed * self.direction[0]
+        self.rect.y += self.speed * self.direction[1]
+
+        for i in borders_list:
+            if self.rect.colliderect(i):
+                if i == borders_list[0]:
+                    self.rect.y = + 5
+                elif i == borders_list[1]:
+                    self.rect.y = - 55
+                elif i == borders_list[2]:
+                    self.rect.x = + 5
+                elif i == borders_list[3]:
+                    self.rect.x = - 55
+
+        if random.random() < 0.05:
+            self.change_direction()
+
+    def change_direction(self):
+        directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+        new_direction = self.direction
+        while new_direction == self.direction:
+            new_direction = random.choice(directions)
+        self.direction = new_direction
+
+    def draw(self, surface):
+        surface.blit(self.texture, self.rect)
+
+    def delete(self):
+        boss_list.remove(self)
+        dead_boss_list.append(self)
+        del self
+
+
+
+def boss():
+    boss_list = []
+    boss = Boss(500,500,300,300,boss_texture,1,300)
+    boss_list.append(boss)
+    
+    return boss_list
+    
+boss_list = boss()
+ 
 
 
 def deadscreen():
@@ -389,6 +489,8 @@ def deadscreen():
     global x
     global y
     global magazine
+    global background
+    global background1
     waiting = True
     w8 = True
     end_width, end_height = 1920, 1080
@@ -412,7 +514,7 @@ def deadscreen():
         with open('best_score.txt', 'w') as f:
             f.write(str(level))
         points2_text = Dfont.render(
-            f'Your record{level}', True, (255, 0, 0))
+            f'Your record {level} levels', True, (255, 0, 0))
         window.blit(points2_text, (widthWindow/4-80, heightWindow/4+100))
     else:
         points2_text = Dfont.render(
@@ -420,7 +522,7 @@ def deadscreen():
         window.blit(points2_text, (widthWindow/4-80, heightWindow/4+100))
 
     points_text = Dfont.render(
-        f'You survive: {level} levels', True, (255, 0, 0))
+        f'You survived: {level} levels', True, (255, 0, 0))
     window.blit(points_text, (widthWindow/4 - 80, heightWindow/4))
 
     pygame.display.update()
@@ -451,6 +553,7 @@ def deadscreen():
                             m_key_pressed = False
                             m_key_released = True
                             powershield = False
+                            background = background1
                             speed = 8
                             x = 100
                             y = 100
@@ -620,7 +723,6 @@ def obstacles():
         load(number_obstacles, tree, obstacles_list, tree_rect)
         load(number_obstacles-4, sarna, obstacles_list, sarna_rect)
         load(number_obstacles-2, bush, obstacles_list, bush_rect)
-        load(number_obstacles-7, bones, obstacles_list, bones_rect)
         load(number_obstacles-6, stone, obstacles_list, stone_rect)
 
     if background == background2:
@@ -628,6 +730,13 @@ def obstacles():
         load(number_obstacles-2, bones, obstacles_list, bones_rect)
         load(number_obstacles-1, stone, obstacles_list, stone_rect)
         load(number_obstacles-2, sarna, obstacles_list, sarna_rect)
+
+    if background == background3:
+        load(number_obstacles+4, deadtree, obstacles_list, deadtree_rect)
+        load(number_obstacles+6, bones, obstacles_list, bones_rect)
+        load(number_obstacles-2, sarna, obstacles_list, sarna_rect)
+    if background == background4:
+        pass
 
     return obstacles_list
 
@@ -707,6 +816,7 @@ class Enemy:
 
 
 def enemies():
+    global boss_spawned
     enemy_list = []
 
     def devil(xdevil, ydevil):
@@ -728,15 +838,31 @@ def enemies():
         ghost = Enemy(xghost, yghost, ghostWidth,
                       ghostHeight, ghost_texture, ghostSpeed, ghostCollision, 'ghost')
         enemy_list.append(ghost)
-
-    if level % 5 == 0:
-        load(number_ghosts, ghost, obstacles_list, ghost_rect)
-    elif level % 4 == 0:
-        load(number_mutants, mutant, obstacles_list, mutant_rect)
-    elif level % 3 == 0:
-        load(number_fasts, fast, obstacles_list, fast_rect)
-    else:
-        load(number_devils, devil, obstacles_list, devil_rect)
+        
+    if background != background4:
+        if level % 5 == 0:
+            load(number_ghosts, ghost, obstacles_list, ghost_rect)
+        elif level % 4 == 0:
+            load(number_mutants, mutant, obstacles_list, mutant_rect)
+        elif level % 3 == 0:
+            load(number_fasts, fast, obstacles_list, fast_rect)
+        else:
+            load(number_devils, devil, obstacles_list, devil_rect)
+            
+    if background == background4:
+        if bossHP == 40:
+            bossload(10, devil)
+            bossload(5, mutant)
+        if bossHP == 30:
+            bossload(6, mutant)
+            bossload(7, ghost)
+            bossload(5, ghost)
+        if bossHP == 20:
+            bossload(10, fast)
+            bossload(10, mutant)
+        if bossHP == 10:
+            bossload(40, devil)
+            
 
     return enemy_list
 
@@ -820,6 +946,7 @@ gold_list = points()
 def generate_new_obstacles():
     global obstacles_list
     obstacles_list.clear()
+    dead_boss_list.clear()
     obstacles_list = obstacles()
 
 
@@ -840,6 +967,7 @@ def death_animation(death_frames, x, y):
         window.blit(i, (x, y))
         pygame.time.wait(50)
         pygame.display.update()
+        
 
 
 def corpses():
@@ -867,6 +995,7 @@ def corpses():
 
 
 def status():
+    global bossHP
     font = pygame.font.Font('font/snap.ttf', 30)
     points_text = font.render(
         f'Gold: {points_counter}', True, (255, 0, 0))
@@ -877,7 +1006,10 @@ def status():
     points_text = font.render(
         f'Bullets: {magazine}', True, (255, 0, 0))
     window.blit(points_text, (850, 10))
-
+    if background == background4:
+        points_str = 'l' * bossHP
+        pointts_text = font.render(points_str, True, (255, 0, 0))
+        window.blit(pointts_text, (700, 1000))
 
 start()
 pygame.mixer.music.load('sounds/music.mp3')
@@ -1012,7 +1144,7 @@ while run:
         generate_new_enemy()
         bullet_fired = True
         right.color = (255, 0, 0)
-        x = 50
+        x = 0
 
     for i in obstacles_list:
         mask = i.mask
@@ -1038,9 +1170,9 @@ while run:
         pause()
 
     if u_key_pressed:
-        if points_counter >= 3:
+        if points_counter >= 2:
             magazine += 10
-            points_counter -= 3
+            points_counter -= 2
             reeload()
         else:
             u_key_pressed = False
@@ -1068,8 +1200,73 @@ while run:
 
     for border in borders_list:
         border.draw(window)
-
+        
+    for boss in dead_boss_list:
+        window.blit(boss_corpses, (boss.rect.x, boss.rect.y))
+        
     corpses()
+    
+        
+    if background == background4:
+        for boss in boss_list:
+            mask = boss.mask
+            offset = (boss.rect.x - player1_rect.x, boss.rect.y - player1_rect.y)
+            if abs(player1_rect.x - boss.rect.x) <= 200 and abs(player1_rect.y - boss.rect.y) <= 200:
+                play_sound(boss_dead_sound)
+            boss.update(obstacles_list)
+            window.blit(boss.texture, boss.rect)
+            if bossHP == 0:
+                stop_sound(boss_dead_sound)
+                play_sound(boss_sound)
+                boss.delete()
+                death_animation(boss_dead_animation,
+                boss.rect.x, boss.rect.y)
+                points_counter += 30
+                right.color = (0, 255, 0)
+                level +=1
+                if right.color == (0, 255, 0) and player1_rect.colliderect(right.rect):
+                    background = random_background()
+                    generate_new_obstacles()
+                    generate_new_gold()
+                    generate_new_enemy()
+                    bullet_fired = True
+                    right.color = (255, 0, 0)
+                    x = 0
+            if player1_mask.overlap(mask, offset):
+                player_dead_sound.play()
+                death_animation(player_dead_animation, x, y)
+                time.sleep(1)
+                deadscreen()
+                generate_new_enemy()
+                generate_new_gold()
+                generate_new_obstacles()
+                break
+            if bossHP ==40:
+                generate_new_enemy()
+                for enemy in enemy_list:
+                    death_animation(devil_dead_animation,enemy.rect.x,enemy.rect.y)
+                bossHP=39
+            if bossHP ==30:
+                generate_new_enemy()
+                for enemy in enemy_list:
+                    death_animation(devil_dead_animation,enemy.rect.x,enemy.rect.y)
+                bossHP=29
+            if bossHP ==20:
+                generate_new_enemy()
+                for enemy in enemy_list:
+                    death_animation(devil_dead_animation,enemy.rect.x,enemy.rect.y)
+                bossHP=19
+            if bossHP ==10:
+                generate_new_enemy()
+                for enemy in enemy_list:
+                    death_animation(devil_dead_animation,enemy.rect.x,enemy.rect.y)
+                bossHP=9
+                
+                
+            
+
+    
+
 
     for obstacle in destroyed_obstacles_list:
         scaled_corpse = pygame.transform.scale(
@@ -1193,6 +1390,7 @@ while run:
                 enemy.delete()
                 powershield = False
 
+
     for bullet in bullets_list:
         try:
             bullet.update()
@@ -1200,6 +1398,11 @@ while run:
             if bullet.rect.left > 2000 or bullet.rect.right < 0 or bullet.rect.top > 1200 or bullet.rect.bottom < 0:
                 bullet.delete()
                 bullet_fired = True
+            for boss in boss_list:
+                if bullet.rect.colliderect(boss.rect):
+                    bullet.delete()
+                    bossHP -=1
+                    bullet_fired = True                
             for obstacle in obstacles_list:
                 if bullet.rect.colliderect(obstacle.rect):
                     destruction_sound.play()
