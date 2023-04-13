@@ -11,7 +11,7 @@ widthWindow = 1920
 heightWindow = 1080
 window = pygame.display.set_mode((widthWindow, heightWindow))
 points_counter = 200
-level = 49
+level = 45
 number_devils = 0
 number_fasts = 0
 number_mutants = 0
@@ -39,7 +39,8 @@ deadtype = None
 gun_on = False
 speed = 18
 max_speed = 15
-bossHP =2
+bossHP =50
+BS = False
 destroyed_obstacles_list = []
 bullets_list = []
 dead_enemy_list = []
@@ -51,13 +52,13 @@ menu = pygame.image.load("textures/menu.png")
 background1 = pygame.image.load('textures/tlo.jpg')
 background2 = pygame.image.load('textures/tlo2.jpg')
 background3 = pygame.image.load('textures/tlo3.jpg')
-background4 = pygame.image.load('textures/tlo4.jpg')
+background4 = pygame.image.load('textures/tlo4.1.jpg')
 background1 = pygame.transform.scale(background1, window.get_size())
 background2 = pygame.transform.scale(background2, window.get_size())
 background3 = pygame.transform.scale(background3, window.get_size())
 background4 = pygame.transform.scale(background4, window.get_size())
 background_list = [background1, background2,background3]
-background = background3    
+background = background1  
 
 
 def random_background():
@@ -257,18 +258,20 @@ deadtree_rect = deadtree_texture.get_rect()
 deadtree_mask = pygame.mask.from_surface(deadtree_texture)
 
 nature_destroy_animation = [pygame.transform.scale(pygame.image.load('textures/destroyednature1.png'), (50, 50)), pygame.transform.scale(
-    pygame.image.load('textures/destroyednature2.png'), (50, 50)), pygame.transform.scale(pygame.image.load('textures/destroyednature3.png'), (50, 50)),]
+    pygame.image.load('textures/destroyednature2.png'), (50, 50)), pygame.transform.scale(pygame.image.load('textures/destroyednature3.png'), (50, 50))]
 
 nature_corpses = pygame.transform.scale(
     pygame.image.load('textures/destroyednature3.png'), (50, 50))
 
 
 boss_texture = pygame.transform.scale(
-pygame.image.load('textures/enemy.png'), (300, 300))
+pygame.image.load('textures/boss.png'), (300, 300))
 boss_rect = boss_texture.get_rect()
 boss_mask = pygame.mask.from_surface(boss_texture)
-boss_dead_animation = mutant_dead_animation
-boss_corpses= devil_corpses
+boss_dead_animation =  [pygame.transform.scale(pygame.image.load('textures/bossdead1.png'), (300, 300)), pygame.transform.scale(
+    pygame.image.load('textures/bossdead2.png'), (300,300)), pygame.transform.scale(pygame.image.load('textures/bossdead3.png'), (300,300))]
+boss_corpses= pygame.transform.scale(
+    pygame.image.load('textures/bossdead3c.png'), (300, 300))
 
 # sounds
 move_sound = pygame.mixer.Sound('sounds/kroki.mp3')
@@ -302,9 +305,9 @@ refresh_sound = pygame.mixer.Sound('sounds/refresh.mp3')
 refresh_sound.set_volume(0.5)
 gold_sound = pygame.mixer.Sound('sounds/gold.mp3')
 boss_dead_sound = pygame.mixer.Sound('sounds/boss_death.mp3')
-boss_dead_sound.set_volume(0.3)
+boss_dead_sound.set_volume(0.2)
 boss_sound = pygame.mixer.Sound('sounds/boss_sound.mp3')
-boss_sound.set_volume(0.2)
+boss_sound.set_volume(0.5)
 
 
 def play_sound(sound):
@@ -457,9 +460,11 @@ class Boss:
 
 
 def boss():
+    global BS
     boss_list = []
     boss = Boss(500,500,300,300,boss_texture,1,300)
     boss_list.append(boss)
+    BS=True
     
     return boss_list
     
@@ -1208,6 +1213,12 @@ while run:
     
         
     if background == background4:
+        if BS == True:
+            pygame.mixer.stop()
+            pygame.mixer.music.load('sounds/bossfight.mp3')
+            pygame.mixer.music.set_volume(0.7)
+            pygame.mixer.music.play(-1)
+            BS = False
         for boss in boss_list:
             mask = boss.mask
             offset = (boss.rect.x - player1_rect.x, boss.rect.y - player1_rect.y)
@@ -1217,14 +1228,25 @@ while run:
             window.blit(boss.texture, boss.rect)
             if bossHP == 0:
                 stop_sound(boss_dead_sound)
-                play_sound(boss_sound)
+                boss_sound.play()
                 boss.delete()
                 death_animation(boss_dead_animation,
                 boss.rect.x, boss.rect.y)
                 points_counter += 30
                 right.color = (0, 255, 0)
                 level +=1
+                points_counter = 0
+                number_devils = 0
+                number_fasts = 0
+                number_mutants = 0
+                number_ghosts = 0
+                pygame.mixer.music.stop()
+                pygame.mixer.music.load('sounds/music.mp3')
+                pygame.mixer.music.set_volume(0.4)
+                pygame.mixer.music.play(-1)
                 if right.color == (0, 255, 0) and player1_rect.colliderect(right.rect):
+                    stop_sound(boss_sound)
+                    bossHP =50
                     background = random_background()
                     generate_new_obstacles()
                     generate_new_gold()
@@ -1240,33 +1262,11 @@ while run:
                 generate_new_enemy()
                 generate_new_gold()
                 generate_new_obstacles()
+                pygame.mixer.music.stop()
+                pygame.mixer.music.load('sounds/music.mp3')
+                pygame.mixer.music.set_volume(0.4)
+                pygame.mixer.music.play(-1)
                 break
-            if bossHP ==40:
-                generate_new_enemy()
-                for enemy in enemy_list:
-                    death_animation(devil_dead_animation,enemy.rect.x,enemy.rect.y)
-                bossHP=39
-            if bossHP ==30:
-                generate_new_enemy()
-                for enemy in enemy_list:
-                    death_animation(devil_dead_animation,enemy.rect.x,enemy.rect.y)
-                bossHP=29
-            if bossHP ==20:
-                generate_new_enemy()
-                for enemy in enemy_list:
-                    death_animation(devil_dead_animation,enemy.rect.x,enemy.rect.y)
-                bossHP=19
-            if bossHP ==10:
-                generate_new_enemy()
-                for enemy in enemy_list:
-                    death_animation(devil_dead_animation,enemy.rect.x,enemy.rect.y)
-                bossHP=9
-                
-                
-            
-
-    
-
 
     for obstacle in destroyed_obstacles_list:
         scaled_corpse = pygame.transform.scale(
@@ -1368,6 +1368,10 @@ while run:
                 generate_new_enemy()
                 generate_new_gold()
                 generate_new_obstacles()
+                pygame.mixer.music.stop()
+                pygame.mixer.music.load('sounds/music.mp3')
+                pygame.mixer.music.set_volume(0.4)
+                pygame.mixer.music.play(-1)
                 break
             elif powershield == True:
                 enemy.killed_by = 'shield'
@@ -1419,24 +1423,51 @@ while run:
                     enemy.killed_by = 'bullet'
                     if enemy.type == 'fast':
                         fast_dead_sound.play()
+                        number_fasts -=1
                         death_animation(fast_bullet_dead_animation,
                                         enemy.rect.x, enemy.rect.y)
                     elif enemy.type == 'devil':
                         devil_dead_sound.play()
                         death_animation(devil_bullet_dead_animation,
                                         enemy.rect.x, enemy.rect.y)
+                        number_devils -=1
                     elif enemy.type == 'mutant':
                         mutant_dead_sound.play()
                         death_animation(mutant_bullet2_dead_animation,
                                         enemy.rect.x, enemy.rect.y)
+                        number_mutants -=1
                     elif enemy.type == 'ghost':
                         ghost_dead_sound.play()
                         death_animation(ghost_dead_animation,
                                         enemy.rect.x, enemy.rect.y)
+                        number_ghosts -=1
                     enemy.delete()
                     bullet.delete()
                     bullet_fired = True
             bullet.draw(window)
         except:
             pass
+            
+    if bossHP ==40:
+        generate_new_enemy()
+        for enemy in enemy_list:
+            death_animation(devil_dead_animation,enemy.rect.x,enemy.rect.y)
+        bossHP=39
+    if bossHP ==30:
+        generate_new_enemy()
+        for enemy in enemy_list:
+            death_animation(devil_dead_animation,enemy.rect.x,enemy.rect.y)
+        bossHP=29
+    if bossHP ==20:
+        generate_new_enemy()
+        for enemy in enemy_list:
+            death_animation(devil_dead_animation,enemy.rect.x,enemy.rect.y)
+        bossHP=19
+    if bossHP ==10:
+        generate_new_enemy()
+        for enemy in enemy_list:
+            death_animation(devil_dead_animation,enemy.rect.x,enemy.rect.y)
+        bossHP=9
+                
+
     pygame.display.update()
