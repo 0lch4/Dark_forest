@@ -1,5 +1,5 @@
 # Dark forest
-![GitHub forks](https://img.shields.io/badge/Version-1.2-red)
+![GitHub forks](https://img.shields.io/badge/Version-1.3-red)
 
 My first game in Python
 
