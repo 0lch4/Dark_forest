@@ -10,8 +10,8 @@ pygame.mouse.set_visible(False)
 widthWindow = 1920
 heightWindow = 1080
 window = pygame.display.set_mode((widthWindow, heightWindow))
-points_counter = 200
-level = 45
+points_counter = 0
+level = 0
 number_devils = 0
 number_fasts = 0
 number_mutants = 0
@@ -37,7 +37,7 @@ r_key_released = True
 powershield = False
 deadtype = None
 gun_on = False
-speed = 18
+speed = 8
 max_speed = 15
 bossHP =50
 BS = False
@@ -405,9 +405,12 @@ def bossload(quantity, objectt):
             objectt(x, y)
             for enemy in enemy_list:
                 if abs(player1_rect.x - enemy.rect.x) <= 200 and abs(player1_rect.y - enemy.rect.y) <= 200:
-                    x = random.randint(70, widthWindow-70)
-                    y = random.randint(70, heightWindow-70)
-                    objectt(x, y)
+                    x = random.randint(0, widthWindow)
+                    y = random.randint(0, heightWindow)
+                if enemy.rect.colliderect(boss_rect):
+                    x = random.randint(0, widthWindow)
+                    y = random.randint(0, heightWindow)
+                objectt(x, y)
                     
 
 class Boss:
@@ -462,7 +465,7 @@ class Boss:
 def boss():
     global BS
     boss_list = []
-    boss = Boss(500,500,300,300,boss_texture,1,300)
+    boss = Boss(500,500,300,300,boss_texture,10,300)
     boss_list.append(boss)
     BS=True
     
@@ -1348,51 +1351,54 @@ while run:
             gun_sound.play()
 
     for enemy in enemy_list:
-        enemy.update(obstacles_list)
-        if enemy.type == 'mutant':
-            enemy.mirror(mutant_textureL, mutant_textureR)
-        elif enemy.type == 'ghost':
-            enemy.mirror(ghost_textureL, ghost_textureR)
-        window.blit(enemy.texture, enemy.rect)
+        if background !=background4:
+            enemy.update(obstacles_list)
+        else:
+            enemy.update(boss_list)
+            if enemy.type == 'mutant':
+                enemy.mirror(mutant_textureL, mutant_textureR)
+            elif enemy.type == 'ghost':
+                enemy.mirror(ghost_textureL, ghost_textureR)
+            window.blit(enemy.texture, enemy.rect)
 
-        if abs(player1_rect.x - enemy.rect.x) <= 200 and abs(player1_rect.y - enemy.rect.y) <= 200:
-            random_monster_sound = random.choice(monsters_sounds)
-            play_sound(random_monster_sound)
+            if abs(player1_rect.x - enemy.rect.x) <= 200 and abs(player1_rect.y - enemy.rect.y) <= 200:
+                random_monster_sound = random.choice(monsters_sounds)
+                play_sound(random_monster_sound)
 
-        if enemy.rect.colliderect(player1_rect):
-            if powershield == False:
-                player_dead_sound.play()
-                death_animation(player_dead_animation, x, y)
-                time.sleep(1)
-                deadscreen()
-                generate_new_enemy()
-                generate_new_gold()
-                generate_new_obstacles()
-                pygame.mixer.music.stop()
-                pygame.mixer.music.load('sounds/music.mp3')
-                pygame.mixer.music.set_volume(0.4)
-                pygame.mixer.music.play(-1)
-                break
-            elif powershield == True:
-                enemy.killed_by = 'shield'
-                if enemy.type == 'fast':
-                    fast_dead_sound.play()
-                    death_animation(fast_dead_animation,
-                                    enemy.rect.x, enemy.rect.y)
-                elif enemy.type == 'devil':
-                    devil_dead_sound.play()
-                    death_animation(devil_dead_animation,
-                                    enemy.rect.x, enemy.rect.y)
-                elif enemy.type == 'mutant':
-                    mutant_dead_sound.play()
-                    death_animation(mutant_dead_animation,
-                                    enemy.rect.x, enemy.rect.y)
-                elif enemy.type == 'ghost':
-                    ghost_dead_sound.play()
-                    death_animation(ghost_dead_animation,
-                                    enemy.rect.x, enemy.rect.y)
-                enemy.delete()
-                powershield = False
+            if enemy.rect.colliderect(player1_rect):
+                if powershield == False:
+                    player_dead_sound.play()
+                    death_animation(player_dead_animation, x, y)
+                    time.sleep(1)
+                    deadscreen()
+                    generate_new_enemy()
+                    generate_new_gold()
+                    generate_new_obstacles()
+                    pygame.mixer.music.stop()
+                    pygame.mixer.music.load('sounds/music.mp3')
+                    pygame.mixer.music.set_volume(0.4)
+                    pygame.mixer.music.play(-1)
+                    break
+                elif powershield == True:
+                    enemy.killed_by = 'shield'
+                    if enemy.type == 'fast':
+                        fast_dead_sound.play()
+                        death_animation(fast_dead_animation,
+                                        enemy.rect.x, enemy.rect.y)
+                    elif enemy.type == 'devil':
+                        devil_dead_sound.play()
+                        death_animation(devil_dead_animation,
+                                        enemy.rect.x, enemy.rect.y)
+                    elif enemy.type == 'mutant':
+                        mutant_dead_sound.play()
+                        death_animation(mutant_dead_animation,
+                                        enemy.rect.x, enemy.rect.y)
+                    elif enemy.type == 'ghost':
+                        ghost_dead_sound.play()
+                        death_animation(ghost_dead_animation,
+                                        enemy.rect.x, enemy.rect.y)
+                    enemy.delete()
+                    powershield = False
 
 
     for bullet in bullets_list:
