@@ -362,8 +362,8 @@ def load(quantity, objectt, lista, rect):
                     collision = True
                     break
             if collision:
-                x = random.randint(0, widthWindow)
-                y = random.randint(0, heightWindow)
+                x = random.randint(70, widthWindow)
+                y = random.randint(50, heightWindow)
         objectt(x, y)
 
 
@@ -1012,7 +1012,7 @@ while run:
         generate_new_enemy()
         bullet_fired = True
         right.color = (255, 0, 0)
-        x = 0
+        x = 50
 
     for i in obstacles_list:
         mask = i.mask
