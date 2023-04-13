@@ -320,6 +320,8 @@ def stop_sound(sound):
 
 
 def start():
+    pass
+'''
     intro1 = pygame.image.load("textures/intro.png")
     intro2 = pygame.image.load("textures/intro2.png")
     intro3 = pygame.image.load("textures/intro3.png")
@@ -347,6 +349,7 @@ def start():
             if keys[pygame.K_SPACE]:
                 waiting = False
                 stop_sound(intro_sound)
+'''
 
 
 def load(quantity, objectt, lista, rect):
@@ -422,7 +425,11 @@ class Boss:
         self.x = self.rect.x
         self.y = self.rect.y
 
+<<<<<<< HEAD
     def update(self, enemies_list):
+=======
+    def update(self,obstacles_list):
+>>>>>>> parent of 9b39f8e (Update gra.py)
         self.prev_pos = self.rect.copy()
         self.x, self.y = self.rect.x, self.rect.y
         self.rect.x += self.speed * self.direction[0]
@@ -1222,7 +1229,7 @@ while run:
                       boss.rect.y - player1_rect.y)
             if abs(player1_rect.x - boss.rect.x) <= 200 and abs(player1_rect.y - boss.rect.y) <= 200:
                 play_sound(boss_dead_sound)
-            boss.update(enemy_list)
+            boss.update(obstacles_list)
             window.blit(boss.texture, boss.rect)
             if bossHP == 0:
                 stop_sound(boss_dead_sound)
