@@ -460,9 +460,10 @@ class Boss:
 def boss():
     global BS
     boss_list = []
-    boss = Boss(500, 500, 300, 300, boss_texture, 10, 300)
-    boss_list.append(boss)
-    BS = True
+    if level % 49 == 0:
+        boss = Boss(500, 500, 300, 300, boss_texture, 10, 300)
+        boss_list.append(boss)
+        BS = True
 
     return boss_list
 
@@ -496,7 +497,7 @@ def deadscreen():
     global background1
     waiting = True
     w8 = True
-    end_width, end_height = 1920, 1080
+    end_width, end_height = widthWindow, heightWindow
     end_surface = pygame.Surface((end_width, end_height))
     end_texture = pygame.transform.scale(pygame.image.load(
         "textures/end.png"), (end_width, end_height))
@@ -656,16 +657,16 @@ def borders():
     borders_list = []
     global right
 
-    up = Border(1, 1, 1920, 1)
+    up = Border(1, 1, widthWindow, 1)
     borders_list.append(up)
 
-    down = Border(1, 1079, 1920, 1)
+    down = Border(1, heightWindow-1, widthWindow, 1)
     borders_list.append(down)
 
-    left = Border(1, 1, 1, 1080)
+    left = Border(1, 1, 1, heightWindow)
     borders_list.append(left)
 
-    right = Border(1919, 1, 1, 1080, (255, 0, 0))
+    right = Border(widthWindow-1, 1, 1, heightWindow, (255, 0, 0))
     borders_list.append(right)
 
     return borders_list
