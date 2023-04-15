@@ -336,8 +336,8 @@ def start():
     time.sleep(4.6)
     window.blit(intro3, (1, 1))
     pygame.display.update()
-    window.blit(menu, (1, 1))
     time.sleep(4)
+    window.blit(menu, (1, 1))
     pygame.display.update()
     waiting = True
     while waiting:
@@ -428,15 +428,9 @@ class Boss:
         self.rect.y += self.speed * self.direction[1]
 
         for i in borders_list:
-            if self.rect.colliderect(i):
-                if i == borders_list[0]:
-                    self.rect.y = + 5
-                elif i == borders_list[1]:
-                    self.rect.y = - 55
-                elif i == borders_list[2]:
-                    self.rect.x = + 5
-                elif i == borders_list[3]:
-                    self.rect.x = - 55
+            if self.rect.colliderect(i.rect):
+                self.rect = self.prev_pos
+                break
 
         if random.random() < 0.05:
             self.change_direction()
@@ -775,15 +769,9 @@ class Enemy:
                 break
 
         for i in borders_list:
-            if self.rect.colliderect(i):
-                if i == borders_list[0]:
-                    self.rect.y = + 5
-                elif i == borders_list[1]:
-                    self.rect.y = - 55
-                elif i == borders_list[2]:
-                    self.rect.x = + 5
-                elif i == borders_list[3]:
-                    self.rect.x = - 55
+            if self.rect.colliderect(i.rect):
+                self.rect = self.prev_pos
+                break
 
         if random.random() < 0.05:
             self.change_direction()
