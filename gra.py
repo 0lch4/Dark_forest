@@ -18,9 +18,9 @@ font = pygame.font.Font(None, 36)
 x = 0
 y = 0
 #gold
-points_counter = 20
+points_counter = 100
 #level
-level = 0
+level = 48
 #number of enemies when game started
 number_devils = 0
 number_fasts = 0
@@ -31,11 +31,11 @@ number_obstacles = 8
 #max number of obstacles
 max_obstacles = 18
 #bullets in magazine
-magazine = 0
+magazine = 100
 #glag for gun hide/pick
 gun_on = False
 #basic player speed
-speed = 8
+speed = 15
 #max player speed
 max_speed = 15
 #flags for eliminate double click in abilities
@@ -467,52 +467,29 @@ def collision(lista,rect,x,y):
 def load(quantity, objectt, lista, rect):
     for i in range(quantity):
         if lista == obstacles_list:        
-            if background == background1:
+            if background == background1 or background==background3:
                 x = random.randint(20, window_width-20)
                 y = random.randint(20, window_height-20)
             elif background == background2:
                 #obstacles dont spawn on skull
                 x = random.randint(20, window_width-90)
-                y = random.randint(20, window_height-150)        
-            elif background == background3:
-                x = random.randint(20, window_width-20)
-                y = random.randint(20, window_height-20)
+                y = random.randint(20, window_height-150)
         else:
             x = random.randint(20, window_width-90)
             y = random.randint(20, window_height-150)
             
         if lista == enemy_list:
-            if background == background1:
-                x = random.randint(20, window_width-20)
-                y = random.randint(20, window_height-20)
-            elif background == background2:
-                x = random.randint(20, window_width-20)
-                y = random.randint(20, window_height-20)        
-            elif background == background3:
-                x = random.randint(20, window_width-20)
-                y = random.randint(20, window_height-20)
-        else:
-            x = random.randint(20, window_width-20)
-            y = random.randint(20, window_height-20)
-        
-        x,y = collision(lista,rect,x,y)    
-                
+            x = random.randint(50, window_width-50)
+            y = random.randint(50, window_height-50)
+                        
         if background != background4:
+            x,y = collision(lista,rect,x,y)    
             objectt(x, y)
-
-
-def bossload(quantity, objectt):
-    for i in range(quantity):
-        x = random.randint(70, window_width-70)
-        y = random.randint(70, window_height-70)
-        for enemy in enemy_list:
-            if abs(player1_rect.x - enemy.rect.x) <= 200 and abs(player1_rect.y - enemy.rect.y) <= 200:
-                x = random.randint(0, window_width)
-                y = random.randint(0, window_height)
-            if enemy.rect.colliderect(boss_rect):
-                x = random.randint(0, window_width)
-                y = random.randint(0, window_height)
-        objectt(x, y)
+        else:
+            x = random.randint(50, window_width-50)
+            y = random.randint(50, window_height-50)
+            x,y = collision(lista,rect,x,y)    
+            objectt(x, y)
 
 
 class Boss:
@@ -527,7 +504,7 @@ class Boss:
         self.x = self.rect.x
         self.y = self.rect.y
 
-    def update(self, obstacles_list):
+    def update(self):
         self.prev_pos = self.rect.copy()
         self.x, self.y = self.rect.x, self.rect.y
         self.rect.x += self.speed * self.direction[0]
@@ -537,7 +514,14 @@ class Boss:
             if self.rect.colliderect(i.rect):
                 self.rect = self.prev_pos
                 break
-
+            
+        for i in enemy_list:
+            offset = (self.rect.x - i.x,
+            self.rect.y - i.y)
+            if i.mask.overlap(mask, offset):   
+                i.rect = i.prev_pos
+                
+            
         if random.random() < 0.05:
             self.change_direction()
 
@@ -560,8 +544,8 @@ class Boss:
 def boss():
     global bs
     boss_list = []
-    if level % 49 == 0:
-        boss = Boss(500, 500, 300, 300, boss_texture, 10, 300)
+    if level % 48 == 0:
+        boss = Boss(500, 500, 300, 300, boss_texture, 1, 300)
         boss_list.append(boss)
         bs = True
 
@@ -664,6 +648,7 @@ def deadscreen():
                             gun_on = False
                             magazine = 0
                             w8 = False
+                            right.color = (255, 0, 0)
                             pygame.display.update()
                             break
             elif keys[pygame.K_ESCAPE]:
@@ -949,17 +934,17 @@ def enemies():
 
     if background == background4:
         if boss_hp == 40:
-            bossload(10, devil)
-            bossload(5, mutant)
+            load(10, devil,enemy_list,devil_rect)
+            load(5, mutant,enemy_list,mutant_rect)
         if boss_hp == 30:
-            bossload(6, mutant)
-            bossload(7, ghost)
-            bossload(5, devil)
+            load(6, mutant,enemy_list,mutant_rect)
+            load(7, ghost,enemy_list,ghost_rect)
+            load(5, devil,enemy_list,devil_rect)
         if boss_hp == 20:
-            bossload(10, fast)
-            bossload(10, mutant)
+            load(10, fast,enemy_list,fast_rect)
+            load(10, mutant,enemy_list,mutant_rect)
         if boss_hp == 10:
-            bossload(40, devil)
+            load(40, devil,enemy_list,devil_rect)
 
     return enemy_list
 
@@ -1033,7 +1018,8 @@ def points():
         if level % 5 == 0:
             number_ghosts += 1
 
-    gold = load(1, gold, obstacles_list, gold_rect)
+    if background!=background4:
+        gold = load(1, gold, obstacles_list, gold_rect)
     return gold_list
 
 
@@ -1316,7 +1302,7 @@ while run:
                       boss.rect.y - player1_rect.y)
             if abs(player1_rect.x - boss.rect.x) <= 200 and abs(player1_rect.y - boss.rect.y) <= 200:
                 play_sound(boss_death_sound)
-            boss.update(obstacles_list)
+            boss.update()
             window.blit(boss.texture, boss.rect)
             if boss_hp == 0:
                 stop_sound(boss_death_sound)
