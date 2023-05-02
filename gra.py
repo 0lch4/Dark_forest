@@ -417,8 +417,6 @@ def stop_sound(sound):
 
 #game intro
 def start():
-    pass
-'''
     #shows all intro slaids and play intro music refresh screen beetween intro slaids
     window.blit(olchastudio, (1, 1))
     intro_sound.play()
@@ -443,10 +441,9 @@ def start():
             keys = pygame.key.get_pressed()
             if keys[pygame.K_SPACE]:
                 waiting = False
-                stop_sound(intro_sound)'''
+                stop_sound(intro_sound)
 
-#loading objects in the map:enemies,obstacles,corpses itd
-
+#if obstacles/enemies colliderect with other or with player generete new x and y
 def collision(lista,rect,x,y):
         collision = True
         while collision:
@@ -463,7 +460,7 @@ def collision(lista,rect,x,y):
                 y = random.randint(20, window_height-150)
         return x,y
                 
-
+#loading objects in the map:enemies,obstacles,corpses etc
 def load(quantity, objectt, lista, rect):
     for i in range(quantity):
         if lista == obstacles_list:        
@@ -481,11 +478,13 @@ def load(quantity, objectt, lista, rect):
         if lista == enemy_list:
             x = random.randint(50, window_width-50)
             y = random.randint(50, window_height-50)
-                        
+        
+        #in boss level are no obstacles and number of enemies are static                
         if background != background4:
             x,y = collision(lista,rect,x,y)    
             objectt(x, y)
         else:
+            #additional security for crash if no enemies in this moment 
             x = random.randint(50, window_width-50)
             y = random.randint(50, window_height-50)
             x,y = collision(lista,rect,x,y)    
