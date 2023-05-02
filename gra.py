@@ -4,24 +4,41 @@ import time
 import sys
 import math
 
-# values:
+# initiation pygame
 pygame.init()
+#mouse disable
 pygame.mouse.set_visible(False)
-widthWindow = 1920
-heightWindow = 1080
-window = pygame.display.set_mode((widthWindow, heightWindow))
-points_counter = 0
+#resolution
+window_width = 1920
+window_height = 1080
+window = pygame.display.set_mode((window_width, window_height))
+#font in the game
+font = pygame.font.Font(None, 36)
+#start player position 
+x = 0
+y = 0
+#gold
+points_counter = 20
+#level
 level = 0
+#number of enemies when game started
 number_devils = 0
 number_fasts = 0
 number_mutants = 0
 number_ghosts = 0
+#number of obstacless when game started
 number_obstacles = 8
+#max number of obstacles
 max_obstacles = 18
+#bullets in magazine
 magazine = 0
-font = pygame.font.Font(None, 36)
-x = 100
-y = 100
+#glag for gun hide/pick
+gun_on = False
+#basic player speed
+speed = 8
+#max player speed
+max_speed = 15
+#flags for eliminate double click in abilities
 p_key_pressed = False
 p_key_released = True
 o_key_pressed = False
@@ -34,33 +51,42 @@ u_key_pressed = False
 u_key_released = True
 r_key_pressed = False
 r_key_released = True
+#flag for shield active/dont active
 powershield = False
-deadtype = None
-gun_on = False
-speed = 8
-max_speed = 15
-bossHP = 50
-BS = False
+#boss hp
+boss_hp = 50
+#the flag checks if there is a boss fight
+bs = False
+#lists
 destroyed_obstacles_list = []
 bullets_list = []
 dead_enemy_list = []
 boss_list = []
 dead_boss_list = []
 
-# background:
+#intro textures
 menu = pygame.image.load("textures/menu.png")
+intro1 = pygame.image.load("textures/intro.png")
+intro2 = pygame.image.load("textures/intro2.png")
+intro3 = pygame.image.load("textures/intro3.png")
+olchastudio = pygame.image.load("textures/olchastudio.png")
+#backgrounds textures
 background1 = pygame.image.load('textures/tlo.jpg')
 background2 = pygame.image.load('textures/tlo2.jpg')
 background3 = pygame.image.load('textures/tlo3.jpg')
 background4 = pygame.image.load('textures/tlo4.1.jpg')
+#scaling background textures
 background1 = pygame.transform.scale(background1, window.get_size())
 background2 = pygame.transform.scale(background2, window.get_size())
 background3 = pygame.transform.scale(background3, window.get_size())
 background4 = pygame.transform.scale(background4, window.get_size())
+#list of background textures
 background_list = [background1, background2, background3]
+#default background
 background = background1
 
-
+#choose random background without backgorund4
+#set background 4 in 50 lvl (boss fight)
 def random_background():
     if level % 50 == 0:
         background = background4
@@ -68,262 +94,328 @@ def random_background():
         background = random.choice(background_list)
     return background
 
+#all player textures scaled to 40x40 px
 
-# player texture:
+#player basic texture:
 player1_texture = pygame.transform.scale(
     pygame.image.load('textures/player.png'), (40, 40))
+#playe rect
 player1_rect = player1_texture.get_rect()
+#player mask
 player1_mask = pygame.mask.from_surface(player1_texture)
-# with shield
+#player texture with shield
 player1_texture_shield = pygame.image.load('textures/playershield1.png')
-player_dead_animation = [pygame.image.load('textures/playerdead1.png'), pygame.image.load(
-    'textures/playerdead2.png'), pygame.image.load('textures/playerdead3.png')]
-# with gun
-player_plazmaL_texture = pygame.transform.scale(
+
+#player texture with gun adaptate to player direction
+player_plazma_left_texture = pygame.transform.scale(
     pygame.image.load('textures/playerplazmaL.png'), (40, 40))
-player_plazmaR_texture = pygame.transform.scale(
+
+player_plazma_right_texture = pygame.transform.scale(
     pygame.image.load('textures/playerplazmaR.png'), (40, 40))
-player_plazmaT_texture = pygame.transform.scale(
+
+player_plazma_top_texture = pygame.transform.scale(
     pygame.image.load('textures/playerplazmaT.png'), (40, 40))
-player_plazmaD_texture = pygame.transform.scale(
+
+player_plazma_down_texture = pygame.transform.scale(
     pygame.image.load('textures/playerplazmaB.png'), (40, 40))
-player_plazmaLS_texture = pygame.transform.scale(
+
+#player texture with gun and shield adaptate to player direction
+player_plazma_left_shield_texture = pygame.transform.scale(
     pygame.image.load('textures/playerpalzmaLS.png'), (40, 40))
-player_plazmaRS_texture = pygame.transform.scale(
+
+player_plazma_right_shield_texture = pygame.transform.scale(
     pygame.image.load('textures/playerpalzmaPS.png'), (40, 40))
-player_plazmaTS_texture = pygame.transform.scale(
+
+player_plazma_top_shield_texture = pygame.transform.scale(
     pygame.image.load('textures/playerplazmaTS.png'), (40, 40))
-player_plazmaDS_texture = pygame.transform.scale(
+
+player_plazma_down_shield_texture = pygame.transform.scale(
     pygame.image.load('textures/playerpalzmaDS.png'), (40, 40))
 
+#player dead animation
+player_dead_animation = [pygame.image.load('textures/playerdead1.png'), pygame.image.load(
+    'textures/playerdead2.png'), pygame.image.load('textures/playerdead3.png')]
+
+#last player texture
 last_texture = player1_texture
-last2_texture = player1_texture
+#last player texture with shield
+last_texture_with_shield = player1_texture
 
-# bullet textures:
+#bullet speed
 bullet_speed = 70
+#basic bullet direction
 bullet_direction = 'right'
+#flag checks a bullet are shooted
 bullet_fired = True
+#bullet right,left size
+bullet_width = 15
+bullet_height = 5
+#bullet top,down size
+bullet2_width = 5
+bullet2_height = 15
 
-bulletWidth = 15
-bulletHeight = 5
-bullet_textureR = pygame.transform.scale(
-    pygame.image.load('textures/bulletR.png'), (bulletWidth, bulletHeight))
-bulletR_rect = bullet_textureR.get_rect()
-bulletR_mask = pygame.mask.from_surface(bullet_textureR)
+#bullet textures adaptate to bullet direction
+bullet_texture_right = pygame.transform.scale(
+    pygame.image.load('textures/bulletR.png'), (bullet_width, bullet_height))
+
 bullet_textureL = pygame.transform.scale(
-    pygame.image.load('textures/bulletL.png'), (bulletWidth, bulletHeight))
-bulletL_rect = bullet_textureL.get_rect()
-bulletL_mask = pygame.mask.from_surface(bullet_textureL)
-bulletxWidth = 5
-bulletxHeight = 15
+    pygame.image.load('textures/bulletL.png'), (bullet_width, bullet_height))
+
 bullet_textureT = pygame.transform.scale(
-    pygame.image.load('textures/bulletT.png'), (bulletxWidth, bulletxHeight))
-bulletT_rect = bullet_textureT.get_rect()
-bulletT_mask = pygame.mask.from_surface(bullet_textureT)
+    pygame.image.load('textures/bulletT.png'), (bullet2_width, bullet2_height))
+
 bullet_textureD = pygame.transform.scale(
-    pygame.image.load('textures/bulletD.png'), (bulletxWidth, bulletxHeight))
-bulletD_rect = bullet_textureD.get_rect()
-bulletD_mask = pygame.mask.from_surface(bullet_textureD)
-# bullet explosion
+    pygame.image.load('textures/bulletD.png'), (bullet2_width, bullet2_height))
+
+# bullet explosion textures
 bullet_boom1_texture = pygame.transform.scale(
     pygame.image.load('textures/bulletboom1.png'), (20, 20))
+
 bullet_boom2_texture = pygame.transform.scale(
     pygame.image.load('textures/bulletboom2.png'), (20, 20))
+
 bullet_boom3_texture = pygame.transform.scale(
     pygame.image.load('textures/bulletboom3.png'), (20, 20))
+
+# bullet explosion animation
 bullet_boom_list = [bullet_boom1_texture,
-                    bullet_boom2_texture, bullet_boom3_texture]
+                    bullet_boom2_texture, 
+                    bullet_boom3_texture]
 
 # monsters textures
-devilWidth = 50
-devilHeight = 50
-devilSpeed = 5
-devilCollision = 50
+
+#devil size
+devil_width = 50
+devil_height = 50
+#devil speed
+devil_speed = 6
+#devil collision parametr
+devil_collision = 50
+#devil texture
 devil_texture = pygame.transform.scale(
-    pygame.image.load('textures/enemy.png'), (devilWidth, devilHeight))
+    pygame.image.load('textures/enemy.png'), (devil_width, devil_height))
+#devil rect
 devil_rect = devil_texture.get_rect()
-devil_mask = pygame.mask.from_surface(devil_texture)
-
-devil_corpses = pygame.transform.scale(pygame.image.load(
-    'textures/devildead3.png'), (devilWidth, devilHeight))
-devil_dead_animation = [pygame.transform.scale(pygame.image.load('textures/devildead1.png'), (devilWidth, devilHeight)), pygame.transform.scale(pygame.image.load(
-    'textures/devildead2.png'), (devilWidth, devilHeight)), pygame.transform.scale(pygame.image.load('textures/devildead3.png'), (devilWidth, devilHeight))]
-
-devil_bullet_dead_animation = [pygame.transform.scale(pygame.image.load('textures/devildead1v2.png'), (devilWidth, devilHeight)), pygame.transform.scale(pygame.image.load(
-    'textures/devildead2v2.png'), (devilWidth, devilHeight)), pygame.transform.scale(pygame.image.load('textures/devildead3v2.png'), (devilWidth, devilHeight))]
-
+#devil death animation (killed by shield)
+devil_dead_animation = [pygame.transform.scale(pygame.image.load('textures/devildead1.png'), (devil_width, devil_height)), pygame.transform.scale(pygame.image.load(
+    'textures/devildead2.png'), (devil_width, devil_height)), pygame.transform.scale(pygame.image.load('textures/devildead3.png'), (devil_width, devil_height))]
+#devil death animation (killed by gun)
+devil_bullet_dead_animation = [pygame.transform.scale(pygame.image.load('textures/devildead1v2.png'), (devil_width, devil_height)), pygame.transform.scale(pygame.image.load(
+    'textures/devildead2v2.png'), (devil_width, devil_height)), pygame.transform.scale(pygame.image.load('textures/devildead3v2.png'), (devil_width, devil_height))]
+#devil corpses texture (killed by gun)
 devil_bullet_corpses = pygame.transform.scale(pygame.image.load(
-    'textures/devildead3v2.png'), (devilWidth, devilHeight))
+    'textures/devildead3v2.png'), (devil_width, devil_height))
+#devil corpses texture (killed by shield)
+devil_corpses = pygame.transform.scale(pygame.image.load(
+    'textures/devildead3.png'), (devil_width, devil_height))
 
-fastWidth = 40
-fastHeight = 40
-fastSpeed = 15
-fastCollision = 40
+#fast size
+fast_width = 40
+fast_height = 40
+#fast speed
+fast_speed = 15
+#fast collision parametr
+fast_collison = 40
+#fast texture
 fast_texture = pygame.transform.scale(
-    pygame.image.load('textures/fast.png'), (fastWidth, fastHeight))
+    pygame.image.load('textures/fast.png'), (fast_width, fast_height))
+#fast rect
 fast_rect = fast_texture.get_rect()
-fast_mask = pygame.mask.from_surface(fast_texture)
-fast_corpses = pygame.transform.scale(pygame.image.load(
-    'textures/fastdead3.png'), (fastWidth, fastHeight))
-fast_dead_animation = [pygame.transform.scale(pygame.image.load('textures/fastdead1.png'), (fastWidth, fastHeight)), pygame.transform.scale(pygame.image.load(
-    'textures/fastdead2.png'), (fastWidth, fastHeight)), pygame.transform.scale(pygame.image.load('textures/fastdead3.png'), (fastWidth, fastHeight))]
-
-fast_bullet_corpses = pygame.transform.scale(pygame.image.load(
-    'textures/fastdead3v2.png'), (100, 100))
-fast_bullet_dead_animation = [pygame.transform.scale(pygame.image.load('textures/fastdead1v2.png'), (fastWidth, fastHeight)), pygame.transform.scale(pygame.image.load(
+#fast death animation (killed by shield)
+fast_dead_animation = [pygame.transform.scale(pygame.image.load('textures/fastdead1.png'), (fast_width, fast_height)), pygame.transform.scale(pygame.image.load(
+    'textures/fastdead2.png'), (fast_width, fast_height)), pygame.transform.scale(pygame.image.load('textures/fastdead3.png'), (fast_width, fast_height))]
+#fast death animation (killed by gun)
+fast_bullet_dead_animation = [pygame.transform.scale(pygame.image.load('textures/fastdead1v2.png'), (fast_width, fast_height)), pygame.transform.scale(pygame.image.load(
     'textures/fastdead2v2.png'), (60, 60)), pygame.transform.scale(pygame.image.load('textures/fastdead3v2.png'), (60, 60))]
+#fast corpses texture
+fast_corpses = pygame.transform.scale(pygame.image.load(
+    'textures/fastdead3v2.png'), (100, 100))
 
-mutantWidth = 100
-mutantHeight = 100
-mutantSpeed = 2
-mutantCollision = 100
-mutant_texture = pygame.transform.scale(
-    pygame.image.load('textures/mutantL.png'), (mutantWidth, mutantHeight))
-mutant_rect = mutant_texture.get_rect()
-mutant_mask = pygame.mask.from_surface(mutant_texture)
-mutant_textureL = mutant_texture
-mutant_textureR = pygame.transform.scale(
-    pygame.image.load('textures/mutantR.png'), (mutantWidth, mutantHeight))
-mutant_corpses = pygame.transform.scale(pygame.image.load(
-    'textures/mutantdead3L.png'), (mutantWidth, mutantHeight))
-mutant_dead_animation = [pygame.transform.scale(pygame.image.load('textures/mutantdead1L.png'), (mutantWidth, mutantHeight)), pygame.transform.scale(pygame.image.load(
-    'textures/mutantdead2L.png'), (mutantWidth, mutantHeight)), pygame.transform.scale(pygame.image.load('textures/mutantdead3L.png'), (mutantWidth, mutantHeight))]
+#mutant size
+mutant_width = 100
+mutant_height = 100
+#mutant speed
+mutant_speed = 3
+#mutant collision parametr
+mutant_collision = 100
+#mutant texture left direction
+mutant_texture_left_direction = pygame.transform.scale(
+    pygame.image.load('textures/mutantL.png'), (mutant_width, mutant_height))
+#mutant texture right direction
+mutant_texture_right_direction = pygame.transform.scale(
+    pygame.image.load('textures/mutantR.png'), (mutant_width, mutant_height))
+#mutant rect
+mutant_rect = mutant_texture_left_direction.get_rect()
+#mutant corpses (killed by gun)
+mutant_corpses_bullet = pygame.transform.scale(pygame.image.load(
+    'textures/mutantdead3L.png'), (mutant_width, mutant_height))
+#mutant corpses (killed by shield)
+mutant_corpses_shield = pygame.transform.scale(pygame.image.load(
+    'textures/mutantL.dead3v3.png'), (mutant_width, mutant_height))
+#mutant death animation (killed by shield)
+mutant_bullet_dead_animation = [pygame.transform.scale(pygame.image.load('textures/mutantdead1L.png'), (mutant_width, mutant_height)), pygame.transform.scale(pygame.image.load(
+    'textures/mutantdead2L.png'), (mutant_width, mutant_height)), pygame.transform.scale(pygame.image.load('textures/mutantdead3L.png'), (mutant_width, mutant_height))]
+#mutant death animation (killed by gun)
+mutant_shield_dead_animation = [pygame.transform.scale(pygame.image.load('textures/mutantL.dead1v3.png'), (mutant_width, mutant_height)), pygame.transform.scale(pygame.image.load(
+    'textures/mutantL.dead2v3.png'), (mutant_width, mutant_height)), pygame.transform.scale(pygame.image.load('textures/mutantL.dead3v3.png'), (mutant_width, mutant_height))]
 
-mutant_bullet2_dead_animation = [pygame.transform.scale(pygame.image.load('textures/mutantL.dead1v3.png'), (mutantWidth, mutantHeight)), pygame.transform.scale(pygame.image.load(
-    'textures/mutantL.dead2v3.png'), (mutantWidth, mutantHeight)), pygame.transform.scale(pygame.image.load('textures/mutantL.dead3v3.png'), (mutantWidth, mutantHeight))]
-mutant_bullet2_corpses = pygame.transform.scale(pygame.image.load(
-    'textures/mutantL.dead3v3.png'), (mutantWidth, mutantHeight))
-
-
-ghostWidth = 50
-ghostHeight = 50
-ghostSpeed = 10
-ghostCollision = 50
-ghost_texture = pygame.transform.scale(
-    pygame.image.load('textures/ghostL.png'), (ghostWidth, ghostHeight))
-ghost_rect = ghost_texture.get_rect()
-ghost_mask = pygame.mask.from_surface(ghost_texture)
-ghost_textureL = ghost_texture
-ghost_textureR = pygame.transform.scale(
-    pygame.image.load('textures/ghostR.png'), (ghostWidth, ghostHeight))
+#ghost size
+ghost_width = 50
+ghost_height = 50
+#ghost speed
+ghost_speed = 10
+#ghost collision parametr
+ghost_collision = 50
+#ghost texture left direction
+ghost_texture_left_direction = pygame.transform.scale(
+    pygame.image.load('textures/ghostL.png'), (ghost_width, ghost_height))
+#ghost texture right direction
+ghost_texture_right_direction = pygame.transform.scale(
+    pygame.image.load('textures/ghostR.png'), (ghost_width, ghost_height))
+#ghost rect
+ghost_rect = ghost_texture_left_direction.get_rect()
+#ghost death animation
+ghost_dead_animation = [pygame.transform.scale(pygame.image.load('textures/ghostdead1L.png'), (ghost_width, ghost_height)), pygame.transform.scale(pygame.image.load(
+    'textures/ghostdead2L.png'), (ghost_width, ghost_height)), pygame.transform.scale(pygame.image.load('textures/ghostdead3L.png'), (ghost_width, ghost_height))]
+#ghost corpses
 ghost_corpses = pygame.transform.scale(pygame.image.load(
-    'textures/ghostdead3L.png'), (ghostWidth, ghostHeight))
-ghost_dead_animation = [pygame.transform.scale(pygame.image.load('textures/ghostdead1L.png'), (ghostWidth, ghostHeight)), pygame.transform.scale(pygame.image.load(
-    'textures/ghostdead2L.png'), (ghostWidth, ghostHeight)), pygame.transform.scale(pygame.image.load('textures/ghostdead3L.png'), (ghostWidth, ghostHeight))]
+    'textures/ghostdead3L.png'), (ghost_width, ghost_height))
 
-
-# obstacles
-treeWidth = 70
-treeHeight = 100
-tree_texture = pygame.transform.scale(
-    pygame.image.load('textures/drzewo.png'), (treeWidth, treeHeight))
-tree_rect = tree_texture.get_rect()
-tree_mask = pygame.mask.from_surface(tree_texture)
-
-stoneWidth = 50
-stoneHeight = 50
-stone_texture = pygame.transform.scale(
-    pygame.image.load('textures/kamien.png'), (stoneWidth, stoneHeight))
-stone_rect = stone_texture.get_rect()
-stone_mask = pygame.mask.from_surface(stone_texture)
-
-
-bushWidth = 40
-bushHeight = 40
-bush_texture = pygame.transform.scale(
-    pygame.image.load('textures/krzak.png'), (bushWidth, bushHeight))
-bush_rect = bush_texture.get_rect()
-bush_mask = pygame.mask.from_surface(bush_texture)
-
-bonesWidth = 70
-bonesHeight = 30
-bones_texture = pygame.transform.scale(
-    pygame.image.load('textures/bones.png'), (bonesWidth, bonesHeight))
-bones_rect = bones_texture.get_rect()
-bones_mask = pygame.mask.from_surface(bones_texture)
-
-sarnaWidth = 50
-sarnaHeight = 30
-sarna_texture = pygame.transform.scale(
-    pygame.image.load('textures/sarna.png'), (bonesWidth, bonesHeight))
-sarna_rect = sarna_texture.get_rect()
-sarna_mask = pygame.mask.from_surface(sarna_texture)
-
-
-deadtreeWidth = 70
-deadtreeHeight = 100
-deadtree_texture = pygame.transform.scale(
-    pygame.image.load('textures/deadtree.png'), (deadtreeWidth, deadtreeHeight))
-deadtree_rect = deadtree_texture.get_rect()
-deadtree_mask = pygame.mask.from_surface(deadtree_texture)
-
-nature_destroy_animation = [pygame.transform.scale(pygame.image.load('textures/destroyednature1.png'), (50, 50)), pygame.transform.scale(
-    pygame.image.load('textures/destroyednature2.png'), (50, 50)), pygame.transform.scale(pygame.image.load('textures/destroyednature3.png'), (50, 50))]
-
-nature_corpses = pygame.transform.scale(
-    pygame.image.load('textures/destroyednature3.png'), (50, 50))
-
-
+#boss texture
 boss_texture = pygame.transform.scale(
     pygame.image.load('textures/boss.png'), (300, 300))
+#boss rect
 boss_rect = boss_texture.get_rect()
-boss_mask = pygame.mask.from_surface(boss_texture)
+#boss death animation
 boss_dead_animation = [pygame.transform.scale(pygame.image.load('textures/bossdead1.png'), (300, 300)), pygame.transform.scale(
     pygame.image.load('textures/bossdead2.png'), (300, 300)), pygame.transform.scale(pygame.image.load('textures/bossdead3.png'), (300, 300))]
+#boss corpses
 boss_corpses = pygame.transform.scale(
     pygame.image.load('textures/bossdead3c.png'), (300, 300))
 
+# obstacles textures
+
+#tree size
+tree_width = 70
+tree_height = 100
+#tree texture
+tree_texture = pygame.transform.scale(
+    pygame.image.load('textures/drzewo.png'), (tree_width, tree_height))
+#tree rect
+tree_rect = tree_texture.get_rect()
+
+#stone size
+stone_width = 50
+stone_height = 50
+#stone texture
+stone_texture = pygame.transform.scale(
+    pygame.image.load('textures/kamien.png'), (stone_width, stone_height))
+#stone rect
+stone_rect = stone_texture.get_rect()
+
+#bush size
+bush_width = 40
+bush_height = 40
+#bush texture
+bush_texture = pygame.transform.scale(
+    pygame.image.load('textures/krzak.png'), (bush_width, bush_height))
+#bush rect
+bush_rect = bush_texture.get_rect()
+
+#bones size
+bones_width = 70
+bones_height = 30
+#bones texture
+bones_texture = pygame.transform.scale(
+    pygame.image.load('textures/bones.png'), (bones_width, bones_height))
+#bones rect
+bones_rect = bones_texture.get_rect()
+
+#sarna size
+sarna_width = 50
+sarna_height = 30
+#sarna texture
+sarna_texture = pygame.transform.scale(
+    pygame.image.load('textures/sarna.png'), (bones_width, bones_height))
+#sarna rect
+sarna_rect = sarna_texture.get_rect()
+
+#dead tree size
+dead_tree_width = 70
+dead_tree_height = 100
+#dead tree texture
+dead_tree_texture = pygame.transform.scale(
+    pygame.image.load('textures/deadtree.png'), (dead_tree_width, dead_tree_height))
+#dead tree rect
+dead_tree_rect = dead_tree_texture.get_rect()
+
+#obstacle destruction animation
+obstacle_destroy_animation = [pygame.transform.scale(pygame.image.load('textures/destroyednature1.png'), (50, 50)), pygame.transform.scale(
+    pygame.image.load('textures/destroyednature2.png'), (50, 50)), pygame.transform.scale(pygame.image.load('textures/destroyednature3.png'), (50, 50))]
+#destroyed obstacle texture 
+destroyed_obstacle_texture = pygame.transform.scale(
+    pygame.image.load('textures/destroyednature3.png'), (50, 50))
+
+
 # sounds
-move_sound = pygame.mixer.Sound('sounds/kroki.mp3')
-pickup_sound = pygame.mixer.Sound('sounds/pickup.mp3')
+
 intro_sound = pygame.mixer.Sound('sounds/intro.mp3')
-player_dead_sound = pygame.mixer.Sound('sounds/playerdead.mp3')
-ghost_dead_sound = pygame.mixer.Sound('sounds/ghostdead.mp3')
-devil_dead_sound = pygame.mixer.Sound('sounds/devildead.mp3')
-devil_dead_sound.set_volume(0.5)
-monsters1_sound = pygame.mixer.Sound('sounds/monsters.mp3')
-monsters2_sound = pygame.mixer.Sound('sounds/monsters2.mp3')
-fast_dead_sound = pygame.mixer.Sound('sounds/fastdead.mp3')
-fast_dead_sound.set_volume(0.3)
-mutant_dead_sound = pygame.mixer.Sound('sounds/mutantdead.mp3')
+#steps sound
+steps_sound = pygame.mixer.Sound('sounds/kroki.mp3')
+#next level sound
+next_level_sound = pygame.mixer.Sound('sounds/pickup.mp3')
+#earn gold sound
+gold_sound = pygame.mixer.Sound('sounds/gold.mp3')
+#death sounds
+player_death_sound = pygame.mixer.Sound('sounds/playerdead.mp3')
+devil_death_sound = pygame.mixer.Sound('sounds/devildead.mp3')
+devil_death_sound.set_volume(0.5)
+fast_death_sound = pygame.mixer.Sound('sounds/fastdead.mp3')
+fast_death_sound.set_volume(0.3)
+mutant_death_sound = pygame.mixer.Sound('sounds/mutantdead.mp3')
+ghost_death_sound = pygame.mixer.Sound('sounds/ghostdead.mp3')
+boss_death_sound = pygame.mixer.Sound('sounds/boss_death.mp3')
+#obstacle destruction sound
+destruction_sound = pygame.mixer.Sound('sounds/destruction.mp3')
+destruction_sound.set_volume(0.2)
+boss_death_sound.set_volume(0.2)
+#immersive mounsters sounds (playing when player is close to monster)
 monsters1_sound = pygame.mixer.Sound('sounds/monsters.mp3')
 monsters1_sound.set_volume(0.5)
 monsters2_sound = pygame.mixer.Sound('sounds/monsters2.mp3')
 monsters2_sound.set_volume(0.5)
-destruction_sound = pygame.mixer.Sound('sounds/destruction.mp3')
-destruction_sound.set_volume(0.2)
-gun_sound = pygame.mixer.Sound('sounds/gunsound.mp3')
-gun_sound.set_volume(0.6)
-reload_sound = pygame.mixer.Sound('sounds/reload.mp3')
-reload_sound.set_volume(0.2)
 monsters_sounds = [monsters1_sound, monsters2_sound]
-speed_sound = pygame.mixer.Sound('sounds/speed.mp3')
-speed_sound.set_volume(0.5)
-shield_sound = pygame.mixer.Sound('sounds/shield.mp3')
-shield_sound.set_volume(0.5)
-refresh_sound = pygame.mixer.Sound('sounds/refresh.mp3')
-refresh_sound.set_volume(0.5)
-gold_sound = pygame.mixer.Sound('sounds/gold.mp3')
-boss_dead_sound = pygame.mixer.Sound('sounds/boss_death.mp3')
-boss_dead_sound.set_volume(0.2)
+#boss sound
 boss_sound = pygame.mixer.Sound('sounds/boss_sound.mp3')
 boss_sound.set_volume(0.5)
+#pick/hide gun sound
+gun_sound = pygame.mixer.Sound('sounds/gunsound.mp3')
+gun_sound.set_volume(0.6)
+#buy ammo sound
+reload_sound = pygame.mixer.Sound('sounds/reload.mp3')
+reload_sound.set_volume(0.2)
+#buy speed boost sound
+speed_sound = pygame.mixer.Sound('sounds/speed.mp3')
+speed_sound.set_volume(0.5)
+#bouy shield sound
+shield_sound = pygame.mixer.Sound('sounds/shield.mp3')
+shield_sound.set_volume(0.5)
+#buy refresh sound
+refresh_sound = pygame.mixer.Sound('sounds/refresh.mp3')
+refresh_sound.set_volume(0.5)
 
-
+#playing sound only when nothing is playing
 def play_sound(sound):
     if not pygame.mixer.get_busy():
         sound.play()
 
-
+#stop sound
 def stop_sound(sound):
     sound.stop()
 
-
+#game intro
 def start():
-    intro1 = pygame.image.load("textures/intro.png")
-    intro2 = pygame.image.load("textures/intro2.png")
-    intro3 = pygame.image.load("textures/intro3.png")
-    olchastudio = pygame.image.load("textures/olchastudio.png")
+    #shows all intro slaids and play intro music refresh screen beetween intro slaids
     window.blit(olchastudio, (1, 1))
     intro_sound.play()
     pygame.display.update()
@@ -340,6 +432,7 @@ def start():
     window.blit(menu, (1, 1))
     pygame.display.update()
     waiting = True
+    #game was started when player press space
     while waiting:
         play_sound(intro_sound)
         for i in pygame.event.get():
@@ -348,23 +441,18 @@ def start():
                 waiting = False
                 stop_sound(intro_sound)
 
-
+#loading objects in the map:enemies,obstacles,corpses itd
 def load(quantity, objectt, lista, rect):
     for i in range(quantity):
         if background == background1:
-            x = random.randint(20, widthWindow)
-            y = random.randint(20, heightWindow)
+            x = random.randint(20, window_width)
+            y = random.randint(20, window_height)
         elif background == background3:
-            x = random.randint(20, widthWindow)
-            y = random.randint(20, heightWindow)
+            x = random.randint(20, window_width)
+            y = random.randint(20, window_height)
         elif background == background2:
-            if lista == enemy_list:
-                for enemy in enemy_list:
-                    if abs(player1_rect.x - enemy.rect.x) <= 200 and abs(player1_rect.y - enemy.rect.y) <= 200:
-                        x = random.randint(0, widthWindow)
-                        y = random.randint(0, heightWindow)
             if lista == obstacles_list:
-                if player1_rect.right < widthWindow - 100:
+                if player1_rect.right < window_width - 100:
                     x = random.randint(10, 1750)
                     y = random.randint(10, 990)
                 else:
@@ -373,11 +461,11 @@ def load(quantity, objectt, lista, rect):
             elif lista == enemy_list:
                 for enemy in enemy_list:
                     if abs(player1_rect.x - enemy.rect.x) <= 200 and abs(player1_rect.y - enemy.rect.y) <= 200:
-                        x = random.randint(0, widthWindow)
-                        y = random.randint(0, heightWindow)
+                        x = random.randint(0, window_width)
+                        y = random.randint(0, window_height)
             else:
-                x = random.randint(0, widthWindow)
-                y = random.randint(0, heightWindow)
+                x = random.randint(0, window_width)
+                y = random.randint(0, window_height)
         collision = True
         while collision:
             collision = False
@@ -389,23 +477,23 @@ def load(quantity, objectt, lista, rect):
                     collision = True
                     break
             if collision:
-                x = random.randint(70, widthWindow)
-                y = random.randint(50, heightWindow)
+                x = random.randint(200, window_width)
+                y = random.randint(50, window_height)
         if background != background4:
             objectt(x, y)
 
 
 def bossload(quantity, objectt):
     for i in range(quantity):
-        x = random.randint(70, widthWindow-70)
-        y = random.randint(70, heightWindow-70)
+        x = random.randint(70, window_width-70)
+        y = random.randint(70, window_height-70)
         for enemy in enemy_list:
             if abs(player1_rect.x - enemy.rect.x) <= 200 and abs(player1_rect.y - enemy.rect.y) <= 200:
-                x = random.randint(0, widthWindow)
-                y = random.randint(0, heightWindow)
+                x = random.randint(0, window_width)
+                y = random.randint(0, window_height)
             if enemy.rect.colliderect(boss_rect):
-                x = random.randint(0, widthWindow)
-                y = random.randint(0, heightWindow)
+                x = random.randint(0, window_width)
+                y = random.randint(0, window_height)
         objectt(x, y)
 
 
@@ -452,12 +540,12 @@ class Boss:
 
 
 def boss():
-    global BS
+    global bs
     boss_list = []
     if level % 49 == 0:
         boss = Boss(500, 500, 300, 300, boss_texture, 10, 300)
         boss_list.append(boss)
-        BS = True
+        bs = True
 
     return boss_list
 
@@ -489,9 +577,10 @@ def deadscreen():
     global magazine
     global background
     global background1
+    global gun_on
     waiting = True
     w8 = True
-    end_width, end_height = widthWindow, heightWindow
+    end_width, end_height = window_width, window_height
     end_surface = pygame.Surface((end_width, end_height))
     end_texture = pygame.transform.scale(pygame.image.load(
         "textures/end.png"), (end_width, end_height))
@@ -513,15 +602,15 @@ def deadscreen():
             f.write(str(level))
         points2_text = Dfont.render(
             f'Your record {level} levels', True, (255, 0, 0))
-        window.blit(points2_text, (widthWindow/4-80, heightWindow/4+100))
+        window.blit(points2_text, (window_width/4-80, window_height/4+100))
     else:
         points2_text = Dfont.render(
             f'Your record: {best_score} levels', True, (255, 0, 0))
-        window.blit(points2_text, (widthWindow/4-80, heightWindow/4+100))
+        window.blit(points2_text, (window_width/4-80, window_height/4+100))
 
     points_text = Dfont.render(
         f'You survived: {level} levels', True, (255, 0, 0))
-    window.blit(points_text, (widthWindow/4 - 80, heightWindow/4))
+    window.blit(points_text, (window_width/4 - 80, window_height/4))
 
     pygame.display.update()
     while waiting:
@@ -553,9 +642,8 @@ def deadscreen():
                             powershield = False
                             background = background1
                             speed = 8
-                            x = 100
-                            y = 100
                             level = 0
+                            gun_on = False
                             magazine = 0
                             w8 = False
                             pygame.display.update()
@@ -581,7 +669,7 @@ def gun1():
     gun_sound.play()
     shield_banner = pygame.transform.scale(
         pygame.image.load("textures/gunpick.png"), (300, 200))
-    window.blit(shield_banner, (widthWindow/2 - 140, heightWindow/2 - 140))
+    window.blit(shield_banner, (window_width/2 - 140, window_height/2 - 140))
     pygame.display.update()
     time.sleep(0.5)
 
@@ -590,7 +678,7 @@ def gun2():
     gun_sound.play()
     shield_banner = pygame.transform.scale(
         pygame.image.load("textures/gunhide.png"), (300, 200))
-    window.blit(shield_banner, (widthWindow/2 - 140, heightWindow/2 - 140))
+    window.blit(shield_banner, (window_width/2 - 140, window_height/2 - 140))
     pygame.display.update()
     time.sleep(0.5)
 
@@ -603,10 +691,10 @@ def speed_boost():
     if speed < 15:
         speed_sound.play()
         window.blit(speed_boost_banner,
-                    (widthWindow/2-140, heightWindow/2-140))
+                    (window_width/2-140, window_height/2-140))
     else:
-        window.blit(max_speed_banner, (widthWindow /
-                    2 - 140, heightWindow/2 - 140))
+        window.blit(max_speed_banner, (window_width /
+                    2 - 140, window_height/2 - 140))
     pygame.display.update()
     time.sleep(1)
 
@@ -615,7 +703,7 @@ def refresh():
     refresh_sound.play()
     refresh_banner = pygame.transform.scale(
         pygame.image.load("textures/refresh.png"), (300, 200))
-    window.blit(refresh_banner, (widthWindow/2 - 140, heightWindow/2 - 140))
+    window.blit(refresh_banner, (window_width/2 - 140, window_height/2 - 140))
     pygame.display.update()
     time.sleep(1)
 
@@ -624,7 +712,7 @@ def shield():
     shield_sound.play()
     shield_banner = pygame.transform.scale(
         pygame.image.load("textures/shield.png"), (300, 200))
-    window.blit(shield_banner, (widthWindow/2 - 140, heightWindow/2 - 140))
+    window.blit(shield_banner, (window_width/2 - 140, window_height/2 - 140))
     pygame.display.update()
     time.sleep(1)
 
@@ -633,7 +721,7 @@ def reeload():
     reload_sound.play()
     refresh_banner = pygame.transform.scale(
         pygame.image.load("textures/reload.png"), (300, 200))
-    window.blit(refresh_banner, (widthWindow/2 - 140, heightWindow/2 - 140))
+    window.blit(refresh_banner, (window_width/2 - 140, window_height/2 - 140))
     pygame.display.update()
     time.sleep(1)
 
@@ -651,16 +739,16 @@ def borders():
     borders_list = []
     global right
 
-    up = Border(1, 1, widthWindow, 1)
+    up = Border(1, 1, window_width, 1)
     borders_list.append(up)
 
-    down = Border(1, heightWindow-1, widthWindow, 1)
+    down = Border(1, window_height-1, window_width, 1)
     borders_list.append(down)
 
-    left = Border(1, 1, 1, heightWindow)
+    left = Border(1, 1, 1, window_height)
     borders_list.append(left)
 
-    right = Border(widthWindow-1, 1, 1, heightWindow, (255, 0, 0))
+    right = Border(window_width-1, 1, 1, window_height, (255, 0, 0))
     borders_list.append(right)
 
     return borders_list
@@ -688,33 +776,33 @@ def obstacles():
     obstacles_list = []
 
     def tree(xtree, ytree):
-        tree = Obstacle(xtree, ytree, treeWidth,
-                        treeHeight, tree_texture)
+        tree = Obstacle(xtree, ytree, tree_width,
+                        tree_height, tree_texture)
         obstacles_list.append(tree)
 
     def stone(xstone, ystone):
-        stone = Obstacle(xstone, ystone, stoneWidth,
-                         stoneHeight, stone_texture)
+        stone = Obstacle(xstone, ystone, stone_width,
+                         stone_height, stone_texture)
         obstacles_list.append(stone)
 
     def bush(xbush, ybush):
-        bush = Obstacle(xbush, ybush, bushWidth,
-                        bushHeight, bush_texture)
+        bush = Obstacle(xbush, ybush, bush_width,
+                        bush_height, bush_texture)
         obstacles_list.append(bush)
 
     def bones(xbones, ybones):
-        bones = Obstacle(xbones, ybones, bonesWidth,
-                         bonesHeight, bones_texture)
+        bones = Obstacle(xbones, ybones, bones_width,
+                         bones_height, bones_texture)
         obstacles_list.append(bones)
 
     def sarna(xsarna, ysarna):
-        sarna = Obstacle(xsarna, ysarna, sarnaWidth,
-                         sarnaHeight, sarna_texture)
+        sarna = Obstacle(xsarna, ysarna, sarna_width,
+                         sarna_height, sarna_texture)
         obstacles_list.append(sarna)
 
     def deadtree(xdeadtree, ydeadtree):
-        deadtree = Obstacle(xdeadtree, ydeadtree, deadtreeWidth,
-                            deadtreeHeight, deadtree_texture)
+        deadtree = Obstacle(xdeadtree, ydeadtree, dead_tree_width,
+                            dead_tree_height, dead_tree_texture)
         obstacles_list.append(deadtree)
 
     if background == background1:
@@ -724,13 +812,13 @@ def obstacles():
         load(number_obstacles-6, stone, obstacles_list, stone_rect)
 
     if background == background2:
-        load(number_obstacles, deadtree, obstacles_list, deadtree_rect)
+        load(number_obstacles, deadtree, obstacles_list, dead_tree_rect)
         load(number_obstacles-2, bones, obstacles_list, bones_rect)
         load(number_obstacles-1, stone, obstacles_list, stone_rect)
         load(number_obstacles-2, sarna, obstacles_list, sarna_rect)
 
     if background == background3:
-        load(number_obstacles+4, deadtree, obstacles_list, deadtree_rect)
+        load(number_obstacles+4, deadtree, obstacles_list, dead_tree_rect)
         load(number_obstacles+6, bones, obstacles_list, bones_rect)
         load(number_obstacles-2, sarna, obstacles_list, sarna_rect)
     if background == background4:
@@ -812,23 +900,23 @@ def enemies():
     enemy_list = []
 
     def devil(xdevil, ydevil):
-        devil = Enemy(xdevil, ydevil, devilWidth,
-                      devilHeight, devil_texture, devilSpeed, devilCollision, 'devil')
+        devil = Enemy(xdevil, ydevil, devil_width,
+                      devil_height, devil_texture, devil_speed, devil_collision, 'devil')
         enemy_list.append(devil)
 
     def fast(xfast, yfast):
-        fast = Enemy(xfast, yfast, fastWidth,
-                     fastHeight, fast_texture, fastSpeed, fastCollision, 'fast')
+        fast = Enemy(xfast, yfast, fast_width,
+                     fast_height, fast_texture, fast_speed, fast_collison, 'fast')
         enemy_list.append(fast)
 
     def mutant(xmutant, ymutant):
-        mutant = Enemy(xmutant, ymutant, mutantWidth,
-                       mutantHeight, mutant_texture, mutantSpeed, mutantCollision, 'mutant')
+        mutant = Enemy(xmutant, ymutant, mutant_width,
+                       mutant_height, mutant_texture_left_direction, mutant_speed, mutant_collision, 'mutant')
         enemy_list.append(mutant)
 
     def ghost(xghost, yghost):
-        ghost = Enemy(xghost, yghost, ghostWidth,
-                      ghostHeight, ghost_texture, ghostSpeed, ghostCollision, 'ghost')
+        ghost = Enemy(xghost, yghost, ghost_width,
+                      ghost_height, ghost_texture_left_direction, ghost_speed, ghost_collision, 'ghost')
         enemy_list.append(ghost)
 
     if background != background4:
@@ -842,17 +930,17 @@ def enemies():
             load(number_devils, devil, obstacles_list, devil_rect)
 
     if background == background4:
-        if bossHP == 40:
+        if boss_hp == 40:
             bossload(10, devil)
             bossload(5, mutant)
-        if bossHP == 30:
+        if boss_hp == 30:
             bossload(6, mutant)
             bossload(7, ghost)
             bossload(5, devil)
-        if bossHP == 20:
+        if boss_hp == 20:
             bossload(10, fast)
             bossload(10, mutant)
-        if bossHP == 10:
+        if boss_hp == 10:
             bossload(40, devil)
 
     return enemy_list
@@ -862,15 +950,15 @@ enemy_list = enemies()
 
 
 class Bullet:
-    def __init__(self, x, y, speed, bulletWidth, bulletHeight, direction, texture):
+    def __init__(self, x, y, speed, bullet_width, bullet_height, direction, texture):
         self.x = x
         self.y = y
         self.speed = speed
         self.direction = direction
         self.texture = texture
-        self.bulletHeight = bulletHeight
-        self.bulletWidth = bulletWidth
-        self.rect = pygame.Rect(x, y, bulletWidth, bulletHeight)
+        self.bullet_height = bullet_height
+        self.bullet_width = bullet_width
+        self.rect = pygame.Rect(x, y, bullet_width, bullet_height)
 
     def update(self):
         if self.direction == 'left':
@@ -912,7 +1000,7 @@ def points():
                         goldHeight, gold_texture)
         gold_list.append(gold)
         if level != 0:
-            pickup_sound.play()
+            next_level_sound.play()
         dead_enemy_list.clear()
         destroyed_obstacles_list.clear()
         level += 1
@@ -945,7 +1033,7 @@ def generate_new_gold():
     global gold_list
     gold_list.clear()
     gold_list = points()
-    play_sound(pickup_sound)
+    play_sound(next_level_sound)
 
 
 def generate_new_enemy():
@@ -964,10 +1052,10 @@ def corpses():
     for enemy in dead_enemy_list:
         if enemy.type == 'fast':
             if enemy.killed_by == 'bullet':
-                window.blit(fast_bullet_corpses,
+                window.blit(fast_corpses,
                             (enemy.rect.x-20, enemy.rect.y-20))
             elif enemy.killed_by == 'shield':
-                window.blit(fast_bullet_corpses,
+                window.blit(fast_corpses,
                             (enemy.rect.x-20, enemy.rect.y-20))
         if enemy.type == 'devil':
             if enemy.killed_by == 'bullet':
@@ -976,16 +1064,16 @@ def corpses():
                 window.blit(devil_corpses, (enemy.rect.x, enemy.rect.y))
         if enemy.type == 'mutant':
             if enemy.killed_by == 'shield':
-                window.blit(mutant_bullet2_corpses,
+                window.blit(mutant_corpses_shield,
                             (enemy.rect.x, enemy.rect.y))
             elif enemy.killed_by == 'bullet':
-                window.blit(mutant_corpses, (enemy.rect.x, enemy.rect.y))
+                window.blit(mutant_corpses_bullet, (enemy.rect.x, enemy.rect.y))
         if enemy.type == 'ghost':
             window.blit(ghost_corpses, (enemy.rect.x, enemy.rect.y))
 
 
 def status():
-    global bossHP
+    global boss_hp
     font = pygame.font.Font('font/snap.ttf', 30)
     points_text = font.render(
         f'Gold: {points_counter}', True, (255, 0, 0))
@@ -997,7 +1085,7 @@ def status():
         f'Bullets: {magazine}', True, (255, 0, 0))
     window.blit(points_text, (850, 10))
     if background == background4:
-        points_str = 'l' * bossHP
+        points_str = 'l' * boss_hp
         pointts_text = font.render(points_str, True, (255, 0, 0))
         window.blit(pointts_text, (700, 1000))
 
@@ -1020,23 +1108,23 @@ while run:
     xx, yy = 0, 0
 
     if keys[pygame.K_d]:
-        play_sound(move_sound)
+        play_sound(steps_sound)
         xx += speed
         bullet_direction = 'right'
     elif keys[pygame.K_a]:
-        play_sound(move_sound)
+        play_sound(steps_sound)
         xx -= speed
         bullet_direction = 'left'
     elif keys[pygame.K_s]:
-        play_sound(move_sound)
+        play_sound(steps_sound)
         yy += speed
         bullet_direction = 'down'
     elif keys[pygame.K_w]:
-        play_sound(move_sound)
+        play_sound(steps_sound)
         yy -= speed
         bullet_direction = 'top'
     else:
-        stop_sound(move_sound)
+        stop_sound(steps_sound)
 
     prev_pos = player1_rect.copy()
     player1_rect.move_ip(xx, yy)
@@ -1162,7 +1250,7 @@ while run:
 
     if u_key_pressed:
         if points_counter >= 2:
-            magazine += 10
+            magazine += 20
             points_counter -= 2
             reeload()
         else:
@@ -1198,22 +1286,22 @@ while run:
     corpses()
 
     if background == background4:
-        if BS == True:
+        if bs == True:
             pygame.mixer.stop()
             pygame.mixer.music.load('sounds/bossfight.mp3')
             pygame.mixer.music.set_volume(0.7)
             pygame.mixer.music.play(-1)
-            BS = False
+            bs = False
         for boss in boss_list:
             mask = boss.mask
             offset = (boss.rect.x - player1_rect.x,
                       boss.rect.y - player1_rect.y)
             if abs(player1_rect.x - boss.rect.x) <= 200 and abs(player1_rect.y - boss.rect.y) <= 200:
-                play_sound(boss_dead_sound)
+                play_sound(boss_death_sound)
             boss.update(obstacles_list)
             window.blit(boss.texture, boss.rect)
-            if bossHP == 0:
-                stop_sound(boss_dead_sound)
+            if boss_hp == 0:
+                stop_sound(boss_death_sound)
                 boss_sound.play()
                 boss.delete()
                 death_animation(boss_dead_animation,
@@ -1232,7 +1320,7 @@ while run:
                 pygame.mixer.music.play(-1)
                 if right.color == (0, 255, 0) and player1_rect.colliderect(right.rect):
                     stop_sound(boss_sound)
-                    bossHP = 50
+                    boss_hp = 50
                     background = random_background()
                     generate_new_obstacles()
                     generate_new_gold()
@@ -1241,7 +1329,7 @@ while run:
                     right.color = (255, 0, 0)
                     x = 0
             if player1_mask.overlap(mask, offset):
-                player_dead_sound.play()
+                player_death_sound.play()
                 death_animation(player_dead_animation, x, y)
                 time.sleep(1)
                 deadscreen()
@@ -1256,7 +1344,7 @@ while run:
 
     for obstacle in destroyed_obstacles_list:
         scaled_corpse = pygame.transform.scale(
-            nature_corpses, (obstacle.rect.width, obstacle.rect.height))
+            destroyed_obstacle_texture, (obstacle.rect.width, obstacle.rect.height))
         window.blit(scaled_corpse, (obstacle.rect.x, obstacle.rect.y))
 
     if powershield == False and gun_on == False:
@@ -1267,67 +1355,67 @@ while run:
         player1_rect = pygame.rect.Rect(x, y, 40, 40)
     elif powershield == False and gun_on == True:
         if keys[pygame.K_d]:
-            window.blit(player_plazmaR_texture, player1_rect)
-            last_texture = player_plazmaR_texture
+            window.blit(player_plazma_right_texture, player1_rect)
+            last_texture = player_plazma_right_texture
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
         elif keys[pygame.K_a]:
-            window.blit(player_plazmaL_texture, player1_rect)
+            window.blit(player_plazma_left_texture, player1_rect)
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
-            last_texture = player_plazmaL_texture
+            last_texture = player_plazma_left_texture
         elif keys[pygame.K_s]:
-            window.blit(player_plazmaD_texture, player1_rect)
+            window.blit(player_plazma_down_texture, player1_rect)
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
-            last_texture = player_plazmaD_texture
+            last_texture = player_plazma_down_texture
         elif keys[pygame.K_w]:
-            window.blit(player_plazmaT_texture, player1_rect)
+            window.blit(player_plazma_top_texture, player1_rect)
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
-            last_texture = player_plazmaT_texture
+            last_texture = player_plazma_top_texture
         else:
             window.blit(last_texture, player1_rect)
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
     elif powershield == True and gun_on == True:
         if keys[pygame.K_d]:
-            window.blit(player_plazmaRS_texture, player1_rect)
+            window.blit(player_plazma_right_shield_texture, player1_rect)
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
-            last2_texture = player_plazmaRS_texture
+            last_texture_with_shield = player_plazma_right_shield_texture
         elif keys[pygame.K_a]:
-            window.blit(player_plazmaLS_texture, player1_rect)
+            window.blit(player_plazma_left_shield_texture, player1_rect)
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
-            last2_texture = player_plazmaLS_texture
+            last_texture_with_shield = player_plazma_left_shield_texture
         elif keys[pygame.K_s]:
-            window.blit(player_plazmaDS_texture, player1_rect)
+            window.blit(player_plazma_down_shield_texture, player1_rect)
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
-            last2_texture = player_plazmaDS_texture
+            last_texture_with_shield = player_plazma_down_shield_texture
         elif keys[pygame.K_w]:
-            window.blit(player_plazmaTS_texture, player1_rect)
+            window.blit(player_plazma_top_shield_texture, player1_rect)
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
-            last2_texture = player_plazmaTS_texture
+            last_texture_with_shield = player_plazma_top_shield_texture
         else:
-            window.blit(last2_texture, player1_rect)
+            window.blit(last_texture_with_shield, player1_rect)
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
     status()
 
     if keys[pygame.K_SPACE] and bullet_fired == True and magazine > 0 and gun_on == True:
         if bullet_direction == 'right':
-            new_bullet = Bullet(player1_rect.x, player1_rect.y, bullet_speed, bulletWidth, bulletHeight,
-                                bullet_direction, bullet_textureR)
+            new_bullet = Bullet(player1_rect.x, player1_rect.y, bullet_speed, bullet_width, bullet_height,
+                                bullet_direction, bullet_texture_right)
             bullets_list.append(new_bullet)
             magazine -= 1
             gun_sound.play()
         elif bullet_direction == 'left':
-            new_bullet = Bullet(player1_rect.x, player1_rect.y, bullet_speed, bulletWidth, bulletHeight,
+            new_bullet = Bullet(player1_rect.x, player1_rect.y, bullet_speed, bullet_width, bullet_height,
                                 bullet_direction, bullet_textureL)
             bullets_list.append(new_bullet)
             magazine -= 1
             gun_sound.play()
         elif bullet_direction == 'top':
-            new_bullet = Bullet(player1_rect.x, player1_rect.y, bullet_speed, bulletxWidth, bulletxHeight,
+            new_bullet = Bullet(player1_rect.x, player1_rect.y, bullet_speed, bullet2_width, bullet2_height,
                                 bullet_direction, bullet_textureT)
             bullets_list.append(new_bullet)
             magazine -= 1
             gun_sound.play()
         elif bullet_direction == 'down':
-            new_bullet = Bullet(player1_rect.x, player1_rect.y, bullet_speed, bulletxWidth, bulletxHeight,
+            new_bullet = Bullet(player1_rect.x, player1_rect.y, bullet_speed, bullet2_width, bullet2_height,
                                 bullet_direction, bullet_textureD)
             bullets_list.append(new_bullet)
             magazine -= 1
@@ -1336,9 +1424,9 @@ while run:
     for enemy in enemy_list:
         enemy.update(obstacles_list)
         if enemy.type == 'mutant':
-            enemy.mirror(mutant_textureL, mutant_textureR)
+            enemy.mirror(mutant_texture_left_direction, mutant_texture_right_direction)
         elif enemy.type == 'ghost':
-            enemy.mirror(ghost_textureL, ghost_textureR)
+            enemy.mirror(ghost_texture_left_direction, ghost_texture_right_direction)
         window.blit(enemy.texture, enemy.rect)
 
         if abs(player1_rect.x - enemy.rect.x) <= 200 and abs(player1_rect.y - enemy.rect.y) <= 200:
@@ -1347,7 +1435,7 @@ while run:
 
         if enemy.rect.colliderect(player1_rect):
             if powershield == False:
-                player_dead_sound.play()
+                player_death_sound.play()
                 death_animation(player_dead_animation, x, y)
                 time.sleep(1)
                 deadscreen()
@@ -1362,19 +1450,19 @@ while run:
             elif powershield == True:
                 enemy.killed_by = 'shield'
                 if enemy.type == 'fast':
-                    fast_dead_sound.play()
+                    fast_death_sound.play()
                     death_animation(fast_dead_animation,
                                     enemy.rect.x, enemy.rect.y)
                 elif enemy.type == 'devil':
-                    devil_dead_sound.play()
+                    devil_death_sound.play()
                     death_animation(devil_dead_animation,
                                     enemy.rect.x, enemy.rect.y)
                 elif enemy.type == 'mutant':
-                    mutant_dead_sound.play()
-                    death_animation(mutant_dead_animation,
+                    mutant_death_sound.play()
+                    death_animation(mutant_bullet_dead_animation,
                                     enemy.rect.x, enemy.rect.y)
                 elif enemy.type == 'ghost':
-                    ghost_dead_sound.play()
+                    ghost_death_sound.play()
                     death_animation(ghost_dead_animation,
                                     enemy.rect.x, enemy.rect.y)
                 enemy.delete()
@@ -1390,14 +1478,14 @@ while run:
             for boss in boss_list:
                 if bullet.rect.colliderect(boss.rect):
                     bullet.delete()
-                    bossHP -= 1
+                    boss_hp -= 1
                     bullet_fired = True
             for obstacle in obstacles_list:
                 if bullet.rect.colliderect(obstacle.rect):
                     destruction_sound.play()
                     death_animation(bullet_boom_list,
                                     bullet.rect.x, bullet.rect.y)
-                    death_animation(nature_destroy_animation,
+                    death_animation(obstacle_destroy_animation,
                                     obstacle.rect.x, obstacle.rect.y)
                     bullet.delete()
                     obstacle.delete()
@@ -1407,22 +1495,22 @@ while run:
                 if bullet.rect.colliderect(enemy.rect):
                     enemy.killed_by = 'bullet'
                     if enemy.type == 'fast':
-                        fast_dead_sound.play()
+                        fast_death_sound.play()
                         number_fasts -= 1
                         death_animation(fast_bullet_dead_animation,
                                         enemy.rect.x, enemy.rect.y)
                     elif enemy.type == 'devil':
-                        devil_dead_sound.play()
+                        devil_death_sound.play()
                         death_animation(devil_bullet_dead_animation,
                                         enemy.rect.x, enemy.rect.y)
                         number_devils -= 1
                     elif enemy.type == 'mutant':
-                        mutant_dead_sound.play()
-                        death_animation(mutant_bullet2_dead_animation,
+                        mutant_death_sound.play()
+                        death_animation(mutant_shield_dead_animation,
                                         enemy.rect.x, enemy.rect.y)
                         number_mutants -= 1
                     elif enemy.type == 'ghost':
-                        ghost_dead_sound.play()
+                        ghost_death_sound.play()
                         death_animation(ghost_dead_animation,
                                         enemy.rect.x, enemy.rect.y)
                         number_ghosts -= 1
@@ -1433,24 +1521,24 @@ while run:
         except:
             pass
 
-    if bossHP == 40:
+    if boss_hp == 40:
         generate_new_enemy()
-        bossHP = 39
+        boss_hp = 39
         for enemy in enemy_list:
             death_animation(devil_dead_animation, enemy.rect.x, enemy.rect.y)
-    if bossHP == 30:
+    if boss_hp == 30:
         generate_new_enemy()
-        bossHP = 29
+        boss_hp = 29
         for enemy in enemy_list:
             death_animation(devil_dead_animation, enemy.rect.x, enemy.rect.y)
-    if bossHP == 20:
+    if boss_hp == 20:
         generate_new_enemy()
-        bossHP = 19
+        boss_hp = 19
         for enemy in enemy_list:
             death_animation(devil_dead_animation, enemy.rect.x, enemy.rect.y)
-    if bossHP == 10:
+    if boss_hp == 10:
         generate_new_enemy()
-        bossHP = 9
+        boss_hp = 9
         for enemy in enemy_list:
             death_animation(devil_dead_animation, enemy.rect.x, enemy.rect.y)
 
