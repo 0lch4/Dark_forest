@@ -63,6 +63,8 @@ bullets_list = []
 dead_enemy_list = []
 boss_list = []
 dead_boss_list = []
+obstacles_list =[]
+enemy_list=[]
 
 #intro textures
 menu = pygame.image.load("textures/menu.png")
@@ -415,6 +417,8 @@ def stop_sound(sound):
 
 #game intro
 def start():
+    pass
+'''
     #shows all intro slaids and play intro music refresh screen beetween intro slaids
     window.blit(olchastudio, (1, 1))
     intro_sound.play()
@@ -439,46 +443,60 @@ def start():
             keys = pygame.key.get_pressed()
             if keys[pygame.K_SPACE]:
                 waiting = False
-                stop_sound(intro_sound)
+                stop_sound(intro_sound)'''
 
 #loading objects in the map:enemies,obstacles,corpses itd
-def load(quantity, objectt, lista, rect):
-    for i in range(quantity):
-        if background == background1:
-            x = random.randint(20, window_width)
-            y = random.randint(20, window_height)
-        elif background == background3:
-            x = random.randint(20, window_width)
-            y = random.randint(20, window_height)
-        elif background == background2:
-            if lista == obstacles_list:
-                if player1_rect.right < window_width - 100:
-                    x = random.randint(10, 1750)
-                    y = random.randint(10, 990)
-                else:
-                    x = random.randint(0, player1_rect.left - 100)
-                    y = random.randint(10, 990)
-            elif lista == enemy_list:
-                for enemy in enemy_list:
-                    if abs(player1_rect.x - enemy.rect.x) <= 200 and abs(player1_rect.y - enemy.rect.y) <= 200:
-                        x = random.randint(0, window_width)
-                        y = random.randint(0, window_height)
-            else:
-                x = random.randint(0, window_width)
-                y = random.randint(0, window_height)
+
+def collision(lista,rect,x,y):
         collision = True
         while collision:
             collision = False
-            for o in lista:
-                if rect.move(x, y).colliderect(o.rect) or rect.move(x, y).colliderect(player1_rect):
+            for i in lista:
+                if rect.move(x, y).colliderect(i.rect) or rect.move(x, y).colliderect(player1_rect):
                     collision = True
                     break
-                elif math.dist((x, y), player1_rect.center) < 100:
+                elif math.dist((x, y), player1_rect.center) < 200:
                     collision = True
                     break
             if collision:
-                x = random.randint(200, window_width)
-                y = random.randint(50, window_height)
+                x = random.randint(20, window_width-90)
+                y = random.randint(20, window_height-150)
+        return x,y
+                
+
+def load(quantity, objectt, lista, rect):
+    for i in range(quantity):
+        if lista == obstacles_list:        
+            if background == background1:
+                x = random.randint(20, window_width-20)
+                y = random.randint(20, window_height-20)
+            elif background == background2:
+                #obstacles dont spawn on skull
+                x = random.randint(20, window_width-90)
+                y = random.randint(20, window_height-150)        
+            elif background == background3:
+                x = random.randint(20, window_width-20)
+                y = random.randint(20, window_height-20)
+        else:
+            x = random.randint(20, window_width-90)
+            y = random.randint(20, window_height-150)
+            
+        if lista == enemy_list:
+            if background == background1:
+                x = random.randint(20, window_width-20)
+                y = random.randint(20, window_height-20)
+            elif background == background2:
+                x = random.randint(20, window_width-20)
+                y = random.randint(20, window_height-20)        
+            elif background == background3:
+                x = random.randint(20, window_width-20)
+                y = random.randint(20, window_height-20)
+        else:
+            x = random.randint(20, window_width-20)
+            y = random.randint(20, window_height-20)
+        
+        x,y = collision(lista,rect,x,y)    
+                
         if background != background4:
             objectt(x, y)
 
