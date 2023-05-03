@@ -18,9 +18,9 @@ font = pygame.font.Font(None, 36)
 x = 0
 y = 0
 #gold
-points_counter = 100
+points_counter = 0
 #level
-level = 48
+level = 0
 #number of enemies when game started
 number_devils = 0
 number_fasts = 0
@@ -31,11 +31,11 @@ number_obstacles = 8
 #max number of obstacles
 max_obstacles = 18
 #bullets in magazine
-magazine = 100
+magazine = 0
 #glag for gun hide/pick
 gun_on = False
 #basic player speed
-speed = 15
+speed = 8
 #max player speed
 max_speed = 15
 #flags for eliminate double click in abilities
@@ -55,8 +55,10 @@ r_key_released = True
 powershield = False
 #boss hp
 boss_hp = 50
-#the flag checks if there is a boss fight
+#the flag checks if there is a boss fight and play boss music
 bs = False
+#load boss only in boss level
+load_boss= False
 #lists
 destroyed_obstacles_list = []
 bullets_list = []
@@ -422,10 +424,7 @@ def stop_sound(sound):
 
 #game intro
 def start():
-    pass
-   #shows all intro slaids and play intro music refresh screen beetween intro slaids
-   
-'''
+   #shows all intro slaids and play intro music refresh screen beetween intro slaids   
     window.blit(olchastudio, (1, 1))
     intro_sound.play()
     pygame.display.update()
@@ -450,7 +449,6 @@ def start():
             if keys[pygame.K_SPACE]:
                 waiting = False
                 stop_sound(intro_sound)
-'''           
 
 #deadscreen
 def deadscreen():
@@ -605,70 +603,6 @@ def load(quantity, objectt, lista, rect):
             y = random.randint(50, window_height-50)
             x,y = collision(lista,rect,x,y)    
             objectt(x, y)
-
-
-class Boss:
-    def __init__(self, x, y, width, height, texture, speed, collision):
-        self.rect = pygame.Rect(x, y, width, height)
-        self.texture = texture
-        self.speed = speed
-        self.collision = collision
-        self.direction = (1, 0)
-        self.mask = pygame.mask.from_surface(texture)
-        self.prev_pos = self.rect.copy()
-        self.x = self.rect.x
-        self.y = self.rect.y
-
-    def update(self):
-        self.prev_pos = self.rect.copy()
-        self.x, self.y = self.rect.x, self.rect.y
-        self.rect.x += self.speed * self.direction[0]
-        self.rect.y += self.speed * self.direction[1]
-
-        for i in borders_list:
-            if self.rect.colliderect(i.rect):
-                self.rect = self.prev_pos
-                break
-            
-        for i in enemy_list:
-            offset = (self.rect.x - i.x,
-            self.rect.y - i.y)
-            if i.mask.overlap(mask, offset):   
-                i.rect = i.prev_pos
-                
-            
-        if random.random() < 0.05:
-            self.change_direction()
-
-    def change_direction(self):
-        directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
-        new_direction = self.direction
-        while new_direction == self.direction:
-            new_direction = random.choice(directions)
-        self.direction = new_direction
-
-    def draw(self, surface):
-        surface.blit(self.texture, self.rect)
-
-    def delete(self):
-        boss_list.remove(self)
-        dead_boss_list.append(self)
-        del self
-
-
-def boss():
-    global bs
-    boss_list = []
-    if level % 48 == 0:
-        boss = Boss(500, 500, 300, 300, boss_texture, 1, 300)
-        boss_list.append(boss)
-        bs = True
-
-    return boss_list
-
-
-boss_list = boss()
-
 
 
 #pick your gun
@@ -1002,6 +936,64 @@ class Bullet:
         bullets_list.remove(self)
         del self
 
+#boss class
+class Boss:
+    def __init__(self, x, y, width, height, texture, speed, collision):
+        self.rect = pygame.Rect(x, y, width, height)
+        self.texture = texture
+        self.speed = speed
+        self.collision = collision
+        self.direction = (1, 0)
+        self.mask = pygame.mask.from_surface(texture)
+        self.prev_pos = self.rect.copy()
+        self.x = self.rect.x
+        self.y = self.rect.y
+
+    def update(self):
+        self.prev_pos = self.rect.copy()
+        self.x, self.y = self.rect.x, self.rect.y
+        self.rect.x += self.speed * self.direction[0]
+        self.rect.y += self.speed * self.direction[1]
+
+        for i in borders_list:
+            if self.rect.colliderect(i.rect):
+                self.rect = self.prev_pos
+                break
+        #enemy colliderect with boss    
+        for i in enemy_list:
+            offset = (self.rect.x - i.x,
+            self.rect.y - i.y)
+            if i.mask.overlap(mask, offset):   
+                i.rect = i.prev_pos
+                            
+        if random.random() < 0.05:
+            self.change_direction()
+
+    def change_direction(self):
+        directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+        new_direction = self.direction
+        while new_direction == self.direction:
+            new_direction = random.choice(directions)
+        self.direction = new_direction
+
+    def draw(self, surface):
+        surface.blit(self.texture, self.rect)
+
+    def delete(self):
+        boss_list.remove(self)
+        dead_boss_list.append(self)
+        del self
+
+#add boss to boss list
+def boss():
+    global bs
+    boss_list = []
+    boss = Boss(500, 500, 300, 300, boss_texture, 10, 300)
+    boss_list.append(boss)
+    bs = True
+    return boss_list
+
+
 #creating gold in map and modify levels
 def points():
     #gold list
@@ -1102,6 +1094,14 @@ def corpses():
                 window.blit(mutant_corpses_bullet, (enemy.rect.x, enemy.rect.y))
         if enemy.type == 'ghost':
             window.blit(ghost_corpses, (enemy.rect.x, enemy.rect.y))
+            
+    for boss in dead_boss_list:
+        window.blit(boss_corpses, (boss.rect.x, boss.rect.y))
+        
+    for obstacle in destroyed_obstacles_list:
+        scaled_corpse = pygame.transform.scale(
+            destroyed_obstacle_texture, (obstacle.rect.width, obstacle.rect.height))
+        window.blit(scaled_corpse, (obstacle.rect.x, obstacle.rect.y))
 
 #showing on screen level,points,bullets and boss hp on boss lvl
 def status():
@@ -1177,6 +1177,7 @@ while run:
             player1_rect = prev_pos
             x, y = player1_rect.x, player1_rect.y
             break
+    
         
     #checking for collisions with borders (borders dont have masks, so checking for collisions with them looks different)
     for i in borders_list:
@@ -1266,7 +1267,6 @@ while run:
             hide_gun()
             gun_on = False
             speed += 3
-            hide_gun = False
 
     #check collision with gold and change right border color
     for gold in gold_list:
@@ -1276,7 +1276,7 @@ while run:
             right.color = (0, 255, 0)
             gold_list.remove(gold)
     
-            
+    #load new level when player touch green border and change player possition to left side to make immersion      
     if right.color == (0, 255, 0) and player1_rect.colliderect(right.rect):
         background = random_background()
         generate_new_obstacles()
@@ -1288,37 +1288,48 @@ while run:
 
     #loading the background
     window.blit(background, (0, 0))
-
+    
+    #load gold on the map
     for gol in gold_list:
         gol.draw(window)
-
+    #load obstacles on the map
     for obj in obstacles_list:
         obj.draw(window)
-
+    #load borders on the map
     for border in borders_list:
         border.draw(window)
 
-    for boss in dead_boss_list:
-        window.blit(boss_corpses, (boss.rect.x, boss.rect.y))
-
+    #load corpses on the map
     corpses()
 
+    #loading the boss level
     if background == background4:
+        destroyed_obstacles_list.clear()
+        dead_enemy_list.clear()
+        if x==0:
+            load_boss = True
+        if load_boss==True:
+            boss_list = boss()
+            load_boss = False
         if bs == True:
+            #playing boss level music
             pygame.mixer.stop()
             pygame.mixer.music.load('sounds/bossfight.mp3')
             pygame.mixer.music.set_volume(0.7)
             pygame.mixer.music.play(-1)
             bs = False
+        #load boss on the map
         for boss in boss_list:
             mask = boss.mask
             offset = (boss.rect.x - player1_rect.x,
                       boss.rect.y - player1_rect.y)
-            if abs(player1_rect.x - boss.rect.x) <= 200 and abs(player1_rect.y - boss.rect.y) <= 200:
+            #play boss sound when player is close to boss
+            if abs(player1_rect.x - boss.rect.x) <= 400 and abs(player1_rect.y - boss.rect.y) <= 200:
                 play_sound(boss_death_sound)
             boss.update()
             window.blit(boss.texture, boss.rect)
             if boss_hp == 0:
+                #if boss hp go to 0 loading boss death effect and reset number of enemies
                 stop_sound(boss_death_sound)
                 boss_sound.play()
                 boss.delete()
@@ -1336,6 +1347,7 @@ while run:
                 pygame.mixer.music.load('sounds/music.mp3')
                 pygame.mixer.music.set_volume(0.4)
                 pygame.mixer.music.play(-1)
+                #load new level when player touch right border after killed boss
                 if right.color == (0, 255, 0) and player1_rect.colliderect(right.rect):
                     stop_sound(boss_sound)
                     boss_hp = 50
@@ -1346,6 +1358,7 @@ while run:
                     bullet_fired = True
                     right.color = (255, 0, 0)
                     x = 0
+            #if player touch boss player are dead
             if player1_mask.overlap(mask, offset):
                 player_death_sound.play()
                 death_animation(player_dead_animation, x, y)
@@ -1360,59 +1373,70 @@ while run:
                 pygame.mixer.music.play(-1)
                 break
 
-    for obstacle in destroyed_obstacles_list:
-        scaled_corpse = pygame.transform.scale(
-            destroyed_obstacle_texture, (obstacle.rect.width, obstacle.rect.height))
-        window.blit(scaled_corpse, (obstacle.rect.x, obstacle.rect.y))
-
+    #player textures adapte to shield and gun and direction
     if powershield == False and gun_on == False:
         window.blit(player1_texture, player1_rect)
         player1_rect = pygame.rect.Rect(x, y, 40, 40)
+        
     elif powershield == True and gun_on == False:
         window.blit(player1_texture_shield, player1_rect)
         player1_rect = pygame.rect.Rect(x, y, 40, 40)
+        
     elif powershield == False and gun_on == True:
         if keys[pygame.K_d]:
             window.blit(player_plazma_right_texture, player1_rect)
             last_texture = player_plazma_right_texture
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
+            
         elif keys[pygame.K_a]:
             window.blit(player_plazma_left_texture, player1_rect)
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
             last_texture = player_plazma_left_texture
+            
         elif keys[pygame.K_s]:
             window.blit(player_plazma_down_texture, player1_rect)
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
             last_texture = player_plazma_down_texture
+            
         elif keys[pygame.K_w]:
             window.blit(player_plazma_top_texture, player1_rect)
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
             last_texture = player_plazma_top_texture
+            
         else:
             window.blit(last_texture, player1_rect)
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
+            
     elif powershield == True and gun_on == True:
         if keys[pygame.K_d]:
             window.blit(player_plazma_right_shield_texture, player1_rect)
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
             last_texture_with_shield = player_plazma_right_shield_texture
+            
         elif keys[pygame.K_a]:
             window.blit(player_plazma_left_shield_texture, player1_rect)
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
             last_texture_with_shield = player_plazma_left_shield_texture
+            
         elif keys[pygame.K_s]:
             window.blit(player_plazma_down_shield_texture, player1_rect)
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
             last_texture_with_shield = player_plazma_down_shield_texture
+            
         elif keys[pygame.K_w]:
             window.blit(player_plazma_top_shield_texture, player1_rect)
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
             last_texture_with_shield = player_plazma_top_shield_texture
+            
         else:
             window.blit(last_texture_with_shield, player1_rect)
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
+    
+    #show level coins bullets        
     status()
-
+    
+    '''when player press space and any bullet flying in this moment and player have bullets and holds his gun
+    create bullet adapte to bullet direction'''
     if keys[pygame.K_SPACE] and bullet_fired == True and magazine > 0 and gun_on == True:
         if bullet_direction == 'right':
             new_bullet = Bullet(player1_rect.x, player1_rect.y, bullet_speed, bullet_width, bullet_height,
@@ -1439,6 +1463,7 @@ while run:
             magazine -= 1
             gun_sound.play()
 
+    #loading enemies on the map
     for enemy in enemy_list:
         enemy.update(obstacles_list)
         if enemy.type == 'mutant':
@@ -1446,11 +1471,11 @@ while run:
         elif enemy.type == 'ghost':
             enemy.mirror(ghost_texture_left_direction, ghost_texture_right_direction)
         window.blit(enemy.texture, enemy.rect)
-
+        #when player is close to monsters playing monsters sounds
         if abs(player1_rect.x - enemy.rect.x) <= 200 and abs(player1_rect.y - enemy.rect.y) <= 200:
             random_monster_sound = random.choice(monsters_sounds)
             play_sound(random_monster_sound)
-
+        #when enemy touch player and player dont have shield player is dead
         if enemy.rect.colliderect(player1_rect):
             if powershield == False:
                 player_death_sound.play()
@@ -1465,6 +1490,8 @@ while run:
                 pygame.mixer.music.set_volume(0.4)
                 pygame.mixer.music.play(-1)
                 break
+                '''when an enemy touches a player and the player has a shield, the enemy is dead
+                enemies have a specific death animation depending on the type of enemy and how he die'''
             elif powershield == True:
                 enemy.killed_by = 'shield'
                 if enemy.type == 'fast':
@@ -1486,21 +1513,29 @@ while run:
                 enemy.delete()
                 powershield = False
 
+    '''when the bullet touched an enemy and an obstacle at the same time
+    the game was crashed because there was one bullet in the list and the program wanted to remove it twice
+    so I put a try so that both things would be destroyed and the error would not appear'''
     for bullet in bullets_list:
         try:
             bullet.update()
             bullet_fired = False
-            if bullet.rect.left > 2000 or bullet.rect.right < 0 or bullet.rect.top > 1200 or bullet.rect.bottom < 0:
+            '''#borders have only 1px width, so the bullet can go to the other side
+            so I added that after slightly exceeding the size of the window, the bullet would be deleted'''
+            if bullet.rect.left > window_width+300 or bullet.rect.right < 0 or bullet.rect.top > window_height+200 or bullet.rect.bottom < 0:
                 bullet.delete()
                 bullet_fired = True
+            #when bullet touch boss boss lose 1 hp
             for boss in boss_list:
                 if bullet.rect.colliderect(boss.rect):
                     bullet.delete()
                     boss_hp -= 1
                     bullet_fired = True
+            #when bullet touch obstacle destroy it
             for obstacle in obstacles_list:
                 if bullet.rect.colliderect(obstacle.rect):
                     destruction_sound.play()
+                    #bullet explosion animation
                     death_animation(bullet_boom_list,
                                     bullet.rect.x, bullet.rect.y)
                     death_animation(obstacle_destroy_animation,
@@ -1509,6 +1544,7 @@ while run:
                     obstacle.delete()
                     bullet_fired = True
                     break
+            #when bullet touch enemy kill him
             for enemy in enemy_list:
                 if bullet.rect.colliderect(enemy.rect):
                     enemy.killed_by = 'bullet'
@@ -1539,6 +1575,7 @@ while run:
         except:
             pass
 
+    #generate new enemies when boss hp run below static values
     if boss_hp == 40:
         generate_new_enemy()
         boss_hp = 39
@@ -1560,4 +1597,5 @@ while run:
         for enemy in enemy_list:
             death_animation(devil_dead_animation, enemy.rect.x, enemy.rect.y)
 
+    #update the screen
     pygame.display.update()
