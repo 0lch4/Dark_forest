@@ -85,6 +85,7 @@ background2 = pygame.image.load('textures/tlo2.jpg')
 background3 = pygame.image.load('textures/tlo3.jpg')
 background4 = pygame.image.load('textures/tlo4.1.jpg')
 background5 = pygame.image.load('textures/tlo5.png')
+
 #scaling background textures
 background1 = pygame.transform.scale(background1, window.get_size())
 background2 = pygame.transform.scale(background2, window.get_size())
