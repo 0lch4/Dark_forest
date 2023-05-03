@@ -94,7 +94,7 @@ background5 = pygame.transform.scale(background5, window.get_size())
 #list of background textures
 background_list = [background1, background2, background3,background5]
 #default background
-background = background5
+background = background1
 
 #choose random background without backgorund4
 #set background 4 in 50 lvl (boss fight)
