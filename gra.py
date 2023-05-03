@@ -84,15 +84,17 @@ background1 = pygame.image.load('textures/tlo.jpg')
 background2 = pygame.image.load('textures/tlo2.jpg')
 background3 = pygame.image.load('textures/tlo3.jpg')
 background4 = pygame.image.load('textures/tlo4.1.jpg')
+background5 = pygame.image.load('textures/tlo5.png')
 #scaling background textures
 background1 = pygame.transform.scale(background1, window.get_size())
 background2 = pygame.transform.scale(background2, window.get_size())
 background3 = pygame.transform.scale(background3, window.get_size())
 background4 = pygame.transform.scale(background4, window.get_size())
+background5 = pygame.transform.scale(background5, window.get_size())
 #list of background textures
-background_list = [background1, background2, background3]
+background_list = [background1, background2, background3,background5]
 #default background
-background = background1
+background = background5
 
 #choose random background without backgorund4
 #set background 4 in 50 lvl (boss fight)
@@ -449,7 +451,6 @@ def start():
             if keys[pygame.K_SPACE]:
                 waiting = False
                 stop_sound(intro_sound)
-
 #deadscreen
 def deadscreen():
     global level
@@ -570,15 +571,15 @@ def collision(lista,rect,x,y):
                     collision = True
                     break
             if collision:
-                x = random.randint(20, window_width-90)
-                y = random.randint(20, window_height-150)
+                x = random.randint(0,window_width-90)
+                y = random.randint(0,window_height-150)
         return x,y
                 
 #loading objects in the map:enemies,obstacles,corpses etc
 def load(quantity, objectt, lista, rect):
     for i in range(quantity):
         if lista == obstacles_list:        
-            if background == background1 or background==background3:
+            if background == background1 or background==background3 or background==background5:
                 x = random.randint(20, window_width-20)
                 y = random.randint(20, window_height-20)
             elif background == background2:
@@ -599,8 +600,8 @@ def load(quantity, objectt, lista, rect):
             objectt(x, y)
         else:
             #additional security for crash if no enemies in this moment 
-            x = random.randint(50, window_width-50)
-            y = random.randint(50, window_height-50)
+            x = random.randint(80, window_width-80)
+            y = random.randint(80, window_height-80)
             x,y = collision(lista,rect,x,y)    
             objectt(x, y)
 
@@ -776,6 +777,13 @@ def obstacles():
         load(number_obstacles-2, sarna, obstacles_list, sarna_rect)
     if background == background4:
         pass
+    if background == background5:
+        load(number_obstacles-7, tree, obstacles_list, tree_rect)
+        load(number_obstacles-6, deadtree, obstacles_list, dead_tree_rect)
+        load(number_obstacles-3, bones, obstacles_list, bones_rect)
+        load(number_obstacles-3, sarna, obstacles_list, sarna_rect)
+        load(number_obstacles-5, bush, obstacles_list, bush_rect)
+        
 
     return obstacles_list
 
