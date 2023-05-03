@@ -72,6 +72,11 @@ intro1 = pygame.image.load("textures/intro.png")
 intro2 = pygame.image.load("textures/intro2.png")
 intro3 = pygame.image.load("textures/intro3.png")
 olchastudio = pygame.image.load("textures/olchastudio.png")
+#dead screen texture
+dead_screen = pygame.image.load("textures/deadscreen.png")
+#end of the game texture
+end_texture = pygame.transform.scale(pygame.image.load(
+        "textures/end.png"), (window_width, window_height))
 #backgrounds textures
 background1 = pygame.image.load('textures/tlo.jpg')
 background2 = pygame.image.load('textures/tlo2.jpg')
@@ -417,7 +422,10 @@ def stop_sound(sound):
 
 #game intro
 def start():
-    #shows all intro slaids and play intro music refresh screen beetween intro slaids
+    pass
+   #shows all intro slaids and play intro music refresh screen beetween intro slaids
+   
+'''
     window.blit(olchastudio, (1, 1))
     intro_sound.play()
     pygame.display.update()
@@ -442,6 +450,114 @@ def start():
             if keys[pygame.K_SPACE]:
                 waiting = False
                 stop_sound(intro_sound)
+'''           
+
+#deadscreen
+def deadscreen():
+    global level
+    global points_counter
+    global number_devils
+    global number_fasts
+    global number_mutants
+    global number_ghosts
+    global number_obstacles
+    global p_key_pressed
+    global p_key_released
+    global o_key_pressed
+    global o_key_released
+    global i_key_pressed
+    global i_key_released
+    global m_key_pressed
+    global m_key_released
+    global powershield
+    global speed
+    global magazine
+    global background
+    global background1
+    global gun_on
+    waiting = True
+    w8 = True
+    #load end of the game screen
+    window.blit(end_texture, (0,0))
+    pygame.display.update()
+    time.sleep(2)
+    #load dead screen and show player score
+    window.blit(dead_screen, (0, 0))
+    dead_screen_font = pygame.font.Font('font/snap.ttf', 100)
+    #show best score
+    with open('best_score.txt', 'r') as f:
+        best_score = int(f.read())
+    #update best score if you have more points and show best score on sreen
+    if level > best_score:
+        with open('best_score.txt', 'w') as f:
+            f.write(str(level))
+        points2_text = dead_screen_font.render(
+            f'Your record {level} levels', True, (255, 0, 0))
+        window.blit(points2_text, (window_width/4-80, window_height/4+100))
+    else:
+        points2_text = dead_screen_font.render(
+            f'Your record: {best_score} levels', True, (255, 0, 0))
+        window.blit(points2_text, (window_width/4-80, window_height/4+100))
+    #show your actual score
+    points_text = dead_screen_font.render(
+        f'You survived: {level} levels', True, (255, 0, 0))
+    window.blit(points_text, (window_width/4 - 80, window_height/4))
+    pygame.display.update()
+    #when player press space stop showing scores and go into menu
+    while waiting:
+        for i in pygame.event.get():
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_SPACE]:
+                waiting = False
+                window.blit(menu, (1, 1))
+                pygame.display.update()
+                #when player press space game was started again
+                while w8:
+                    for i in pygame.event.get():
+                        keys = pygame.key.get_pressed()
+                        if keys[pygame.K_SPACE]:
+                            time.sleep(0.5)
+                            #reset all stats
+                            points_counter = 0
+                            number_devils = 0
+                            number_fasts = 0
+                            number_mutants = 0
+                            number_ghosts = 0
+                            number_obstacles = 8
+                            p_key_pressed = False
+                            p_key_released = True
+                            o_key_pressed = False
+                            o_key_released = True
+                            i_key_pressed = False
+                            i_key_released = True
+                            m_key_pressed = False
+                            m_key_released = True
+                            powershield = False
+                            background = background1
+                            speed = 8
+                            level = 0
+                            gun_on = False
+                            magazine = 0
+                            w8 = False
+                            right.color = (255, 0, 0)
+                            pygame.display.update()
+                            break
+            #if player press escape the game is closed
+            elif keys[pygame.K_ESCAPE]:
+                sys.exit()
+
+#pause the game when player press m
+def pause():
+    pauza = pygame.image.load("textures/pauza.png")
+    waiting = True
+    while waiting:
+        window.blit(pauza, (1, 1))
+        pygame.display.update()
+        for i in pygame.event.get():
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_m]:
+                waiting = False
+                time.sleep(0.5)
 
 #if obstacles/enemies colliderect with other or with player generete new x and y
 def collision(lista,rect,x,y):
@@ -554,120 +670,9 @@ def boss():
 boss_list = boss()
 
 
-def deadscreen():
-    dead = pygame.image.load("textures/deadscreen.png")
-    global level
-    global points_counter
-    global number_devils
-    global number_fasts
-    global number_mutants
-    global number_ghosts
-    global number_obstacles
-    global p_key_pressed
-    global p_key_released
-    global o_key_pressed
-    global o_key_released
-    global i_key_pressed
-    global i_key_released
-    global m_key_pressed
-    global m_key_released
-    global powershield
-    global speed
-    global x
-    global y
-    global magazine
-    global background
-    global background1
-    global gun_on
-    waiting = True
-    w8 = True
-    end_width, end_height = window_width, window_height
-    end_surface = pygame.Surface((end_width, end_height))
-    end_texture = pygame.transform.scale(pygame.image.load(
-        "textures/end.png"), (end_width, end_height))
-    end_texture_rect = end_texture.get_rect()
-    end_surface.blit(end_texture, end_texture_rect)
-    end_x = 0
-    end_y = 0
-    window.blit(end_surface, (end_x, end_y))
-    pygame.display.update()
-    time.sleep(2)
-    window.blit(dead, (0, 0))
-    Dfont = pygame.font.Font('font/snap.ttf', 100)
 
-    with open('best_score.txt', 'r') as f:
-        best_score = int(f.read())
-
-    if level > best_score:
-        with open('best_score.txt', 'w') as f:
-            f.write(str(level))
-        points2_text = Dfont.render(
-            f'Your record {level} levels', True, (255, 0, 0))
-        window.blit(points2_text, (window_width/4-80, window_height/4+100))
-    else:
-        points2_text = Dfont.render(
-            f'Your record: {best_score} levels', True, (255, 0, 0))
-        window.blit(points2_text, (window_width/4-80, window_height/4+100))
-
-    points_text = Dfont.render(
-        f'You survived: {level} levels', True, (255, 0, 0))
-    window.blit(points_text, (window_width/4 - 80, window_height/4))
-
-    pygame.display.update()
-    while waiting:
-        for i in pygame.event.get():
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_SPACE]:
-                waiting = False
-                window.blit(menu, (1, 1))
-                pygame.display.update()
-                while w8:
-                    for i in pygame.event.get():
-                        keys = pygame.key.get_pressed()
-                        if keys[pygame.K_SPACE]:
-                            time.sleep(0.5)
-                            points_counter = 0
-                            number_devils = 0
-                            number_fasts = 0
-                            number_mutants = 0
-                            number_ghosts = 0
-                            number_obstacles = 8
-                            p_key_pressed = False
-                            p_key_released = True
-                            o_key_pressed = False
-                            o_key_released = True
-                            i_key_pressed = False
-                            i_key_released = True
-                            m_key_pressed = False
-                            m_key_released = True
-                            powershield = False
-                            background = background1
-                            speed = 8
-                            level = 0
-                            gun_on = False
-                            magazine = 0
-                            w8 = False
-                            right.color = (255, 0, 0)
-                            pygame.display.update()
-                            break
-            elif keys[pygame.K_ESCAPE]:
-                sys.exit()
-
-
-def pause():
-    pauza = pygame.image.load("textures/pauza.png")
-    waiting = True
-    while waiting:
-        window.blit(pauza, (1, 1))
-        pygame.display.update()
-        for i in pygame.event.get():
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_m]:
-                waiting = False
-                time.sleep(0.5)
-
-
-def gun1():
+#pick your gun
+def pick_gun():
     gun_sound.play()
     shield_banner = pygame.transform.scale(
         pygame.image.load("textures/gunpick.png"), (300, 200))
@@ -675,8 +680,8 @@ def gun1():
     pygame.display.update()
     time.sleep(0.5)
 
-
-def gun2():
+#hide your gun
+def hide_gun():
     gun_sound.play()
     shield_banner = pygame.transform.scale(
         pygame.image.load("textures/gunhide.png"), (300, 200))
@@ -684,7 +689,7 @@ def gun2():
     pygame.display.update()
     time.sleep(0.5)
 
-
+#boost your speed when you have less than 15
 def speed_boost():
     speed_boost_banner = pygame.transform.scale(
         pygame.image.load("textures/turbo.png"), (300, 200))
@@ -700,16 +705,22 @@ def speed_boost():
     pygame.display.update()
     time.sleep(1)
 
-
+#load new obstacles on the map
 def refresh():
+    global level
+    global points_counter
     refresh_sound.play()
     refresh_banner = pygame.transform.scale(
         pygame.image.load("textures/refresh.png"), (300, 200))
     window.blit(refresh_banner, (window_width/2 - 140, window_height/2 - 140))
+    generate_new_obstacles()
+    generate_new_gold()
+    points_counter -= 1
+    level -= 1
     pygame.display.update()
     time.sleep(1)
 
-
+#activating your shield
 def shield():
     shield_sound.play()
     shield_banner = pygame.transform.scale(
@@ -718,16 +729,20 @@ def shield():
     pygame.display.update()
     time.sleep(1)
 
-
+#buying ammunition
 def reeload():
+    global magazine
+    global points_counter
     reload_sound.play()
     refresh_banner = pygame.transform.scale(
         pygame.image.load("textures/reload.png"), (300, 200))
     window.blit(refresh_banner, (window_width/2 - 140, window_height/2 - 140))
+    magazine += 20
+    points_counter -= 2
     pygame.display.update()
     time.sleep(1)
 
-
+#border class
 class Border:
     def __init__(self, x, y, width, height, color=(255, 0, 0)):
         self.rect = pygame.Rect(x, y, width, height)
@@ -736,7 +751,7 @@ class Border:
     def draw(self, surface):
         pygame.draw.rect(surface, self.color, self.rect)
 
-
+#add borders to border list
 def borders():
     borders_list = []
     global right
@@ -749,7 +764,7 @@ def borders():
 
     left = Border(1, 1, 1, window_height)
     borders_list.append(left)
-
+    #default is red but when player earn gold change color to green
     right = Border(window_width-1, 1, 1, window_height, (255, 0, 0))
     borders_list.append(right)
 
@@ -758,7 +773,7 @@ def borders():
 
 borders_list = borders()
 
-
+#obstacle class
 class Obstacle:
     def __init__(self, x, y, width, height, texture):
         self.rect = pygame.Rect(x, y, width, height)
@@ -767,13 +782,14 @@ class Obstacle:
 
     def draw(self, surface):
         surface.blit(self.texture, self.rect)
-
+    '''when player destroy obstacle save possition to destroyed obstacles list 
+    to load destroyed obstacle texture in the same possition'''
     def delete(self):
         destroyed_obstacles_list.append(self)
         obstacles_list.remove(self)
         del self
 
-
+#add obstacles to obstacles list
 def obstacles():
     obstacles_list = []
 
@@ -807,6 +823,7 @@ def obstacles():
                             dead_tree_height, dead_tree_texture)
         obstacles_list.append(deadtree)
 
+    #load obstacles in the map without background 4
     if background == background1:
         load(number_obstacles, tree, obstacles_list, tree_rect)
         load(number_obstacles-4, sarna, obstacles_list, sarna_rect)
@@ -831,7 +848,7 @@ def obstacles():
 
 obstacles_list = obstacles()
 
-
+#enemy class
 class Enemy:
     def __init__(self, x, y, width, height, texture, speed, collision, enemy_type):
         self.rect = pygame.Rect(x, y, width, height)
@@ -845,6 +862,8 @@ class Enemy:
         self.x = self.rect.x
         self.y = self.rect.y
 
+    '''enemies colliderete with obstacles and borders (ghost dont colliderect with obstacles)
+    when the enemy touch obstacle he returns to his previous position'''
     def update(self, obstacles_list):
         self.prev_pos = self.rect.copy()
         self.x, self.y = self.rect.x, self.rect.y
@@ -866,6 +885,7 @@ class Enemy:
         if random.random() < 0.05:
             self.change_direction()
 
+    #enemies are moving randomly
     def change_direction(self):
         directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
         new_direction = self.direction
@@ -873,6 +893,7 @@ class Enemy:
             new_direction = random.choice(directions)
         self.direction = new_direction
 
+    #enemies with left and right texture change textures when change direction
     def mirror(self, L, R):
         self.L = L
         self.R = R
@@ -890,13 +911,14 @@ class Enemy:
 
     def draw(self, surface):
         surface.blit(self.texture, self.rect)
-
+    '''when player destroy enemy save possition to dead enemy list 
+    to load enemy corpses texture in the same possition'''
     def delete(self):
         dead_enemy_list.append(self)
         enemy_list.remove(self)
         del self
 
-
+#add enemies to enemy list
 def enemies():
     global boss_spawned
     enemy_list = []
@@ -921,6 +943,7 @@ def enemies():
                       ghost_height, ghost_texture_left_direction, ghost_speed, ghost_collision, 'ghost')
         enemy_list.append(ghost)
 
+    #load different enemies on different levels
     if background != background4:
         if level % 5 == 0:
             load(number_ghosts, ghost, obstacles_list, ghost_rect)
@@ -931,6 +954,7 @@ def enemies():
         else:
             load(number_devils, devil, obstacles_list, devil_rect)
 
+    #boss level have static number of enemies
     if background == background4:
         if boss_hp == 40:
             load(10, devil,enemy_list,devil_rect)
@@ -947,10 +971,9 @@ def enemies():
 
     return enemy_list
 
-
 enemy_list = enemies()
 
-
+#bullet class
 class Bullet:
     def __init__(self, x, y, speed, bullet_width, bullet_height, direction, texture):
         self.x = x
@@ -961,7 +984,7 @@ class Bullet:
         self.bullet_height = bullet_height
         self.bullet_width = bullet_width
         self.rect = pygame.Rect(x, y, bullet_width, bullet_height)
-
+    #changes the texture according to the direction of the bullet 
     def update(self):
         if self.direction == 'left':
             self.rect.move_ip(-self.speed, 0)
@@ -979,14 +1002,17 @@ class Bullet:
         bullets_list.remove(self)
         del self
 
-
+#creating gold in map and modify levels
 def points():
+    #gold list
     gold_list = []
-
+    #gold size
     goldWidth = 20
     goldHeight = 20
+    #gold texture
     gold_texture = pygame.transform.scale(
         pygame.image.load('textures/gold.png'), (goldWidth, goldHeight))
+    #gold rect
     gold_rect = gold_texture.get_rect()
 
     def gold(xgold, ygold):
@@ -998,13 +1024,17 @@ def points():
         global number_ghosts
         global level
         global bullet_fired
+        #create gold
         gold = Obstacle(xgold, ygold, goldWidth,
                         goldHeight, gold_texture)
         gold_list.append(gold)
+        #play next level sound
         if level != 0:
             next_level_sound.play()
+        #delete corpses and destroyed obstacles in next level
         dead_enemy_list.clear()
         destroyed_obstacles_list.clear()
+        #make levels harder
         level += 1
         if number_obstacles <= max_obstacles:
             number_obstacles += 1
@@ -1016,7 +1046,7 @@ def points():
             number_mutants += 1
         if level % 5 == 0:
             number_ghosts += 1
-
+    #in boss level gold dont spawn
     if background!=background4:
         gold = load(1, gold, obstacles_list, gold_rect)
     return gold_list
@@ -1024,33 +1054,32 @@ def points():
 
 gold_list = points()
 
-
+#clear old list and load new
 def generate_new_obstacles():
     global obstacles_list
     obstacles_list.clear()
     dead_boss_list.clear()
     obstacles_list = obstacles()
 
-
+#clear old list and load new
 def generate_new_gold():
     global gold_list
     gold_list.clear()
     gold_list = points()
-    play_sound(next_level_sound)
 
-
+#update list (dont clear it)
 def generate_new_enemy():
     global enemy_list
     enemy_list = enemies()
 
-
+#load death animation
 def death_animation(death_frames, x, y):
     for i in death_frames:
         window.blit(i, (x, y))
         pygame.time.wait(50)
         pygame.display.update()
 
-
+#load corpses on screen, adapts to enemy type and way of death
 def corpses():
     for enemy in dead_enemy_list:
         if enemy.type == 'fast':
@@ -1074,7 +1103,7 @@ def corpses():
         if enemy.type == 'ghost':
             window.blit(ghost_corpses, (enemy.rect.x, enemy.rect.y))
 
-
+#showing on screen level,points,bullets and boss hp on boss lvl
 def status():
     global boss_hp
     font = pygame.font.Font('font/snap.ttf', 30)
@@ -1087,29 +1116,34 @@ def status():
     points_text = font.render(
         f'Bullets: {magazine}', True, (255, 0, 0))
     window.blit(points_text, (850, 10))
+    #boss HP is the letter l at the bottom of the screen, which decreases in multiples depending on his health
     if background == background4:
         points_str = 'l' * boss_hp
         pointts_text = font.render(points_str, True, (255, 0, 0))
         window.blit(pointts_text, (700, 1000))
 
-
+#load start od the game and play game music
 start()
 pygame.mixer.music.load('sounds/music.mp3')
 pygame.mixer.music.set_volume(0.4)
 pygame.mixer.music.play(-1)
 
+#main loop
 run = True
 while run:
+    #game have 60fps
     pygame.time.Clock().tick(60)
     keys = pygame.key.get_pressed()
     for event in pygame.event.get():
+        #click on x in window or escape ending the game
         if event.type == pygame.QUIT:
             run = False
         if keys[pygame.K_ESCAPE]:
             run = False
 
+#parametr to add or subtract player x and y
     xx, yy = 0, 0
-
+#when player press movement button he change the possition, steps sound are playing and bullet direction is changing
     if keys[pygame.K_d]:
         play_sound(steps_sound)
         xx += speed
@@ -1129,10 +1163,12 @@ while run:
     else:
         stop_sound(steps_sound)
 
+    #save last player possition and load it when player colliderete with something
     prev_pos = player1_rect.copy()
     player1_rect.move_ip(xx, yy)
     x, y = player1_rect.x, player1_rect.y
-
+    
+    #check collision with obstacles
     for obstacle in obstacles_list:
         mask = obstacle.mask
         offset = (obstacle.rect.x - player1_rect.x,
@@ -1141,11 +1177,26 @@ while run:
             player1_rect = prev_pos
             x, y = player1_rect.x, player1_rect.y
             break
+        
+    #checking for collisions with borders (borders dont have masks, so checking for collisions with them looks different)
+    for i in borders_list:
+        if player1_rect.colliderect(i):
+            if i == borders_list[0]:
+                y = i.rect.top + 5
+            elif i == borders_list[1]:
+                y = i.rect.bottom - 40
+            elif i == borders_list[2]:
+                x = i.rect.left + 5
+            if right.color == (255, 0, 0):
+                if i == borders_list[3]:
+                    x = i.rect.right - 40
 
+#abilities events pressed and released is for eliminate double click
     if keys[pygame.K_o]:
         if o_key_released:
             if points_counter > 0:
                 o_key_pressed = True
+                refresh()
             o_key_released = False
         else:
             o_key_pressed = False
@@ -1180,6 +1231,7 @@ while run:
     if keys[pygame.K_m]:
         if m_key_released:
             m_key_pressed = True
+            pause()
             m_key_released = False
         else:
             m_key_pressed = False
@@ -1188,6 +1240,8 @@ while run:
     if keys[pygame.K_u]:
         if u_key_released:
             u_key_pressed = True
+            if points_counter >= 2:
+                reeload()
             u_key_released = False
         else:
             u_key_pressed = False
@@ -1200,25 +1254,29 @@ while run:
         else:
             r_key_pressed = False
             r_key_released = True
+    #bug protection
+    if r_key_pressed:
+        if gun_on == False:
+            pick_gun()
+            gun_on = True
+            speed -= 3
+            r_key_pressed = False
 
-    for i in borders_list:
-        if player1_rect.colliderect(i):
-            if i == borders_list[0]:
-                y = i.rect.top + 5
-            elif i == borders_list[1]:
-                y = i.rect.bottom - 40
-            elif i == borders_list[2]:
-                x = i.rect.left + 5
-            if right.color == (255, 0, 0):
-                if i == borders_list[3]:
-                    x = i.rect.right - 40
+        elif gun_on == True:
+            hide_gun()
+            gun_on = False
+            speed += 3
+            hide_gun = False
 
+    #check collision with gold and change right border color
     for gold in gold_list:
         if player1_rect.colliderect(gold.rect):
             gold_sound.play()
             points_counter += 1
             right.color = (0, 255, 0)
             gold_list.remove(gold)
+    
+            
     if right.color == (0, 255, 0) and player1_rect.colliderect(right.rect):
         background = random_background()
         generate_new_obstacles()
@@ -1228,50 +1286,7 @@ while run:
         right.color = (255, 0, 0)
         x = 0
 
-    for i in obstacles_list:
-        mask = i.mask
-        offset = (i.rect.x - player1_rect.x, i.rect.y - player1_rect.y)
-        if player1_mask.overlap(mask, offset):
-            if offset[0] > 0:
-                player1_rect.right = player1_rect.right - 40
-            elif offset[0] < 0:
-                player1_rect.left = player1_rect.left + 40
-            elif offset[1] > 0:
-                player1_rect.bottom = player1_rect.right - 40
-            else:
-                player1_rect.top = player1_rect.right + 40
-
-    if o_key_pressed:
-        refresh()
-        generate_new_obstacles()
-        generate_new_gold()
-        points_counter -= 2
-        level -= 1
-
-    if m_key_pressed:
-        pause()
-
-    if u_key_pressed:
-        if points_counter >= 2:
-            magazine += 20
-            points_counter -= 2
-            reeload()
-        else:
-            u_key_pressed = False
-
-    if r_key_pressed:
-        if gun_on == False:
-            gun1()
-            gun_on = True
-            speed -= 3
-            r_key_pressed = False
-
-        elif gun_on == True:
-            gun2()
-            gun_on = False
-            speed += 3
-            r_key_pressed = False
-
+    #loading the background
     window.blit(background, (0, 0))
 
     for gol in gold_list:
