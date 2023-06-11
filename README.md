@@ -1,17 +1,40 @@
 # Dark forest
-![GitHub forks](https://img.shields.io/badge/Version-1.4-red)
+![GitHub forks](https://img.shields.io/badge/Version-1.5.0-red)
 
-My first game in Python
+# Description
+My first project in Python
 
-Earn Gold, buy boosts and don't get caught by enemies
+You have to try survive the most number of levels. Before going to the next level you have to pick up gold in actualy level. You can buy equipmend in shop, destroy obstacles and killing monsters. Press `m` in game to show more tips. Game have infinite number of different levels. Every 50 levels you can find boss.
 
-Press m in game to show more tips
+## License
+Application is licensed under the MIT License.
 
-Pygame liblary
-Install: type 'pip install pygame' in cmd
+# Instalation
 
-Sounds an textures i find in the internet, some of it i edited
+## Copying the repository
 
-Exe version: https://drive.google.com/drive/folders/18XJt7mrsq8PtlCFCOp9l-pUfNfoBimPy?usp=sharing
+```
+git clone https://github.com/0lch4/Dark-forest.git
+```
 
-Client avilable now: https://github.com/0lch4/Dark_forest_client
+## Installing the liblaries
+
+```
+pip install pygame
+```
+
+# Exe version:
+https://drive.google.com/drive/folders/18XJt7mrsq8PtlCFCOp9l-pUfNfoBimPy?usp=sharing
+
+# Client avilable now:
+https://github.com/0lch4/Dark_forest_client
+
+## New versions will only be released for client
+But i will still repair bugs if someone find it.
+
+# Sources:
+Sounds an textures i find in the internet, some of it i edited.
+
+![screen1](screenshots/dark_forest_screen1.png)
+![screen2](screenshots/dark_forest_screen2.png)
+![screen3](screenshots/dark_forest_screen3.png)
