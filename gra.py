@@ -1333,7 +1333,7 @@ while run:
             offset = (boss.rect.x - player1_rect.x,
                       boss.rect.y - player1_rect.y)
             #play boss sound when player is close to boss
-            if abs(player1_rect.x - boss.rect.x) <= 400 and abs(player1_rect.y - boss.rect.y) <= 200:
+            if abs(player1_rect.x - boss.rect.x) <= 400 and abs(player1_rect.y - boss.rect.y) <= 400:
                 play_sound(boss_death_sound)
             boss.update()
             window.blit(boss.texture, boss.rect)
