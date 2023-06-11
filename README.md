@@ -4,7 +4,7 @@
 # Description
 My first project in Python
 
-You have to try survive the most number of levels. Before going to the next level you have to pick up gold in actualy level. You can buy equipmend in shop, destroy obstacles and killing monsters. Press `m` in game to show more tips. Game have infinite number of different levels. Every 50 levels you can find boss.
+You have to try survive the most number of levels. Before going to the next level you have to pick up gold in actualy level. When you pick the gold go to the right border of map. You can buy equipmend in shop, destroy obstacles and killing monsters. Press `m` in game to show more tips. Game have infinite number of different levels. Every 50 levels you can find boss.
 
 ## License
 Application is licensed under the MIT License.
