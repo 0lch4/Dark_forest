@@ -13,7 +13,7 @@ Application is licensed under the MIT License.
 ## Copying the repository
 
 ```
-git clone https://github.com/0lch4/Dark-forest.git
+git clone https://github.com/0lch4/Dark_forest.git
 ```
 
 ## Installing the liblaries
