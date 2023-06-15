@@ -545,8 +545,6 @@ def stop_sound(sound: Any) -> None:
 
 # game intro
 def start() -> None:
-    pass
-    '''
     # shows all intro slaids and play intro music refresh screen beetween intro slaids
     window.blit(olchastudio, (1, 1))
     intro_sound.play()
@@ -571,7 +569,7 @@ def start() -> None:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_SPACE]:
                 waiting = False
-                stop_sound(intro_sound)'''
+                stop_sound(intro_sound)
 
 
 # deadscreen
