@@ -69,6 +69,8 @@ boss_list = []
 dead_boss_list = []
 obstacles_list = []
 enemy_list = []
+gold_list = []
+borders_list = []
 
 # intro textures
 menu = pygame.image.load("textures/menu.png")
@@ -259,7 +261,7 @@ devil_bullet_corpses = pygame.transform.scale(
     pygame.image.load("textures/devildead3v2.png"), (devil_width, devil_height)
 )
 # devil corpses texture (killed by shield)
-devil_corpses = pygame.transform.scale(
+devil_shield_corpses = pygame.transform.scale(
     pygame.image.load("textures/devildead3.png"), (devil_width, devil_height)
 )
 
@@ -319,11 +321,11 @@ mutant_texture_right_direction = pygame.transform.scale(
 # mutant rect
 mutant_rect = mutant_texture_left_direction.get_rect()
 # mutant corpses (killed by gun)
-mutant_corpses_bullet = pygame.transform.scale(
+mutant_bullet_corpses = pygame.transform.scale(
     pygame.image.load("textures/mutantdead3L.png"), (mutant_width, mutant_height)
 )
 # mutant corpses (killed by shield)
-mutant_corpses_shield = pygame.transform.scale(
+mutant_shield_corpses = pygame.transform.scale(
     pygame.image.load("textures/mutantL.dead3v3.png"), (mutant_width, mutant_height)
 )
 # mutant death animation (killed by shield)
@@ -445,14 +447,14 @@ bones_texture = pygame.transform.scale(
 bones_rect = bones_texture.get_rect()
 
 # sarna size
-sarna_width = 50
-sarna_height = 30
+animal_width = 50
+animal_height = 30
 # sarna texture
-sarna_texture = pygame.transform.scale(
-    pygame.image.load("textures/sarna.png"), (bones_width, bones_height)
+animal_texture = pygame.transform.scale(
+    pygame.image.load("textures/sarna.png"), (animal_width, animal_height)
 )
 # sarna rect
-sarna_rect = sarna_texture.get_rect()
+animal_rect = animal_texture.get_rect()
 
 # dead tree size
 dead_tree_width = 70
@@ -543,6 +545,8 @@ def stop_sound(sound: Any) -> None:
 
 # game intro
 def start() -> None:
+    pass
+    '''
     # shows all intro slaids and play intro music refresh screen beetween intro slaids
     window.blit(olchastudio, (1, 1))
     intro_sound.play()
@@ -567,31 +571,24 @@ def start() -> None:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_SPACE]:
                 waiting = False
-                stop_sound(intro_sound)
+                stop_sound(intro_sound)'''
 
 
 # deadscreen
-def deadscreen() -> None:  # noqa: PLR0915
-    global level  # noqa: PLW0603
-    global points_counter  # noqa: PLW0603
-    global number_devils  # noqa: PLW0603
-    global number_fasts  # noqa: PLW0603
-    global number_mutants  # noqa: PLW0603
-    global number_ghosts  # noqa: PLW0603
-    global number_obstacles  # noqa: PLW0603
-    global p_key_pressed  # noqa: PLW0603
-    global p_key_released  # noqa: PLW0603
-    global o_key_pressed  # noqa: PLW0603
-    global o_key_released  # noqa: PLW0603
-    global i_key_pressed  # noqa: PLW0603
-    global i_key_released  # noqa: PLW0603
-    global m_key_pressed  # noqa: PLW0603
-    global m_key_released  # noqa: PLW0603
-    global powershield  # noqa: PLW0603
-    global speed  # noqa: PLW0603
-    global magazine  # noqa: PLW0603
-    global background  # noqa: PLW0603
-    global gun_on  # noqa: PLW0603
+def deadscreen(  # noqa: PLR0913
+    level: int,
+    points_counter: int,
+    number_devils: int,
+    number_fasts: int,
+    number_mutants: int,
+    number_ghosts: int,
+    number_obstacles: int,
+    powershield: Any,
+    speed: int,
+    magazine: int,
+    background: pygame.Surface,
+    gun_on: Any
+) -> int | Any | pygame.Surface:
     waiting = True
     w8 = True
     # load end of the game screen
@@ -626,55 +623,60 @@ def deadscreen() -> None:  # noqa: PLR0915
     window.blit(points_text, (window_width / 4 - 80, window_height / 4))
     pygame.display.update()
     # when player press space stop showing scores and go into menu
-    while waiting:
-        for _ in pygame.event.get():
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_SPACE]:
-                waiting = False
-                window.blit(menu, (1, 1))
-                pygame.display.update()
-                # when player press space game was started again
-                while w8:
-                    for _ in pygame.event.get():
-                        keys = pygame.key.get_pressed()
-                        if keys[pygame.K_SPACE]:
-                            time.sleep(0.5)
-                            # reset all stats
-                            points_counter = 0
-                            number_devils = 0
-                            number_fasts = 0
-                            number_mutants = 0
-                            number_ghosts = 0
-                            number_obstacles = 8
-                            p_key_pressed = False
-                            p_key_released = True
-                            o_key_pressed = False
-                            o_key_released = True
-                            i_key_pressed = False
-                            i_key_released = True
-                            m_key_pressed = False
-                            m_key_released = True
-                            powershield = False
-                            background = background1
-                            speed = 8
-                            level = 0
-                            gun_on = False
-                            magazine = 0
-                            w8 = False
-                            right.color = (255, 0, 0)
-                            pygame.display.update()
-                            break
-            # if player press escape the game is closed
-            elif keys[pygame.K_ESCAPE]:
-                sys.exit()
+    while waiting:  # noqa: RET503
+            for _ in pygame.event.get():
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_SPACE]:
+                    waiting = False
+                    window.blit(menu, (1, 1))
+                    pygame.display.update()
+                    # when player press space game was started again
+                    while w8:
+                        for _ in pygame.event.get():
+                            keys = pygame.key.get_pressed()
+                            if keys[pygame.K_SPACE]:
+                                time.sleep(0.5)
+                                # reset all stats
+                                points_counter = 0
+                                number_devils = 0
+                                number_fasts = 0
+                                number_mutants = 0
+                                number_ghosts = 0
+                                number_obstacles = 8
+                                powershield = False
+                                background = background1
+                                speed = 8
+                                level = 0
+                                gun_on = False
+                                magazine = 0
+                                w8 = False
+                                right.color = (255, 0, 0)
+                                pygame.display.update()
+                                return (
+                                    level,
+                                    points_counter,
+                                    number_devils,
+                                    number_fasts,
+                                    number_mutants,
+                                    number_ghosts,
+                                    number_obstacles,
+                                    powershield,
+                                    speed,
+                                    magazine,
+                                    background,
+                                    gun_on,
+                                )
+                # if player press escape the game is closed
+                elif keys[pygame.K_ESCAPE]:
+                    sys.exit()
 
 
-# pause the game when player press m
 def pause() -> None:
-    pauza = pygame.image.load("textures/pauza.png")
+    pause_window = pygame.image.load("textures/pause_window.png")
+    pause_window = pygame.transform.scale(pause_window, window.get_size())
     waiting = True
     while waiting:
-        window.blit(pauza, (1, 1))
+        window.blit(pause_window, (1, 1))
         pygame.display.update()
         for _ in pygame.event.get():
             keys = pygame.key.get_pressed()
@@ -684,12 +686,14 @@ def pause() -> None:
 
 
 # if obstacles/enemies colliderect with other or with player generete new x and y
-def collision(lista: list[Any], rect: Any, x: int, y: int) -> tuple[int, int]:
+def collision(
+    lista: list, rect: pygame.Rect, x: int, y: int
+) -> tuple[Any | int, Any | int]:
     collision = True
     while collision:
         collision = False
-        for i in lista:
-            if rect.move(x, y).colliderect(i.rect) or rect.move(x, y).colliderect(
+        for objects in lista:
+            if rect.move(x, y).colliderect(objects.rect) or rect.move(x, y).colliderect(
                 player1_rect
             ):
                 collision = True
@@ -698,29 +702,36 @@ def collision(lista: list[Any], rect: Any, x: int, y: int) -> tuple[int, int]:
                 collision = True
                 break
         if collision:
-            x = random.randint(0, window_width - 90)  # noqa: S311
-            y = random.randint(0, window_height - 150)  # noqa: S311
+            if lista == obstacles_list:
+                x = random.randint(50, window_width - 50)  # noqa: S311
+                y = random.randint(50, window_height - 50)  # noqa: S311
+            else:
+                x = random.randint(150, window_width - 150)  # noqa: S311
+                y = random.randint(150, window_height - 150)  # noqa: S311
     return x, y
 
 
 # loading objects in the map:enemies,obstacles,corpses etc
-def load(quantity: int, objectt: Any, lista: list, rect: Any) -> Any:
-    for _ in range(quantity):
+def load(quantity: int, objectt: Any, lista: list, rect: pygame.Rect) -> None:
+    for obj in range(quantity):
         if lista == obstacles_list:
             if background in (background1, background3, background5):
-                x = random.randint(20, window_width - 20)  # noqa: S311
+                x = random.randint(20, window_width - 20)  # noqa: S311 # type: ignore
                 y = random.randint(20, window_height - 20)  # noqa: S311
             elif background == background2:
                 # obstacles dont spawn on skull
                 x = random.randint(20, window_width - 90)  # noqa: S311
                 y = random.randint(20, window_height - 150)  # noqa: S311
         else:
-            x = random.randint(20, window_width - 90)  # noqa: S311
-            y = random.randint(20, window_height - 150)  # noqa: S311
+            x = random.randint(20, window_width - 20)  # noqa: S311
+            y = random.randint(20, window_height - 20)  # noqa: S311
 
-        if lista == enemy_list:
-            x = random.randint(50, window_width - 50)  # noqa: S311
-            y = random.randint(50, window_height - 50)  # noqa: S311
+        if lista == enemy_list and obj == "mutant":
+            x = random.randint(200, window_width - 200)  # noqa: S311
+            y = random.randint(200, window_height - 200)  # noqa: S311
+        else:
+            x = random.randint(100, window_width - 100)  # noqa: S311
+            y = random.randint(100, window_height - 100)  # noqa: S311
 
         # in boss level are no obstacles and number of enemies are static
         if background != background4:
@@ -728,8 +739,8 @@ def load(quantity: int, objectt: Any, lista: list, rect: Any) -> Any:
             objectt(x, y)
         else:
             # additional security for crash if no enemies in this moment
-            x = random.randint(80, window_width - 80)  # noqa: S311
-            y = random.randint(80, window_height - 80)  # noqa: S311
+            x = random.randint(100, window_width - 100)  # noqa: S311
+            y = random.randint(100, window_height - 100)  # noqa: S311
             x, y = collision(lista, rect, x, y)
             objectt(x, y)
 
@@ -776,20 +787,19 @@ def speed_boost() -> None:
 
 
 # load new obstacles on the map
-def refresh() -> None:
-    global level  # noqa: PLW0603
-    global points_counter  # noqa: PLW0603
+def refresh(level: int, points_counter: int, gold_list: list[Any]) -> int:
     refresh_sound.play()
     refresh_banner = pygame.transform.scale(
         pygame.image.load("textures/refresh.png"), (300, 200)
     )
     window.blit(refresh_banner, (window_width / 2 - 140, window_height / 2 - 140))
-    generate_new_obstacles()
-    generate_new_gold()
+    generate_new_obstacles(obstacles_list)
+    gold_list = generate_new_gold(gold_list)
     points_counter -= 1
     level -= 1
     pygame.display.update()
     time.sleep(1)
+    return level, points_counter, gold_list
 
 
 # activating your shield
@@ -804,18 +814,17 @@ def shield() -> None:
 
 
 # buying ammunition
-def reeload() -> None:
-    global magazine  # noqa: PLW0603
-    global points_counter  # noqa: PLW0603
+def reeload(magazine: int, points_counter: int) -> int:
     reload_sound.play()
-    refresh_banner = pygame.transform.scale(
+    reload_banner = pygame.transform.scale(
         pygame.image.load("textures/reload.png"), (300, 200)
     )
-    window.blit(refresh_banner, (window_width / 2 - 140, window_height / 2 - 140))
+    window.blit(reload_banner, (window_width / 2 - 140, window_height / 2 - 140))
     magazine += 20
     points_counter -= 2
     pygame.display.update()
     time.sleep(1)
+    return magazine, points_counter
 
 
 # border class
@@ -826,7 +835,7 @@ class Border:
         y: int,
         width: int,
         height: int,
-        color: tuple = (255, 0, 0),
+        color: Any = (255, 0, 0),
     ) -> None:
         self.rect = pygame.Rect(x, y, width, height)
         self.color = color
@@ -836,10 +845,7 @@ class Border:
 
 
 # add borders to border list
-def borders() -> list[Any]:
-    borders_list = []
-    global right  # noqa: PLW0603
-
+def borders(borders_list: list[Any]) -> list[Any]:
     up = Border(1, 1, window_width, 1)
     borders_list.append(up)
 
@@ -852,10 +858,10 @@ def borders() -> list[Any]:
     right = Border(window_width - 1, 1, 1, window_height, (255, 0, 0))
     borders_list.append(right)
 
-    return borders_list
+    return borders_list, right
 
 
-borders_list = borders()
+borders_list, right = borders(borders_list)
 
 
 # obstacle class
@@ -870,8 +876,8 @@ class Obstacle:
     def draw(self, surface: pygame.Surface) -> None:
         surface.blit(self.texture, self.rect)
 
-    """when player destroy obstacle save possition to destroyed obstacles list
-    to load destroyed obstacle texture in the same possition"""
+    """when player destroy obstacle save possition to destroyed
+    obstacles list to load destroyed obstacle texture in the same possition"""
 
     def delete(self) -> None:
         destroyed_obstacles_list.append(self)
@@ -880,9 +886,7 @@ class Obstacle:
 
 
 # add obstacles to obstacles list
-def obstacles() -> list[Any]:  # noqa: C901
-    obstacles_list = []
-
+def obstacles(obstacles_list: list[Any]) -> list[Any]:  # noqa: C901
     def tree(xtree: int, ytree: int) -> None:
         tree = Obstacle(xtree, ytree, tree_width, tree_height, tree_texture)
         obstacles_list.append(tree)
@@ -899,9 +903,9 @@ def obstacles() -> list[Any]:  # noqa: C901
         bones = Obstacle(xbones, ybones, bones_width, bones_height, bones_texture)
         obstacles_list.append(bones)
 
-    def sarna(xsarna: int, ysarna: int) -> None:
-        sarna = Obstacle(xsarna, ysarna, sarna_width, sarna_height, sarna_texture)
-        obstacles_list.append(sarna)
+    def animal(xanimal: int, yanimal: int) -> None:
+        animal = Obstacle(xanimal, yanimal, animal_width, animal_height, animal_texture)
+        obstacles_list.append(animal)
 
     def deadtree(xdeadtree: int, ydeadtree: int) -> None:
         deadtree = Obstacle(
@@ -912,7 +916,7 @@ def obstacles() -> list[Any]:  # noqa: C901
     # load obstacles in the map without background 4
     if background == background1:
         load(number_obstacles, tree, obstacles_list, tree_rect)
-        load(number_obstacles - 4, sarna, obstacles_list, sarna_rect)
+        load(number_obstacles - 4, animal, obstacles_list, animal_rect)
         load(number_obstacles - 2, bush, obstacles_list, bush_rect)
         load(number_obstacles - 6, stone, obstacles_list, stone_rect)
 
@@ -920,25 +924,23 @@ def obstacles() -> list[Any]:  # noqa: C901
         load(number_obstacles, deadtree, obstacles_list, dead_tree_rect)
         load(number_obstacles - 2, bones, obstacles_list, bones_rect)
         load(number_obstacles - 1, stone, obstacles_list, stone_rect)
-        load(number_obstacles - 2, sarna, obstacles_list, sarna_rect)
+        load(number_obstacles - 2, animal, obstacles_list, animal_rect)
 
     if background == background3:
-        load(number_obstacles + 4, deadtree, obstacles_list, dead_tree_rect)
-        load(number_obstacles + 6, bones, obstacles_list, bones_rect)
-        load(number_obstacles - 2, sarna, obstacles_list, sarna_rect)
+        load(number_obstacles + 1, deadtree, obstacles_list, dead_tree_rect)
+        load(number_obstacles + 1, bones, obstacles_list, bones_rect)
+        load(number_obstacles - 2, animal, obstacles_list, animal_rect)
     if background == background4:
         pass
     if background == background5:
-        load(number_obstacles - 7, tree, obstacles_list, tree_rect)
         load(number_obstacles - 6, deadtree, obstacles_list, dead_tree_rect)
         load(number_obstacles - 3, bones, obstacles_list, bones_rect)
-        load(number_obstacles - 3, sarna, obstacles_list, sarna_rect)
-        load(number_obstacles - 5, bush, obstacles_list, bush_rect)
+        load(number_obstacles - 3, animal, obstacles_list, animal_rect)
 
     return obstacles_list
 
 
-obstacles_list = obstacles()
+obstacles_list = obstacles(obstacles_list)
 
 
 # enemy class
@@ -965,8 +967,9 @@ class Enemy:
         self.x = self.rect.x
         self.y = self.rect.y
 
-    """enemies colliderete with obstacles and borders (ghost dont colliderect with
-    obstacles) when the enemy touch obstacle he returns to his previous position"""
+    """enemies colliderete with obstacles and borders
+    (ghost dont colliderect with obstacles) when the enemy touch
+    obstacle he returns to his previous position"""
 
     def update(self, obstacles_list: list[Any]) -> None:
         self.prev_pos = self.rect.copy()
@@ -974,15 +977,15 @@ class Enemy:
         self.rect.x += self.speed * self.direction[0]
         self.rect.y += self.speed * self.direction[1]
 
-        for i in obstacles_list:
+        for obstacles in obstacles_list:
             if self.type == "ghost":
                 continue
-            if self.rect.colliderect(i.rect):
+            if self.rect.colliderect(obstacles.rect):
                 self.rect = self.prev_pos
                 break
 
-        for i in borders_list:
-            if self.rect.colliderect(i.rect):
+        for borders in borders_list:
+            if self.rect.colliderect(borders.rect):
                 self.rect = self.prev_pos
                 break
 
@@ -1002,14 +1005,11 @@ class Enemy:
         self.left = left
         self.right = right
         new_direction = self.direction
-        if self.type == "mutant" and new_direction == (1, 0):
-            self.texture = right
-        elif new_direction == (-1, 0):
-            self.texture = left
-        elif self.type == "ghost" and new_direction == (1, 0):
-            self.texture = right
-        elif new_direction == (-1, 0):
-            self.texture = left
+        if self.type in ("mutant", "ghost"):
+            if new_direction == (1, 0):
+                self.texture = right
+            elif new_direction == (-1, 0):
+                self.texture = left
 
     def draw(self, surface: pygame.Surface) -> None:
         surface.blit(self.texture, self.rect)
@@ -1084,9 +1084,9 @@ def enemies() -> list[Any]:  # noqa: C901
         if level % 5 == 0:
             load(number_ghosts, ghost, obstacles_list, ghost_rect)
         elif level % 4 == 0:
-            load(number_mutants, mutant, obstacles_list, mutant_rect)
-        elif level % 3 == 0:
             load(number_fasts, fast, obstacles_list, fast_rect)
+        elif level % 3 == 0:
+            load(number_mutants, mutant, obstacles_list, mutant_rect)
         else:
             load(number_devils, devil, obstacles_list, devil_rect)
 
@@ -1120,7 +1120,7 @@ class Bullet:
         speed: int,
         bullet_width: int,
         bullet_height: int,
-        direction: str,
+        direction: Any,
         texture: Any,
     ) -> None:
         self.x = x
@@ -1136,10 +1136,13 @@ class Bullet:
     def update(self) -> None:
         if self.direction == "left":
             self.rect.move_ip(-self.speed, 0)
+
         elif self.direction == "right":
             self.rect.move_ip(self.speed, 0)
+
         elif self.direction == "top":
             self.rect.move_ip(0, -self.speed)
+
         elif self.direction == "down":
             self.rect.move_ip(0, self.speed)
 
@@ -1179,15 +1182,15 @@ class Boss:
         self.rect.x += self.speed * self.direction[0]
         self.rect.y += self.speed * self.direction[1]
 
-        for i in borders_list:
-            if self.rect.colliderect(i.rect):
+        for borders in borders_list:
+            if self.rect.colliderect(borders.rect):
                 self.rect = self.prev_pos
                 break
         # enemy colliderect with boss
-        for i in enemy_list:
-            offset = (self.rect.x - i.x, self.rect.y - i.y)
-            if i.mask.overlap(mask, offset):
-                i.rect = i.prev_pos
+        for enemies in enemy_list:
+            offset = (self.rect.x - enemies.x, self.rect.y - enemies.y)
+            if enemies.mask.overlap(mask, offset):
+                enemies.rect = enemies.prev_pos
 
         if random.random() < 0.05:  # noqa: S311
             self.change_direction()
@@ -1209,19 +1212,16 @@ class Boss:
 
 
 # add boss to boss list
-def boss() -> list[Any]:
-    global bs  # noqa: PLW0603
-    boss_list = []
+def boss(boss_list: list, bs: Any) -> list[Any]:
     boss = Boss(500, 500, 300, 300, boss_texture, 10, 300)
     boss_list.append(boss)
     bs = True
-    return boss_list
+    return boss_list, bs
 
 
 # creating gold in map and modify levels
-def points() -> list[Any]:
+def points(gold_list: list[Any]) -> list[Any]:
     # gold list
-    gold_list = []
     # gold size
     gold_width = 20
     gold_height = 20
@@ -1255,70 +1255,66 @@ def points() -> list[Any]:
         if level % 2 == 0:
             number_devils += 1
         if level % 3 == 0:
-            number_fasts += 1
-        if level % 4 == 0:
             number_mutants += 1
+        if level % 4 == 0:
+            number_fasts += 1
         if level % 5 == 0:
             number_ghosts += 1
 
     # in boss level gold dont spawn
     if background != background4:
-        gold = load(1, gold, obstacles_list, gold_rect)
+        load(1, gold, obstacles_list, gold_rect)
     return gold_list
 
 
-gold_list = points()
+gold_list = points(gold_list)
 
 
 # clear old list and load new
-def generate_new_obstacles() -> None:
-    global obstacles_list  # noqa: PLW0603
+def generate_new_obstacles(obstacles_list: list[Any]) -> None:
     obstacles_list.clear()
     dead_boss_list.clear()
-    obstacles_list = obstacles()
+    return obstacles(obstacles_list)
 
 
 # clear old list and load new
-def generate_new_gold() -> None:
-    global gold_list  # noqa: PLW0603
+def generate_new_gold(gold_list: list[Any]) -> None:
     gold_list.clear()
-    gold_list = points()
+    return points(gold_list)
 
 
 # update list (dont clear it)
-def generate_new_enemy() -> None:
-    global enemy_list  # noqa: PLW0603
-    enemy_list = enemies()
+def generate_new_enemy() -> list[Any]:
+    return enemies()
 
 
 # load death animation
 def death_animation(death_frames: list[Any], x: int, y: int) -> None:
-    for i in death_frames:
-        window.blit(i, (x, y))
+    for frames in death_frames:
+        window.blit(frames, (x, y))
         pygame.time.wait(50)
         pygame.display.update()
 
 
 # load corpses on screen, adapts to enemy type and way of death
-def corpses() -> None:  # noqa: C901, PLR0912
+def corpses() -> None:  # noqa: C901
     for enemy in dead_enemy_list:
-        if enemy.type == "fast":
-            if enemy.killed_by == "bullet":  # noqa: SIM114
-                window.blit(fast_corpses, (enemy.rect.x - 20, enemy.rect.y - 20))
-            elif enemy.killed_by == "shield":
-                window.blit(fast_corpses, (enemy.rect.x - 20, enemy.rect.y - 20))
-        if enemy.type == "devil":
-            if enemy.killed_by == "bullet":
+        if enemy.killed_by == "bullet":
+            if enemy.type == "devil":
                 window.blit(devil_bullet_corpses, (enemy.rect.x, enemy.rect.y))
-            elif enemy.killed_by == "shield":
-                window.blit(devil_corpses, (enemy.rect.x, enemy.rect.y))
-        if enemy.type == "mutant":
-            if enemy.killed_by == "shield":
-                window.blit(mutant_corpses_shield, (enemy.rect.x, enemy.rect.y))
-            elif enemy.killed_by == "bullet":
-                window.blit(mutant_corpses_bullet, (enemy.rect.x, enemy.rect.y))
+            if enemy.type == "mutant":
+                window.blit(mutant_bullet_corpses, (enemy.rect.x, enemy.rect.y))
+
+        if enemy.killed_by == "shield":
+            if enemy.type == "devil":
+                window.blit(devil_shield_corpses, (enemy.rect.x, enemy.rect.y))
+            if enemy.type == "mutant":
+                window.blit(mutant_shield_corpses, (enemy.rect.x, enemy.rect.y))
+
         if enemy.type == "ghost":
             window.blit(ghost_corpses, (enemy.rect.x, enemy.rect.y))
+        if enemy.type == "fast":
+            window.blit(fast_corpses, (enemy.rect.x - 20, enemy.rect.y - 20))
 
     for boss in dead_boss_list:
         window.blit(boss_corpses, (boss.rect.x, boss.rect.y))
@@ -1331,22 +1327,21 @@ def corpses() -> None:  # noqa: C901, PLR0912
 
 
 # showing on screen level,points,bullets and boss hp on boss lvl
-def status() -> None:
+def status(boss_hp: int) -> None:
     font = pygame.font.Font("font/snap.ttf", 30)
-    points_text = font.render(
-        f"Gold: {points_counter}", True, (255, 0, 0)  # noqa: FBT003
-    )
-    window.blit(points_text, (1750, 10))
-    points_text = font.render(f"Level: {level}", True, (255, 0, 0))  # noqa: FBT003
+    points_text = font.render(f"Gold: {points_counter}", True, (255, 0, 0))  # noqa: FBT003, E501
+    window.blit(points_text, (window_width - 170, 10))
+    points_text = font.render(f"Level: {level}", True, (255, 0, 0))# noqa: FBT003
     window.blit(points_text, (20, 10))
-    points_text = font.render(f"Bullets: {magazine}", True, (255, 0, 0))  # noqa: FBT003
-    window.blit(points_text, (850, 10))
-    # boss HP is the letter l at the bottom of the screen,
-    # which decreases in multiples depending on his health
+    points_text = font.render(f"Bullets: {magazine}", True, (255, 0, 0))# noqa: FBT003
+    window.blit(points_text, (window_width // 2.3, 10))
+    # boss HP is the letter l at the bottom of the screen, which decreases
+    # in multiples depending on his health
     if background == background4:
-        points_str = "l" * boss_hp
-        pointts_text = font.render(points_str, True, (255, 0, 0))  # noqa: FBT003
-        window.blit(pointts_text, (700, 1000))
+        boss_hp_str = "l" * boss_hp
+        boss_hp_text = font.render(boss_hp_str, True, (255, 0, 0))# noqa: FBT003
+        window.blit(boss_hp_text, (window_width // 3, window_height - 80))
+
 
 
 # load start od the game and play game music
@@ -1363,9 +1358,7 @@ while run:
     keys = pygame.key.get_pressed()
     for event in pygame.event.get():
         # click on x in window or escape ending the game
-        if event.type == pygame.QUIT:
-            run = False
-        if keys[pygame.K_ESCAPE]:
+        if event.type == pygame.QUIT or keys[pygame.K_ESCAPE]:
             run = False
 
     # parametr to add or subtract player x and y
@@ -1407,49 +1400,46 @@ while run:
 
     # checking for collisions with borders (borders dont have masks,
     # so checking for collisions with them looks different)
-    for i in borders_list:
-        if player1_rect.colliderect(i):
-            if i == borders_list[0]:
-                y = i.rect.top + 5
-            elif i == borders_list[1]:
-                y = i.rect.bottom - 40
-            elif i == borders_list[2]:
-                x = i.rect.left + 5
-            if right.color == (255, 0, 0) and i == borders_list[3]:
-                x = i.rect.right - 40
+    for border in borders_list:
+        if player1_rect.colliderect(border):
+            if border == borders_list[0]:
+                y = border.rect.top + 5
+            elif border == borders_list[1]:
+                y = border.rect.bottom - 40
+            elif border == borders_list[2]:
+                x = border.rect.left + 5
+            if right.color == (255, 0, 0) and border == borders_list[3]:
+                x = border.rect.right - 40
 
     # abilities events pressed and released is for eliminate double click
     if keys[pygame.K_o]:
-        if o_key_released:
-            if points_counter > 0:
-                o_key_pressed = True
-                refresh()
+        if o_key_released and points_counter > 0:
+            o_key_pressed = True
+            level, points_counter, gold_list = refresh(level, points_counter, gold_list)
             o_key_released = False
         else:
             o_key_pressed = False
             o_key_released = True
 
     if keys[pygame.K_i]:
-        if i_key_released:
-            if points_counter >= 3:
-                i_key_pressed = True
-                shield()
-                points_counter -= 3
-                powershield = True
+        if i_key_released and points_counter >= 3:
+            i_key_pressed = True
+            shield()
+            points_counter -= 3
+            powershield = True
             i_key_released = False
         else:
             i_key_pressed = False
             i_key_released = True
 
     if keys[pygame.K_p]:
-        if p_key_released:
+        if p_key_released and speed <= max_speed and points_counter >= 2:
             p_key_pressed = True
-            if speed <= max_speed and points_counter >= 2:
-                speed_boost()
-                speed += 1
-                points_counter -= 2
-            elif speed == max_speed:
-                speed_boost()
+            speed_boost()
+            speed += 1
+            points_counter -= 2
+        elif speed == max_speed:
+            speed_boost()
             p_key_released = False
         else:
             p_key_pressed = False
@@ -1465,10 +1455,9 @@ while run:
             m_key_released = True
 
     if keys[pygame.K_u]:
-        if u_key_released:
+        if u_key_released and points_counter >= 2:
             u_key_pressed = True
-            if points_counter >= 2:
-                reeload()
+            magazine, points_counter = reeload(magazine, points_counter)
             u_key_released = False
         else:
             u_key_pressed = False
@@ -1502,13 +1491,13 @@ while run:
             right.color = (0, 255, 0)
             gold_list.remove(gold)
 
-    # load new level when player touch green border and change player
-    # possition to left side to make immersion
+    # load new level when player touch green border
+    # and change player possition to left side to make immersion
     if right.color == (0, 255, 0) and player1_rect.colliderect(right.rect):
         background = random_background()
-        generate_new_obstacles()
-        generate_new_gold()
-        generate_new_enemy()
+        obstacles_list = generate_new_obstacles(obstacles_list)
+        gold_list = generate_new_gold(gold_list)
+        enemy_list = generate_new_enemy()
         bullet_fired = True
         right.color = (255, 0, 0)
         x = 0
@@ -1536,7 +1525,7 @@ while run:
         if x == 0:
             load_boss = True
         if load_boss is True:
-            boss_list = boss()
+            boss_list, bs = boss(boss_list, bs)
             load_boss = False
         if bs is True:
             # playing boss level music
@@ -1558,8 +1547,8 @@ while run:
             boss.update()
             window.blit(boss.texture, boss.rect)
             if boss_hp == 0:
-                # if boss hp go to 0 loading boss death effect and
-                # reset number of enemies
+                # if boss hp go to 0 loading boss death effect
+                # and reset number of enemies
                 stop_sound(boss_death_sound)
                 boss_sound.play()
                 boss.delete()
@@ -1581,9 +1570,9 @@ while run:
                     stop_sound(boss_sound)
                     boss_hp = 50
                     background = random_background()
-                    generate_new_obstacles()
-                    generate_new_gold()
-                    generate_new_enemy()
+                    obstacles_list = generate_new_obstacles(obstacles_list)
+                    gold_list = generate_new_gold(gold_list)
+                    enemy_list = generate_new_enemy()
                     bullet_fired = True
                     right.color = (255, 0, 0)
                     x = 0
@@ -1592,10 +1581,36 @@ while run:
                 player_death_sound.play()
                 death_animation(player_dead_animation, x, y)
                 time.sleep(1)
-                deadscreen()
-                generate_new_enemy()
-                generate_new_gold()
-                generate_new_obstacles()
+                (
+                    level,
+                    points_counter,
+                    number_devils,
+                    number_fasts,
+                    number_mutants,
+                    number_ghosts,
+                    number_obstacles,
+                    powershield,
+                    speed,
+                    magazine,
+                    background,
+                    gun_on,
+                ) = deadscreen(
+                    level,
+                    points_counter,
+                    number_devils,
+                    number_fasts,
+                    number_mutants,
+                    number_ghosts,
+                    number_obstacles,
+                    powershield,
+                    speed,
+                    magazine,
+                    background,
+                    gun_on,
+                )
+                enemy_list = generate_new_enemy()
+                gold_list = generate_new_gold(gold_list)
+                obstacles_list = generate_new_obstacles(obstacles_list)
                 pygame.mixer.music.stop()
                 pygame.mixer.music.load("sounds/music.mp3")
                 pygame.mixer.music.set_volume(0.4)
@@ -1662,10 +1677,10 @@ while run:
             player1_rect = pygame.rect.Rect(x, y, 40, 40)
 
     # show level coins bullets
-    status()
+    status(boss_hp)
 
-    """when player press space and any bullet flying in this moment and player
-    have bullets and holds his gun create bullet adapte to bullet direction"""
+    """when player press space and any bullet flying in this moment and
+    player have bullets and holds his gun create bullet adapte to bullet direction"""
     if (
         keys[pygame.K_SPACE]
         and bullet_fired is True
@@ -1685,6 +1700,7 @@ while run:
             bullets_list.append(new_bullet)
             magazine -= 1
             gun_sound.play()
+
         elif bullet_direction == "left":
             new_bullet = Bullet(
                 player1_rect.x,
@@ -1698,6 +1714,7 @@ while run:
             bullets_list.append(new_bullet)
             magazine -= 1
             gun_sound.play()
+
         elif bullet_direction == "top":
             new_bullet = Bullet(
                 player1_rect.x,
@@ -1711,6 +1728,7 @@ while run:
             bullets_list.append(new_bullet)
             magazine -= 1
             gun_sound.play()
+
         elif bullet_direction == "down":
             new_bullet = Bullet(
                 player1_rect.x,
@@ -1730,8 +1748,10 @@ while run:
         enemy.update(obstacles_list)
         if enemy.type == "mutant":
             enemy.mirror(mutant_texture_left_direction, mutant_texture_right_direction)
+
         elif enemy.type == "ghost":
             enemy.mirror(ghost_texture_left_direction, ghost_texture_right_direction)
+
         window.blit(enemy.texture, enemy.rect)
         # when player is close to monsters playing monsters sounds
         if (
@@ -1746,48 +1766,82 @@ while run:
                 player_death_sound.play()
                 death_animation(player_dead_animation, x, y)
                 time.sleep(1)
-                deadscreen()
-                generate_new_enemy()
-                generate_new_gold()
-                generate_new_obstacles()
+                (
+                    level,
+                    points_counter,
+                    number_devils,
+                    number_fasts,
+                    number_mutants,
+                    number_ghosts,
+                    number_obstacles,
+                    powershield,
+                    speed,
+                    magazine,
+                    background,
+                    gun_on,
+                ) = deadscreen(
+                    level,
+                    points_counter,
+                    number_devils,
+                    number_fasts,
+                    number_mutants,
+                    number_ghosts,
+                    number_obstacles,
+                    powershield,
+                    speed,
+                    magazine,
+                    background,
+                    gun_on,
+                )
+                enemy_list = generate_new_enemy()
+                gold_list = generate_new_gold(gold_list)
+                obstacles_list = generate_new_obstacles(obstacles_list)
                 pygame.mixer.music.stop()
                 pygame.mixer.music.load("sounds/music.mp3")
                 pygame.mixer.music.set_volume(0.4)
                 pygame.mixer.music.play(-1)
                 break
-                """when an enemy touches a player and the player has a shield,
-                the enemy is dead enemies have a specific death animation depending
+                """when an enemy touches a player and the player has a shield, the enemy
+                is dead enemies have a specific death animation depending
                 on the type of enemy and how he die"""
             elif powershield is True:
                 enemy.killed_by = "shield"
                 if enemy.type == "fast":
+                    fasts_killed = +1
                     fast_death_sound.play()
                     death_animation(fast_dead_animation, enemy.rect.x, enemy.rect.y)
+
                 elif enemy.type == "devil":
+                    devils_killed = +1
                     devil_death_sound.play()
                     death_animation(devil_dead_animation, enemy.rect.x, enemy.rect.y)
+
                 elif enemy.type == "mutant":
+                    mutants_killed = +1
                     mutant_death_sound.play()
                     death_animation(
-                        mutant_bullet_dead_animation, enemy.rect.x, enemy.rect.y
+                        mutant_shield_dead_animation, enemy.rect.x, enemy.rect.y
                     )
+
                 elif enemy.type == "ghost":
+                    ghosts_killed = +1
                     ghost_death_sound.play()
                     death_animation(ghost_dead_animation, enemy.rect.x, enemy.rect.y)
+
                 enemy.delete()
                 powershield = False
 
     """when the bullet touched an enemy and an obstacle at the same time
-    the game was crashed because there was one bullet in the list and the program wanted
-    to remove it twice so I put a try so that both things would be destroyed and
-    the error would not appear"""
+    the game was crashed because there was one bullet in the list and the program
+    wanted to remove it twice so I put a try so that both things would be destroyed
+    and the error would not appear"""
     for bullet in bullets_list:
         try:
             bullet.update()
             bullet_fired = False
             """#borders have only 1px width, so the bullet can go to the other side
-            so I added that after slightly exceeding the size of the window,
-            the bullet would be deleted"""
+            so I added that after slightly exceeding the size of the window, the bullet
+            would be deleted"""
             if (
                 bullet.rect.left > window_width + 300
                 or bullet.rect.right < 0
@@ -1820,24 +1874,28 @@ while run:
                 if bullet.rect.colliderect(enemy.rect):
                     enemy.killed_by = "bullet"
                     if enemy.type == "fast":
+                        fasts_killed = +1
                         fast_death_sound.play()
                         number_fasts -= 1
                         death_animation(
                             fast_bullet_dead_animation, enemy.rect.x, enemy.rect.y
                         )
                     elif enemy.type == "devil":
+                        devils_killed = +1
                         devil_death_sound.play()
                         death_animation(
                             devil_bullet_dead_animation, enemy.rect.x, enemy.rect.y
                         )
                         number_devils -= 1
                     elif enemy.type == "mutant":
+                        mutants_killed = +1
                         mutant_death_sound.play()
                         death_animation(
-                            mutant_shield_dead_animation, enemy.rect.x, enemy.rect.y
+                            mutant_bullet_dead_animation, enemy.rect.x, enemy.rect.y
                         )
                         number_mutants -= 1
                     elif enemy.type == "ghost":
+                        ghosts_killed = +1
                         ghost_death_sound.play()
                         death_animation(
                             ghost_dead_animation, enemy.rect.x, enemy.rect.y
@@ -1852,22 +1910,25 @@ while run:
 
     # generate new enemies when boss hp run below static values
     if boss_hp == 40:
-        generate_new_enemy()
+        enemy_list = generate_new_enemy()
         boss_hp = 39
         for enemy in enemy_list:
             death_animation(devil_dead_animation, enemy.rect.x, enemy.rect.y)
+
     if boss_hp == 30:
-        generate_new_enemy()
+        enemy_list = generate_new_enemy()
         boss_hp = 29
         for enemy in enemy_list:
             death_animation(devil_dead_animation, enemy.rect.x, enemy.rect.y)
+
     if boss_hp == 20:
-        generate_new_enemy()
+        enemy_list = generate_new_enemy()
         boss_hp = 19
         for enemy in enemy_list:
             death_animation(devil_dead_animation, enemy.rect.x, enemy.rect.y)
+
     if boss_hp == 10:
-        generate_new_enemy()
+        enemy_list = generate_new_enemy()
         boss_hp = 9
         for enemy in enemy_list:
             death_animation(devil_dead_animation, enemy.rect.x, enemy.rect.y)
