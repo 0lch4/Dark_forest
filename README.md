@@ -1,5 +1,4 @@
-# Dark forest
-![GitHub forks](https://img.shields.io/badge/Version-1.6.0-red)
+# Dark forest ![GitHub forks](https://img.shields.io/badge/Version-1.6.0-red)
 
 # Description
 My first project in Python
